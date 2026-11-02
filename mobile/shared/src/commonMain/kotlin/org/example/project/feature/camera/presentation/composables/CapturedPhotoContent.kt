@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -22,21 +23,20 @@ import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.compose.material3.MaterialTheme
-import org.example.project.common.presentation.ui.theme.ScriptLensSpacing
 import org.example.project.common.presentation.ui.composables.buttons.ScriptLensButton
 import org.example.project.common.presentation.ui.composables.buttons.ScriptLensButtonStyle
-import org.example.project.feature.camera.presentation.models.PredictionGlossModel
-import org.example.project.feature.camera.presentation.models.PredictionBoxModel
-import org.example.project.feature.camera.presentation.models.PredictionModel
-import org.example.project.feature.camera.presentation.models.WordPredictionModel
+import org.example.project.common.presentation.ui.theme.ScriptLensSpacing
 import org.example.project.feature.camera.presentation.composables.predictions.PredictionSummary
 import org.example.project.feature.camera.presentation.helpers.decodePhoto
+import org.example.project.feature.camera.presentation.models.PredictionBoxModel
+import org.example.project.feature.camera.presentation.models.PredictionGlossModel
+import org.example.project.feature.camera.presentation.models.PredictionModel
+import org.example.project.feature.camera.presentation.models.WordPredictionModel
 import org.jetbrains.compose.resources.stringResource
 import scriptlens.shared.generated.resources.Res
-import scriptlens.shared.generated.resources.captured_photo_description
-import scriptlens.shared.generated.resources.action_take_new_photo
 import scriptlens.shared.generated.resources.action_choose_another_photo
+import scriptlens.shared.generated.resources.action_take_new_photo
+import scriptlens.shared.generated.resources.captured_photo_description
 
 @Composable
 fun CapturedPhotoContent(
@@ -71,7 +71,7 @@ fun CapturedPhotoContent(
                 Box(
                     modifier = Modifier
                         .matchParentSize()
-                        .transformable(state = transformableState),
+                        .transformable(state = transformableState, canPan = { zoomScale > 1f })
                 ) {
                     Image(
                         bitmap = image,
