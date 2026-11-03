@@ -22,7 +22,7 @@ dependencies = [
 ]
 
 [project.optional-dependencies]
-# Real page reading (KrakenPredictor). Pulls in torch, so it stays out of the default install.
+# KrakenPredictor pulls in torch, so it stays out of the default install
 ml = ["kraken>=7.1.1,<7.2; python_version < '3.14'"]
 
 [project.scripts]

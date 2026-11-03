@@ -14,6 +14,8 @@ from ml.kraken_predictor import (
 from ml.predictor import Prediction
 
 LINE_BOX = (10, 20, 200, 70)
+AB_CD = list("ab cd")
+AB_CD_XS = [30, 50, 90, 130, 170]
 
 
 @pytest.fixture
@@ -26,7 +28,6 @@ def page():
 
 
 def cut(x: float) -> list[list[float]]:
-    """A character position as kraken gives it: a thin polygon at x."""
     return [[x, 20], [x, 70], [x, 70], [x, 20]]
 
 
@@ -38,17 +39,17 @@ def read(labels, xs, page, confidences=None, line=0):
 
 
 def test_splits_the_line_at_spaces(page):
-    words = read(list("ab cd"), [30, 50, 90, 130, 170], page)
+    words = read(AB_CD, AB_CD_XS, page)
     assert [w.text for w in words] == ["ab", "cd"]
 
 
 def test_word_box_runs_between_spaces_and_shrinks_to_the_ink(page):
-    words = read(list("ab cd"), [30, 50, 90, 130, 170], page)
+    words = read(AB_CD, AB_CD_XS, page)
     assert [w.box for w in words] == [(20, 30, 40, 30), (120, 35, 60, 30)]
 
 
 def test_confidence_is_the_mean_of_the_word_characters(page):
-    words = read(list("ab cd"), [30, 50, 90, 130, 170], page, [0.2, 0.4, 1.0, 0.6, 0.8])
+    words = read(AB_CD, AB_CD_XS, page, [0.2, 0.4, 1.0, 0.6, 0.8])
     assert words[0].probabilities == {"ab": pytest.approx(0.3)}
     assert words[1].probabilities == {"cd": pytest.approx(0.7)}
 
@@ -66,7 +67,7 @@ def test_text_is_nfc_for_the_glossary_and_the_frontend(page):
 
 
 def test_words_keep_their_line_number(page):
-    words = read(list("ab cd"), [30, 50, 90, 130, 170], page, line=3)
+    words = read(AB_CD, AB_CD_XS, page, line=3)
     assert {w.line for w in words} == {3}
 
 
@@ -80,12 +81,8 @@ def test_ink_box_without_ink_keeps_the_box():
 
 
 def test_bounds_are_clipped_to_the_page():
-    assert bounds([(-5, 10), (120, 10), (120, 90), (-5, 90)], 100, 80) == (
-        0,
-        10,
-        100,
-        80,
-    )
+    box = bounds([(-5, 10), (120, 10), (120, 90), (-5, 90)], 100, 80)
+    assert box == (0, 10, 100, 80)
 
 
 def test_missing_model_says_where_it_looked(tmp_path):
