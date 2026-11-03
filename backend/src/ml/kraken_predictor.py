@@ -1,5 +1,6 @@
 import io
 import os
+import threading
 import unicodedata
 from collections.abc import Sequence
 from pathlib import Path
@@ -42,8 +43,9 @@ def words_in_line(
 
     kraken gives a position for every character. A word runs from the space
     before it to the space after it (the line edges at the ends) and is then
-    shrunk to the ink inside: that boxes more Eparchos words correctly than the
-    character positions alone. `line_box` is (x0, y0, x1, y1).
+    shrunk to the ink inside: on the Eparchos validation pages that boxes more
+    words correctly than the character positions alone. `line_box` is
+    (x0, y0, x1, y1).
     """
     centers = [(min(p[0] for p in cut) + max(p[0] for p in cut)) / 2 for cut in cuts]
     x0, y0, x1, y1 = line_box
@@ -97,6 +99,9 @@ class KrakenPredictor(AbstractPredictor):
         self.model_name = f"kraken-{path.stem}"
         self.segmenter: Any = SegmentationTaskModel.load_model()
         self.recognizer: Any = RecognitionTaskModel.load_model(path)
+        # kraken keeps per-line scales on the model, so two pages read at once
+        # get each other's character positions
+        self.lock = threading.Lock()
 
     @property
     def model_version(self) -> str:
@@ -107,23 +112,26 @@ class KrakenPredictor(AbstractPredictor):
             RecognitionInferenceConfig,
             SegmentationInferenceConfig,
         )
-        from PIL import Image, ImageOps, UnidentifiedImageError
+        from PIL import Image, ImageOps
 
         try:
             page = ImageOps.exif_transpose(Image.open(io.BytesIO(image)))
-        except UnidentifiedImageError as e:
+        except OSError as e:  # not an image, or a truncated one
             raise ValueError(
                 "Impossible to decode image: invalid or unsupported format."
             ) from e
         gray = np.asarray(page.convert("L"), dtype=np.uint8)
-        segmentation = self.segmenter.predict(
-            page, SegmentationInferenceConfig(accelerator="cpu")
-        )
-        records = self.recognizer.predict(
-            page,
-            segmentation,
-            RecognitionInferenceConfig(accelerator="cpu", num_line_workers=0),
-        )
+        with self.lock:
+            segmentation = self.segmenter.predict(
+                page, SegmentationInferenceConfig(accelerator="cpu")
+            )
+            records = list(
+                self.recognizer.predict(
+                    page,
+                    segmentation,
+                    RecognitionInferenceConfig(accelerator="cpu", num_line_workers=0),
+                )
+            )
         words: list[Prediction] = []
         line = 0
         for record in records:

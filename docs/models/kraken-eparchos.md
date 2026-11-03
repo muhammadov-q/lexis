@@ -6,15 +6,17 @@ The line recognition model behind `KrakenPredictor` in `backend/src/ml/kraken_pr
 
 [Eparchos](https://zenodo.org/records/4095301) (CC BY 4.0): 120 scanned pages of two 16th-century Greek codices, 75 pages of 6791 and 45 of 6971, with the lines and words transcribed in PAGE XML.
 
-The split is fixed per page in `backend/src/ml/data/eparchos_split.json`: 84 train, 12 validation and 24 test pages. Pages are sorted by name, and positions 0 and 5 of every ten go to test, position 3 to validation. Page 6791 (1), the demo page, is a test page. Test pages are not used for training or for picking the checkpoint.
+The split is fixed per page in `backend/src/ml/data/eparchos_split.json`: 84 train, 12 validation and 24 test pages. Pages are sorted by name, and positions 0 and 5 of every ten go to test, position 3 to validation. Page 6791 (1), the demo page, is a test page. Test pages are not used for training, for picking the checkpoint, or for the choices below, which use the validation pages.
 
 Eparchos has line polygons but no baselines, so each line gets a straight baseline at 75% of its height.
 
 ## Training
 
-- Base model: PP-OCRv6 small ([Zenodo 21788405](https://zenodo.org/records/21788405), Apache-2.0), kraken's multilingual CTC line recognizer, 3.2M parameters.
-- kraken 7.1.1 `ketos train`: 6 epochs, batch 4, AdamW, learning rate 2e-4 with cosine decay, augmentation on, NFD normalization, output layer extended with the Eparchos characters (`--resize union`). The epoch with the best validation accuracy (95.6%, epoch 5) was kept.
+- Base model: PP-OCRv6 small ([Zenodo 21788405](https://zenodo.org/records/21788405), Apache-2.0), kraken's multilingual CTC line recognizer, 3.2M parameters. Untrained, it reads the validation pages at the same 36% CER as the Greek minuscule model ([Zenodo 15837901](https://zenodo.org/records/15837901), CC BY-SA); it was picked for its license and because it is made as a base for fine-tuning.
+- kraken 7.1.1 `ketos train`, seed 42: 6 epochs, batch 4, AdamW, learning rate 2e-4 with cosine decay, augmentation on, NFD normalization, output layer extended with the Eparchos characters (`--resize union`). The epoch with the best validation accuracy (95.6%, epoch 5) was kept.
 - About 25 minutes on an M2 Pro laptop GPU (MPS). Cap the GPU memory with `PYTORCH_MPS_HIGH_WATERMARK_RATIO=0.3 PYTORCH_MPS_LOW_WATERMARK_RATIO=0.2`: at batch 16 training took about 20 GB and the laptop started swapping. On macOS `ketos` also needs `TORCHDYNAMO_DISABLE=1`.
+
+- Word boxes (`words_in_line`): on the validation pages, the box from the space before a word to the space after it, shrunk to the ink, boxes 88.7% of the words correctly (IoU of at least 0.5). The character positions alone box 63.8%.
 
 The training and evaluation scripts are not in the repo yet (#80).
 

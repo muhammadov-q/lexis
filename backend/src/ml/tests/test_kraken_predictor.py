@@ -107,6 +107,8 @@ def test_reads_a_rendered_line(digit_image):
 
 
 @needs_model
-def test_bytes_that_are_not_an_image_raise_value_error():
-    with pytest.raises(ValueError, match="decode"):
-        KrakenPredictor().predict(b"not an image")
+def test_broken_images_raise_value_error(digit_image):
+    predictor = KrakenPredictor()
+    for broken in (b"not an image", digit_image[: len(digit_image) // 2]):
+        with pytest.raises(ValueError, match="decode"):
+            predictor.predict(broken)
