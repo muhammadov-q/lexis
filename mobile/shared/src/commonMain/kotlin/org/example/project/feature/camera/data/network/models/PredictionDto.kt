@@ -5,7 +5,7 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class PredictionDto(
-    val predictions: List<DigitDto>,
+    val predictions: List<PredictionItemDto>,
     @SerialName("model_version")
     val modelVersion: String,
 )

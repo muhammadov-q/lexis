@@ -12,15 +12,16 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import org.example.project.common.presentation.ui.theme.ScriptLensSpacing
-import org.example.project.feature.camera.presentation.models.DigitPredictionModel
+import org.example.project.feature.camera.presentation.models.PredictionGlossModel
 import org.example.project.feature.camera.presentation.models.PredictionBoxModel
+import org.example.project.feature.camera.presentation.models.WordPredictionModel
 import org.example.project.common.presentation.ui.theme.ScriptLensColors
 import org.example.project.common.presentation.ui.theme.ScriptLensTypography
 
 @Composable
-fun DigitPredictionItem(
+fun WordPredictionItem(
     modifier: Modifier = Modifier,
-    digitPrediction: DigitPredictionModel
+    digitPrediction: WordPredictionModel
 ) {
     Column(
         modifier = modifier
@@ -30,12 +31,12 @@ fun DigitPredictionItem(
             .size(50.dp),
     ) {
         Text(
-            text = digitPrediction.digit.toString(),
+            text = digitPrediction.text,
             style = ScriptLensTypography.Heading,
             color = ScriptLensColors.Text
         )
         Text(
-            text = digitPrediction.probability,
+            text = "${(digitPrediction.probabilities[digitPrediction.text] ?: 0.0) * 100}%",
             style = ScriptLensTypography.Label,
             color = ScriptLensColors.Border
         )
@@ -46,18 +47,25 @@ fun DigitPredictionItem(
 @Composable
 private fun PredictionItemPreview() {
     MaterialTheme {
-        DigitPredictionItem(
-            digitPrediction = DigitPredictionModel(
-                digit = 7,
-                probability = "87%",
+        WordPredictionItem(
+            digitPrediction = WordPredictionModel(
+                text = "logos",
+                probabilities = mapOf("logos" to 0.87),
                 box = PredictionBoxModel(
                     x = 0.0,
                     y = 0.0,
                     w = 100.0,
                     h = 100.0,
                 ),
+                line = 0,
+                gloss = PredictionGlossModel(
+                    lemma = "logos",
+                    translation = "word",
+                    definition = "A word or statement.",
+                ),
             ),
         )
     }
 }
+
 

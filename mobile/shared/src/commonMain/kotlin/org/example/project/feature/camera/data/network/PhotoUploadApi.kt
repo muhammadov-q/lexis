@@ -23,6 +23,7 @@ class PhotoUploadApi(
 
     suspend fun upload(photo: ByteArray): PredictionDto {
         val endpoint = "${config.baseUrl.trimEnd('/')}/${config.uploadPath.trimStart('/')}"
+        val endpointId = config.uploadPath.trimStart('/').ifBlank { "predict" }
 
         val status: Int
         val body: String
@@ -33,11 +34,12 @@ class PhotoUploadApi(
         } catch (cancellation: CancellationException) {
             throw cancellation
         } catch (exception: Exception) {
-            println("$TAG: no response from $endpoint: $exception")
+            val errorSummary = exception::class.simpleName ?: "Exception"
+            println("$TAG: request failed endpoint=$endpointId status=0 error=$errorSummary")
             throw ApiException(0)
         }
 
-        println("$TAG: response $status")
+        println("$TAG: response endpoint=$endpointId status=$status")
         if (status != HttpStatusCode.OK.value) {
             throw ApiException(status)
         }

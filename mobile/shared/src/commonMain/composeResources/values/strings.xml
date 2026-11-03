@@ -5,8 +5,8 @@
     <string name="nav_source">Source</string>
 
     <!-- Camera screen -->
-    <string name="camera_title">Read handwritten digits</string>
-    <string name="camera_subtitle">Photograph a page and the model finds each digit and reads it.</string>
+    <string name="camera_title">Read historical manuscripts</string>
+    <string name="camera_subtitle">Photograph a page and ScriptLens recognizes words and helps you read the transcription with translations.</string>
     <string name="camera_empty_hint">Lay the page flat in good light JPG, PNG or TIFF</string>
     <string name="captured_photo_description">Uploaded photo with predictions</string>
 
@@ -18,8 +18,14 @@
     <string name="action_retry">Retry</string>
 
     <!-- Prediction summary -->
-    <string name="prediction_digits_read">Digits read</string>
-    <string name="prediction_confidence_label">How sure the model is</string>
+    <string name="prediction_transcription_label">Transcription</string>
+    <string name="prediction_empty_message">No recognizable words were found in this image.</string>
+    <string name="prediction_translation_label">Translation</string>
+    <string name="prediction_select_word_hint">Tap a word in the transcription to view its translation and glossary details.</string>
+    <string name="prediction_recognized_text_label">Recognized text</string>
+    <string name="prediction_lemma_label">Lemma</string>
+    <string name="prediction_definition_label">Definition</string>
+    <string name="prediction_gloss_unavailable">Glossary information unavailable for this word.</string>
 
     <!-- Upload errors -->
     <string name="error_service_offline_title">Recognition service offline</string>

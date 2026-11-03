@@ -7,6 +7,7 @@ data class CameraContract(
     val cameraScreenState: CameraScreenState = CameraScreenState.NoPhotoCaptured,
     val photo: ByteArray? = null,
     val prediction: PredictionModel? = null,
+    val selectedPredictionIndex: Int? = null,
     val isLoading: Boolean = false
 )
 
@@ -17,6 +18,7 @@ sealed interface CameraEvent {
     data object OnPhotoCaptureCancelled : CameraEvent
     data class OnPhotoCaptureFailed(val message: String) : CameraEvent
     data object RetryUploadRequested : CameraEvent
+    data class SelectPrediction(val index: Int) : CameraEvent
 
     data object OnImagePickerProcessingStarted : CameraEvent
 

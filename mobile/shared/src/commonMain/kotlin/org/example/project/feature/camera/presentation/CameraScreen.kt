@@ -45,6 +45,7 @@ fun CameraScreen(viewModel: CameraViewModel) {
         onTakePhotoClicked = { viewModel.onEvent(CameraEvent.CapturePhotoRequested) },
         onChooseFromPhotosClicked = { viewModel.onEvent(CameraEvent.SelectPhotoRequested) },
         onRetryClicked = { viewModel.onEvent(CameraEvent.RetryUploadRequested) },
+        onPredictionSelected = { viewModel.onEvent(CameraEvent.SelectPrediction(it)) },
     )
 
     CameraPreview(
@@ -75,6 +76,7 @@ private fun CameraScreenContent(
     onTakePhotoClicked: () -> Unit,
     onChooseFromPhotosClicked: () -> Unit,
     onRetryClicked: () -> Unit,
+    onPredictionSelected: (Int) -> Unit,
 ) {
     Column(
         modifier = Modifier
@@ -121,6 +123,8 @@ private fun CameraScreenContent(
                             modifier = Modifier.padding(top = ScriptLensSpacing.padding_16),
                             photo = state.photo,
                             prediction = state.prediction,
+                            selectedPredictionIndex = state.selectedPredictionIndex,
+                            onPredictionSelected = onPredictionSelected,
                             onTakeNewPhotoClicked = onTakePhotoClicked,
                             onChooseFromPhotosClicked = onChooseFromPhotosClicked
                         )
@@ -149,6 +153,7 @@ private fun CameraScreenPreview(
             onTakePhotoClicked = {},
             onChooseFromPhotosClicked = {},
             onRetryClicked = {},
+            onPredictionSelected = {},
         )
     }
 }

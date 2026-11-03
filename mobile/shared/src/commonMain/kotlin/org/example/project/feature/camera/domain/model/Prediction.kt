@@ -1,14 +1,16 @@
 package org.example.project.feature.camera.domain.model
 
 data class Prediction(
-    val predictions: List<DigitPrediction>,
+    val predictions: List<WordPrediction>,
     val modelVersion: String,
 )
 
-data class DigitPrediction(
-    val digit: Int,
+data class WordPrediction(
+    val text: String,
     val probabilities: Map<String, Double>,
     val box: PredictionBox,
+    val line: Int,
+    val gloss: PredictionGloss,
 )
 
 data class PredictionBox(
@@ -16,5 +18,11 @@ data class PredictionBox(
     val y: Double,
     val w: Double,
     val h: Double,
+)
+
+data class PredictionGloss(
+    val lemma: String,
+    val translation: String,
+    val definition: String,
 )
 

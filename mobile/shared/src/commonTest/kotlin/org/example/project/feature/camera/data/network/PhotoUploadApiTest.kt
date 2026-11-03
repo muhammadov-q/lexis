@@ -35,7 +35,7 @@ class PhotoUploadApiTest {
     fun successfulUploadParsesThePrediction() = runTest {
         val api = api {
             respond(
-                """{"predictions":[{"digit":7,"probabilities":{"7":0.9},"box":{"x":1,"y":2,"w":3,"h":4}}],"model_version":"v1"}""",
+                """{"predictions":[{"text":"λόγος","probabilities":{"λόγος":0.96,"λόγον":0.04},"box":{"x":1,"y":2,"w":3,"h":4},"line":0,"gloss":{"lemma":"λόγος","translation":"word","definition":"A word."}}],"model_version":"v1"}""",
                 HttpStatusCode.OK,
                 jsonHeaders,
             )
@@ -44,7 +44,9 @@ class PhotoUploadApiTest {
         val result = api.upload(byteArrayOf(1, 2, 3))
 
         assertEquals("v1", result.modelVersion)
-        assertEquals(7, result.predictions.single().digit)
+        assertEquals("λόγος", result.predictions.single().text)
+        assertEquals(0, result.predictions.single().line)
+        assertEquals("word", result.predictions.single().gloss?.translation)
     }
 
     @Test
@@ -64,6 +66,55 @@ class PhotoUploadApiTest {
         assertEquals(HttpMethod.Post, method)
         assertEquals("http://localhost:8000/predict", url)
         assertTrue(body.contains("name=image"), body)
+    }
+
+    @Test
+    fun uploadUsesJpegMimeTypeAndFilename() = runTest {
+        var body = ""
+        val api = api { request ->
+            body = request.body.toByteArray().decodeToString()
+            respond("""{"predictions":[],"model_version":"v1"}""", HttpStatusCode.OK, jsonHeaders)
+        }
+
+        api.upload(byteArrayOf(1, 2, 3))
+
+        assertTrue(body.contains("image/jpeg"), body)
+        assertTrue(body.contains("filename=\"photo.jpg\""), body)
+    }
+
+    @Test
+    fun successfulUploadAllowsNullGloss() = runTest {
+        val api = api {
+            respond(
+                """{"predictions":[{"text":"λόγος","probabilities":{"λόγος":1.0},"box":{"x":1,"y":2,"w":3,"h":4},"line":0,"gloss":null}],"model_version":"v1"}""",
+                HttpStatusCode.OK,
+                jsonHeaders,
+            )
+        }
+
+        val result = api.upload(byteArrayOf(1, 2, 3))
+
+        assertEquals("λόγος", result.predictions.single().text)
+        assertEquals(null, result.predictions.single().gloss)
+    }
+
+    @Test
+    fun successfulUploadAllowsNullGlossFields() = runTest {
+        val api = api {
+            respond(
+                """{"predictions":[{"text":"λόγος","probabilities":{"λόγος":1.0},"box":{"x":1,"y":2,"w":3,"h":4},"line":0,"gloss":{"lemma":null,"translation":null,"definition":null}}],"model_version":"v1"}""",
+                HttpStatusCode.OK,
+                jsonHeaders,
+            )
+        }
+
+        val result = api.upload(byteArrayOf(1, 2, 3))
+        val gloss = result.predictions.single().gloss
+
+        assertEquals("λόγος", result.predictions.single().text)
+        assertEquals(null, gloss?.lemma)
+        assertEquals(null, gloss?.translation)
+        assertEquals(null, gloss?.definition)
     }
 
     @Test

@@ -1,85 +1,77 @@
 package org.example.project.feature.camera.presentation.composables
 
 import androidx.compose.foundation.Canvas
-import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.BoxWithConstraints
+import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.offset
-import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.drawscope.Stroke
-import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.layout.onSizeChanged
+import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
-import org.example.project.common.presentation.ui.theme.ScriptLensSpacing
-import org.example.project.feature.camera.presentation.models.PredictionModel
 import org.example.project.common.presentation.ui.theme.ScriptLensColors
-import org.example.project.common.presentation.ui.theme.ScriptLensTypography
+import org.example.project.feature.camera.presentation.models.PredictionModel
 
 @Composable
 fun PredictionOverlay(
     image: ImageBitmap,
     prediction: PredictionModel?,
+    selectedPredictionIndex: Int?,
+    onPredictionSelected: (Int) -> Unit,
+    zoomScale: Float,
+    panOffset: Offset,
     modifier: Modifier = Modifier,
 ) {
-    BoxWithConstraints(modifier = modifier) {
-        Canvas(modifier = Modifier.fillMaxSize()) {
-            val scaleX = size.width / image.width
-            val scaleY = size.height / image.height
+    var containerSize by remember { mutableStateOf(IntSize.Zero) }
+    val predictions = prediction?.predictions.orEmpty()
 
-            prediction?.predictions?.forEach { digitPrediction ->
-                val box = digitPrediction.box
-                val topLeft = Offset(
-                    (box.x * scaleX).toFloat(),
-                    (box.y * scaleY).toFloat(),
-                )
-                val boxSize = Size(
-                    (box.w * scaleX).toFloat(),
-                    (box.h * scaleY).toFloat(),
-                )
+    Canvas(
+        modifier = modifier
+            .fillMaxSize()
+            .onSizeChanged { containerSize = it }
+            .pointerInput(predictions, zoomScale, panOffset, containerSize) {
+                detectTapGestures { tap ->
+                    if (containerSize.width == 0 || containerSize.height == 0 || predictions.isEmpty()) return@detectTapGestures
+                    selectPredictionIndexForTap(
+                        tap = tap,
+                        predictions = predictions,
+                        imageSize = IntSize(image.width, image.height),
+                        containerSize = containerSize,
+                        zoomScale = zoomScale,
+                        panOffset = panOffset,
+                    )?.let(onPredictionSelected)
+                }
+            },
+    ) {
+        val selectedWord = selectedPredictionIndex
+            ?.takeIf { it in predictions.indices }
+            ?.let { predictions[it] }
 
-                drawRect(
-                    color = ScriptLensColors.Subtext,
-                    topLeft = topLeft,
-                    size = boxSize,
-                    style = Stroke(width = 3.dp.toPx()),
-                )
-                drawRect(
-                    color = ScriptLensColors.Accent,
-                    topLeft = topLeft,
-                    size = boxSize,
-                    style = Stroke(width = 2.dp.toPx()),
-                )
-            }
-        }
+        selectedWord?.let { word ->
+            val rect = overlayRectForImageBox(
+                x = word.box.x,
+                y = word.box.y,
+                w = word.box.w,
+                h = word.box.h,
+                imageSize = IntSize(image.width, image.height),
+                containerSize = IntSize(size.width.toInt(), size.height.toInt()),
+                zoomScale = zoomScale,
+                panOffset = panOffset,
+            ) ?: return@let
 
-        val density = LocalDensity.current
-        val scaleX = with(density) { maxWidth.toPx() } / image.width
-        val scaleY = with(density) { maxHeight.toPx() } / image.height
-        prediction?.predictions?.forEach { digitPrediction ->
-            Text(
-                text = digitPrediction.digit.toString(),
-                color = ScriptLensColors.Text,
-                style = ScriptLensTypography.Caption,
-                modifier = Modifier
-                    .offset(
-                        x = with(density) {
-                            (digitPrediction.box.x * scaleX).toFloat().toDp()
-                        },
-                        y = with(density) {
-                            (digitPrediction.box.y * scaleY)
-                                .toFloat()
-                                .toDp() - 18.dp
-                        },
-                    )
-                    .background(ScriptLensColors.Accent)
-                    .padding(horizontal = ScriptLensSpacing.padding_8, vertical = ScriptLensSpacing.padding_4),
+            drawRect(
+                color = ScriptLensColors.Accent,
+                topLeft = rect.topLeft,
+                size = rect.size,
+                style = Stroke(width = 1.5.dp.toPx()),
             )
         }
     }
 }
-
