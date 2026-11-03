@@ -2,12 +2,14 @@ import os
 
 from ml.eparchos_predictor import EparchosPredictor
 from ml.knn_predictor import KnnPredictor
+from ml.kraken_predictor import KrakenPredictor
 from ml.predictor import AbstractPredictor, DummyPredictor
 
 PREDICTORS: dict[str, type[AbstractPredictor]] = {
     "dummy": DummyPredictor,
     "knn": KnnPredictor,
     "eparchos": EparchosPredictor,
+    "kraken": KrakenPredictor,
 }
 
 
