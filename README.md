@@ -63,6 +63,7 @@ Built for the Advanced Software Engineering MSc course at the University of Frib
 | Resource | Location |
 |---|---|
 | Midterm Presentation | [Presentation Slides](docs/presentations/mid-term-2026.pptx) |
+| Demo Video | [Web app demo, 2 min](docs/presentations/demo-2026.mp4) |
 | User Stories | [GitHub Issues](docs/workflow/issues.md) |
 | Architecture & Design | [Documentation](docs/architecture/README.md) |
 | Machine Learning | [ML Documentation](docs/ml/README.md) |
