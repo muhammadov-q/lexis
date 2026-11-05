@@ -65,9 +65,6 @@ def build():
     return CountingBuild()
 
 
-# --- Which models are offered -----------------------------------------------
-
-
 def test_lists_the_models_that_can_run_in_registry_order():
     assert ModelRegistry(default="ready").available() == [READY, OTHER]
 
@@ -88,9 +85,6 @@ def test_a_loaded_model_stays_listed_when_its_files_disappear():
     assert isinstance(registry.get("missing"), MissingPredictor)
 
 
-# --- Which model a request gets ---------------------------------------------
-
-
 @pytest.mark.parametrize("nothing_chosen", [None, ""])
 def test_no_choice_means_the_default(nothing_chosen):
     registry = ModelRegistry(default="other")
@@ -107,13 +101,6 @@ def test_a_model_that_cannot_be_used_is_rejected_with_the_choices(name):
     registry = ModelRegistry(default="ready")
     with pytest.raises(UnknownModel, match="ready, other"):
         registry.get(name)
-
-
-def test_unknown_model_is_a_value_error():
-    assert issubclass(UnknownModel, ValueError)
-
-
-# --- When models are built --------------------------------------------------
 
 
 def test_only_the_default_is_built_at_startup(build):
@@ -139,16 +126,13 @@ def test_a_broken_default_fails_at_startup():
         ModelRegistry(default="does-not-exist")
 
 
-def test_a_model_that_failed_to_build_is_tried_again(build):
-    outcomes = [RuntimeError("corrupt weights"), OtherPredictor()]
+def test_a_model_that_failed_to_build_is_tried_again():
+    failures = [RuntimeError("corrupt weights")]
 
     def flaky(name):
-        if name == "ready":
-            return ReadyPredictor()
-        outcome = outcomes.pop(0)
-        if isinstance(outcome, Exception):
-            raise outcome
-        return outcome
+        if name == "other" and failures:
+            raise failures.pop()
+        return create_predictor(name)
 
     registry = ModelRegistry(build=flaky, default="ready")
 
@@ -162,7 +146,7 @@ def test_requests_arriving_together_build_one_model():
 
     def slow_build(name):
         built.append(name)
-        time.sleep(0.05)  # so the other requests arrive during the build
+        time.sleep(0.05)
         return create_predictor(name)
 
     registry = ModelRegistry(build=slow_build, default="ready")

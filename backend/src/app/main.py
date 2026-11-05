@@ -63,7 +63,6 @@ def list_models(
     responses=UPLOAD_ERRORS,
 )
 async def predict(
-    # In this order, so a rejected upload doesn't load the chosen model
     content: Annotated[bytes, Depends(capped_image)],
     predictor: Annotated[AbstractPredictor, Depends(get_predictor)],
 ) -> PredictResponse:

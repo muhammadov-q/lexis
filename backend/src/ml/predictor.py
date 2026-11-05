@@ -24,7 +24,6 @@ class AbstractPredictor(ABC):
 
     @classmethod
     def is_available(cls) -> bool:
-        """Whether this install can run the model, checked without loading it."""
         return True
 
     @property

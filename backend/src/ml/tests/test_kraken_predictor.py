@@ -1,12 +1,10 @@
 import unicodedata
-from importlib.util import find_spec
 
 import numpy as np
 import pytest
 
 from ml.kraken_predictor import (
     BASE_MODEL_PATH,
-    MODEL_PATH,
     KrakenBasePredictor,
     KrakenPredictor,
     bounds,
@@ -137,7 +135,7 @@ def test_base_model_is_available_once_downloaded(monkeypatch, tmp_path):
 
 
 needs_model = pytest.mark.skipif(
-    find_spec("kraken") is None or not MODEL_PATH.exists(),
+    not KrakenPredictor.is_available(),
     reason="needs the ml extra and the kraken model, see backend/README.md",
 )
 

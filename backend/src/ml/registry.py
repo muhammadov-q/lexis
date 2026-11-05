@@ -18,13 +18,6 @@ class ModelInfo:
 
 
 class ModelRegistry:
-    """
-    The models a request can choose from. The default is built right away, so a
-    broken setup fails at startup. The others are built on first use, then shared
-    and kept: kraken takes seconds and gigabytes to load, and its lock only works on
-    one instance.
-    """
-
     def __init__(
         self,
         build: Callable[[str], AbstractPredictor] = create_predictor,

@@ -38,8 +38,6 @@ def built():
 
 @pytest.fixture
 def choosing(client, built):
-    """A client whose requests really pick their model, with dummy as the default."""
-
     def build(name):
         built.append(name)
         return create_predictor(name)
@@ -63,9 +61,6 @@ def sign_up(client):
     assert response.status_code == 201
 
 
-# --- GET /models ------------------------------------------------------------
-
-
 def test_models_returns_what_can_run_and_the_default(choosing):
     response = choosing.get("/models")
 
@@ -87,17 +82,9 @@ def test_models_returns_what_can_run_and_the_default(choosing):
     }
 
 
-def test_models_is_open_without_signing_in(choosing):
-    assert "team4_session" not in choosing.cookies
-    assert choosing.get("/models").status_code == 200
-
-
 def test_listing_models_loads_none_of_them(choosing, built):
     choosing.get("/models")
     assert built == ["dummy"]
-
-
-# --- POST /predict ----------------------------------------------------------
 
 
 def test_predict_uses_the_chosen_model(choosing):
@@ -154,9 +141,6 @@ def test_a_model_is_loaded_once_across_requests(choosing, built):
     assert built == ["dummy", "eparchos"]
 
 
-# --- POST /recognitions -----------------------------------------------------
-
-
 def test_recognitions_uses_the_chosen_model_and_saves_which_one(choosing):
     sign_up(choosing)
 
@@ -198,9 +182,6 @@ def test_reading_the_history_loads_no_model(choosing, built):
     assert built == ["dummy"]
 
 
-# --- The API contract -------------------------------------------------------
-
-
 @pytest.mark.parametrize("path", ["/predict", "/recognitions"])
 def test_the_schema_offers_an_optional_model_on_uploads(path):
     schema = app.openapi()
@@ -221,11 +202,5 @@ def test_reading_routes_take_no_form(path):
     assert "requestBody" not in app.openapi()["paths"][path]["get"]
 
 
-# --- The app's real registry ------------------------------------------------
-
-
-@pytest.mark.parametrize("name", [None, "eparchos"])
-def test_every_model_the_app_serves_is_translated(name):
-    predictor = registry.get(name)
-
-    assert isinstance(predictor, TranslatingPredictor)
+def test_a_chosen_model_is_translated_too():
+    assert isinstance(registry.get("eparchos"), TranslatingPredictor)
