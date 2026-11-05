@@ -1,5 +1,5 @@
 from app.main import app
-from app.prediction import get_predictor, predictor
+from app.prediction import get_predictor, registry
 from app.uploads import MAX_FILE_SIZE
 from ml.eparchos_predictor import EparchosPredictor
 from ml.predictor import AbstractPredictor, Prediction
@@ -26,6 +26,7 @@ def upload(client, filename, content, content_type):
 
 
 def test_the_app_translates_what_its_predictor_reads():
+    predictor = registry.get()
     assert isinstance(predictor, TranslatingPredictor)
     assert isinstance(predictor.translator, GlossaryTranslator)
 

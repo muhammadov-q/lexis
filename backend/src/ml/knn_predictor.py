@@ -21,6 +21,13 @@ class DigitClassifier(Protocol):
 
 
 class KnnPredictor(AbstractPredictor):
+    display_name = "Handwritten digits (k-NN)"
+    description = "Finds and reads handwritten digits. Not made for manuscripts."
+
+    @classmethod
+    def is_available(cls) -> bool:
+        return MODEL_PATH.exists()
+
     def __init__(self) -> None:
         super().__init__()
         self.model_name = "KNN-100126"

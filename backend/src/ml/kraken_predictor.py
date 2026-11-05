@@ -3,6 +3,7 @@ import os
 import threading
 import unicodedata
 from collections.abc import Sequence
+from importlib.util import find_spec
 from pathlib import Path
 from typing import Any
 
@@ -15,6 +16,10 @@ from ml.predictor import AbstractPredictor, Box, Prediction
 MODEL_PATH = Path(__file__).resolve().parent / "models" / "kraken_eparchos.safetensors"
 
 Polygon = Sequence[Sequence[float]]
+
+
+def configured_model_path() -> Path:
+    return Path(os.getenv("KRAKEN_MODEL", str(MODEL_PATH)))
 
 
 def ink_box(page: NDArray[np.uint8], x0: int, y0: int, x1: int, y1: int) -> Box:
@@ -76,9 +81,19 @@ def bounds(polygon: Polygon, width: int, height: int) -> tuple[int, int, int, in
 
 
 class KrakenPredictor(AbstractPredictor):
+    display_name = "Kraken, fine-tuned on Eparchos"
+    description = (
+        "Reads 16th-century Greek handwriting. A page takes several seconds, "
+        "and the first one longer while the model loads."
+    )
+
+    @classmethod
+    def is_available(cls) -> bool:
+        return find_spec("kraken") is not None and configured_model_path().exists()
+
     def __init__(self, model_path: Path | None = None) -> None:
         super().__init__()
-        path = model_path or Path(os.getenv("KRAKEN_MODEL", str(MODEL_PATH)))
+        path = model_path or configured_model_path()
         if not path.exists():
             raise FileNotFoundError(f"No kraken model at {path}, see backend/README.md")
 

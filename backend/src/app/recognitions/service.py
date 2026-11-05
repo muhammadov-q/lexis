@@ -18,15 +18,15 @@ class RecognitionService:
     def __init__(
         self,
         repository: RecognitionRepository,
-        predictor: AbstractPredictor,
         clock: Callable[[], datetime] = lambda: datetime.now(UTC),
     ) -> None:
         self._repository = repository
-        self._predictor = predictor
         self._clock = clock
 
-    def recognize(self, user_id: int, upload: ImageUpload) -> Recognition:
-        results = self._predictor.predict(upload.content)
+    def recognize(
+        self, user_id: int, upload: ImageUpload, predictor: AbstractPredictor
+    ) -> Recognition:
+        results = predictor.predict(upload.content)
         return self._repository.add(
             Recognition(
                 user_id=user_id,
@@ -34,7 +34,7 @@ class RecognitionService:
                 filename=upload.filename[:MAX_FILENAME_LENGTH],
                 content_type=upload.content_type,
                 image=upload.content,
-                model_version=self._predictor.model_version,
+                model_version=predictor.model_version,
                 predictions=[PredictionItem.of(r).model_dump() for r in results],
             )
         )

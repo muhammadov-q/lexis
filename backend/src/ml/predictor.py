@@ -1,5 +1,6 @@
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
+from typing import ClassVar
 
 from ml.translator import Gloss
 
@@ -18,6 +19,14 @@ class Prediction:
 class AbstractPredictor(ABC):
     """Base class for every model that predicts the content of an image."""
 
+    display_name: ClassVar[str] = ""
+    description: ClassVar[str] = ""
+
+    @classmethod
+    def is_available(cls) -> bool:
+        """Whether this install can run the model, checked without loading it."""
+        return True
+
     @property
     @abstractmethod
     def model_version(self) -> str:
@@ -30,6 +39,9 @@ class AbstractPredictor(ABC):
 
 class DummyPredictor(AbstractPredictor):
     """Placeholder: ignores the image and always returns the dummy digits."""
+
+    display_name = "Mock digits"
+    description = "Ignores the page and returns the same six digits. For testing."
 
     def __init__(self) -> None:
         super().__init__()
