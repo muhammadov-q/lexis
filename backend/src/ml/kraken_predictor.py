@@ -89,7 +89,7 @@ class KrakenPredictor(AbstractPredictor):
 
     @classmethod
     def is_available(cls) -> bool:
-        return find_spec("kraken") is not None and configured_model_path().exists()
+        return find_spec("kraken") is not None and configured_model_path().is_file()
 
     def __init__(self, model_path: Path | None = None) -> None:
         super().__init__()

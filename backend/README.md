@@ -75,7 +75,7 @@ To read the uploaded page for real, run the `kraken` predictor. It needs the opt
 ```bash
 cd backend
 uv sync --extra ml
-curl -L -o src/ml/models/kraken_eparchos.safetensors \
+curl -fL -o src/ml/models/kraken_eparchos.safetensors \
   https://github.com/muhammadov-q/team4/releases/download/model-kraken-eparchos-v1/kraken_eparchos.safetensors
 ML_PREDICTOR="kraken" uv run uvicorn app.main:app --reload
 ```

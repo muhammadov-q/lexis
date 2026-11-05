@@ -1,4 +1,5 @@
 import threading
+import time
 from concurrent.futures import ThreadPoolExecutor
 from unittest.mock import patch
 
@@ -156,8 +157,15 @@ def test_a_model_that_failed_to_build_is_tried_again(build):
     assert isinstance(registry.get("other"), OtherPredictor)
 
 
-def test_requests_arriving_together_build_one_model(build):
-    registry = ModelRegistry(build=build, default="ready")
+def test_requests_arriving_together_build_one_model():
+    built = []
+
+    def slow_build(name):
+        built.append(name)
+        time.sleep(0.05)  # so the other requests arrive during the build
+        return create_predictor(name)
+
+    registry = ModelRegistry(build=slow_build, default="ready")
     barrier = threading.Barrier(8)
 
     def first_use(_):
@@ -167,7 +175,7 @@ def test_requests_arriving_together_build_one_model(build):
     with ThreadPoolExecutor(max_workers=8) as pool:
         predictors = list(pool.map(first_use, range(8)))
 
-    assert build.built == ["ready", "other"]
+    assert built == ["ready", "other"]
     assert all(predictor is predictors[0] for predictor in predictors)
 
 

@@ -112,6 +112,13 @@ def test_not_available_without_the_extra(monkeypatch, tmp_path):
     assert not KrakenPredictor.is_available()
 
 
+@pytest.mark.parametrize("path", ["", "."])
+def test_not_available_when_the_path_is_not_a_file(monkeypatch, path):
+    monkeypatch.setenv("KRAKEN_MODEL", path)
+    monkeypatch.setattr("ml.kraken_predictor.find_spec", lambda _: object())
+    assert not KrakenPredictor.is_available()
+
+
 needs_model = pytest.mark.skipif(
     find_spec("kraken") is None or not MODEL_PATH.exists(),
     reason="needs the ml extra and the kraken model, see backend/README.md",
