@@ -1,6 +1,6 @@
 # Model cards
 
-One card per model we use, named after the model: [[models/KNN]] and [[models/kraken-eparchos]].
+One card per model we use, named after the model: [[models/KNN]], [[models/kraken-eparchos]] and [[models/ppocrv6-small]].
 
 ## Template
 

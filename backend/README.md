@@ -82,6 +82,14 @@ ML_PREDICTOR="kraken" uv run uvicorn app.main:app --reload
 
 `KRAKEN_MODEL=/path/to/model.safetensors` uses another kraken recognition model.
 
+To compare, `kraken-base` reads with the same model before fine-tuning ([model card](../docs/models/ppocrv6-small.md)). It needs the `ml` dependencies too, and its own weights from Zenodo:
+
+```bash
+cd backend
+curl -fL -o src/ml/models/ppocrv6_small.safetensors \
+  https://zenodo.org/records/21788405/files/small.safetensors
+```
+
 ## Choose a model
 
 `ML_PREDICTOR` sets the default model, and a request can pick another one:
@@ -95,7 +103,7 @@ curl -F image=@page.png -F model=kraken http://localhost:8000/predict
 
 `model_version` in the response says which model read the page, and the results history saves it.
 
-The default model loads when the API starts, the others on their first page, which takes a few seconds longer. A loaded model stays in memory until the API stops. kraken takes about 4 GB.
+The default model loads when the API starts, the others on their first page, which takes a few seconds longer. A loaded model stays in memory until the API stops. On a laptop, kraken took 4 to 5 GB while reading, and about 5.5 GB with both kraken models loaded.
 
 To add a model, add its predictor to `PREDICTORS` in `src/ml/factory.py`. Give it a `display_name`, a `description` and, if it needs files, an `is_available`.
 

@@ -2,12 +2,13 @@ import os
 
 from ml.eparchos_predictor import EparchosPredictor
 from ml.knn_predictor import KnnPredictor
-from ml.kraken_predictor import KrakenPredictor
+from ml.kraken_predictor import KrakenBasePredictor, KrakenPredictor
 from ml.predictor import AbstractPredictor, DummyPredictor
 
 # GET /models lists them in this order, so the real readers come first
 PREDICTORS: dict[str, type[AbstractPredictor]] = {
     "kraken": KrakenPredictor,
+    "kraken-base": KrakenBasePredictor,
     "knn": KnnPredictor,
     "eparchos": EparchosPredictor,
     "dummy": DummyPredictor,

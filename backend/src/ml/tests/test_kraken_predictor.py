@@ -5,7 +5,9 @@ import numpy as np
 import pytest
 
 from ml.kraken_predictor import (
+    BASE_MODEL_PATH,
     MODEL_PATH,
+    KrakenBasePredictor,
     KrakenPredictor,
     bounds,
     ink_box,
@@ -117,6 +119,21 @@ def test_not_available_when_the_path_is_not_a_file(monkeypatch, path):
     monkeypatch.setenv("KRAKEN_MODEL", path)
     monkeypatch.setattr("ml.kraken_predictor.find_spec", lambda _: object())
     assert not KrakenPredictor.is_available()
+
+
+def test_base_model_ignores_the_fine_tuned_model_setting(monkeypatch, tmp_path):
+    monkeypatch.setenv("KRAKEN_MODEL", str(tmp_path / "other.safetensors"))
+    assert KrakenBasePredictor.weights_path() == BASE_MODEL_PATH
+
+
+def test_base_model_is_available_once_downloaded(monkeypatch, tmp_path):
+    weights = tmp_path / "base.safetensors"
+    monkeypatch.setattr("ml.kraken_predictor.BASE_MODEL_PATH", weights)
+    monkeypatch.setattr("ml.kraken_predictor.find_spec", lambda _: object())
+    assert not KrakenBasePredictor.is_available()
+
+    weights.touch()
+    assert KrakenBasePredictor.is_available()
 
 
 needs_model = pytest.mark.skipif(

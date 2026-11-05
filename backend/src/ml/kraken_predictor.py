@@ -14,12 +14,9 @@ from numpy.typing import NDArray
 from ml.predictor import AbstractPredictor, Box, Prediction
 
 MODEL_PATH = Path(__file__).resolve().parent / "models" / "kraken_eparchos.safetensors"
+BASE_MODEL_PATH = MODEL_PATH.with_name("ppocrv6_small.safetensors")
 
 Polygon = Sequence[Sequence[float]]
-
-
-def configured_model_path() -> Path:
-    return Path(os.getenv("KRAKEN_MODEL", str(MODEL_PATH)))
 
 
 def ink_box(page: NDArray[np.uint8], x0: int, y0: int, x1: int, y1: int) -> Box:
@@ -88,12 +85,16 @@ class KrakenPredictor(AbstractPredictor):
     )
 
     @classmethod
+    def weights_path(cls) -> Path:
+        return Path(os.getenv("KRAKEN_MODEL", str(MODEL_PATH)))
+
+    @classmethod
     def is_available(cls) -> bool:
-        return find_spec("kraken") is not None and configured_model_path().is_file()
+        return find_spec("kraken") is not None and cls.weights_path().is_file()
 
     def __init__(self, model_path: Path | None = None) -> None:
         super().__init__()
-        path = model_path or configured_model_path()
+        path = model_path or self.weights_path()
         if not path.exists():
             raise FileNotFoundError(f"No kraken model at {path}, see backend/README.md")
 
@@ -150,3 +151,15 @@ class KrakenPredictor(AbstractPredictor):
                 words += line_words
                 line += 1
         return words
+
+
+class KrakenBasePredictor(KrakenPredictor):
+    display_name = "Kraken, not fine-tuned"
+    description = (
+        "The general PP-OCRv6 model, before we fine-tuned it. Use it to compare: "
+        "on Eparchos pages it gets about one letter in three wrong."
+    )
+
+    @classmethod
+    def weights_path(cls) -> Path:
+        return BASE_MODEL_PATH
