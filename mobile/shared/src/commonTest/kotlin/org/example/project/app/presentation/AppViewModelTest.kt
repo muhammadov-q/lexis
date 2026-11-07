@@ -3,6 +3,7 @@ package org.example.project.app.presentation
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.TestScope
 import kotlinx.coroutines.test.advanceUntilIdle
@@ -22,6 +23,7 @@ import scriptlens.shared.generated.resources.auth_error_network
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFalse
+import kotlin.test.assertNull
 import kotlin.test.assertTrue
 
 @OptIn(ExperimentalCoroutinesApi::class)
@@ -32,12 +34,27 @@ class AppViewModelTest {
         val sessionStore = AuthSessionStore()
         val repository = FakeAuthRepository(currentUser = expectedUser, sessionStore = sessionStore)
         val viewModel = createViewModel(repository, sessionStore)
+        var navigationEffect: AppEffect? = null
+        val effectCollector = launch { navigationEffect = viewModel.effects.first() }
 
         advanceUntilIdle()
 
         assertTrue(viewModel.state.value.isAuthenticated)
         assertFalse(viewModel.state.value.isSessionChecking)
-        assertEquals(AppEffect.NavigateToDashboard, viewModel.effects.first())
+        assertNull(navigationEffect)
+        effectCollector.cancel()
+    }
+
+    @Test
+    fun startingAsGuestFinishesSessionRestorationWithoutAuthentication() = runAppTest {
+        val sessionStore = AuthSessionStore()
+        val viewModel = createViewModel(FakeAuthRepository(null, sessionStore), sessionStore)
+
+        assertTrue(viewModel.state.value.isSessionChecking)
+        advanceUntilIdle()
+
+        assertFalse(viewModel.state.value.isAuthenticated)
+        assertFalse(viewModel.state.value.isSessionChecking)
     }
 
     @Test
@@ -56,6 +73,8 @@ class AppViewModelTest {
         val viewModel = createViewModel(FakeAuthRepository(null, sessionStore), sessionStore)
         advanceUntilIdle()
 
+        viewModel.onEvent(AppEvent.SignInRequested(AuthMode.SignIn))
+        assertEquals(AppEffect.NavigateToAuth(AuthMode.SignIn), viewModel.effects.first())
         sessionStore.setAuthenticated(User(5, "user@example.com", null, null))
         advanceUntilIdle()
 

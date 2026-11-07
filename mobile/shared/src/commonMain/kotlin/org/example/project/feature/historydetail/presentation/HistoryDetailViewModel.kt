@@ -21,12 +21,13 @@ class HistoryDetailViewModel(
     private val _state = MutableStateFlow(HistoryDetailContract())
     val state = _state.asStateFlow()
     private var request: Job? = null
+    private var requestId = 0L
 
     init {
         viewModelScope.launch {
             authSessionStore.mode.collect { mode ->
                 if (mode is SessionMode.Guest) {
-                    request?.cancel()
+                    cancelRequest()
                     _state.value = HistoryDetailContract()
                 }
             }
@@ -34,7 +35,8 @@ class HistoryDetailViewModel(
     }
 
     fun load(id: Long) {
-        if (request?.isActive == true) return
+        request?.cancel()
+        val currentRequestId = ++requestId
         _state.setState {
             it.copy(
                 isLoading = true,
@@ -47,6 +49,7 @@ class HistoryDetailViewModel(
         request = viewModelScope.launch {
             try {
                 val detail = getRecognitionDetail(id)
+                if (currentRequestId != requestId) return@launch
                 _state.setState {
                     it.copy(
                         isLoading = false,
@@ -57,6 +60,7 @@ class HistoryDetailViewModel(
             } catch (cancellation: CancellationException) {
                 throw cancellation
             } catch (exception: Exception) {
+                if (currentRequestId != requestId) return@launch
                 if (exception is AuthApiException && exception.status == 401) {
                     authSessionStore.setGuest()
                 }
@@ -69,6 +73,13 @@ class HistoryDetailViewModel(
                 }
             }
         }
+
+    }
+
+    private fun cancelRequest() {
+        requestId++
+        request?.cancel()
+        request = null
     }
 
     fun selectPrediction(index: Int) {

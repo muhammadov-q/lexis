@@ -121,6 +121,39 @@ class HistoryViewModelTest {
     }
 
     @Test
+    fun openingAnotherDetailCancelsThePreviousLoadAndShowsTheLatestSelection() = runHistoryTest {
+        val firstRequest = CompletableDeferred<Unit>()
+        val firstDetail = RecognitionDetail(
+            1, "2026-01-01", "first.jpg", "v1", samplePrediction(), byteArrayOf(1),
+        )
+        val secondDetail = RecognitionDetail(
+            2, "2026-01-02", "second.jpg", "v1", samplePrediction(), byteArrayOf(2),
+        )
+        val repository = FakeHistoryRepository(detailProvider = { id ->
+            if (id == 1L) {
+                firstRequest.await()
+                firstDetail
+            } else {
+                secondDetail
+            }
+        })
+        val viewModel = createDetailViewModel(repository)
+
+        viewModel.load(1)
+        runCurrent()
+        assertTrue(viewModel.state.value.isLoading)
+
+        viewModel.load(2)
+        advanceUntilIdle()
+        firstRequest.complete(Unit)
+        advanceUntilIdle()
+
+        assertEquals(2L, repository.lastDetailId)
+        assertEquals(secondDetail, viewModel.state.value.selectedDetail)
+        assertFalse(viewModel.state.value.isLoading)
+    }
+
+    @Test
     fun openDetailNotFoundMapsToNotFoundMessage() = runHistoryTest {
         val viewModel = createDetailViewModel(FakeHistoryRepository(detailError = AuthApiException(404)))
 
@@ -194,7 +227,7 @@ class HistoryViewModelTest {
     @Test
     fun signOutCancelsDetailLoadAndClearsState() = runHistoryTest {
         val gate = CompletableDeferred<Unit>()
-        val repository = FakeHistoryRepository(detailProvider = {
+        val repository = FakeHistoryRepository(detailProvider = { _ ->
             gate.await()
             RecognitionDetail(3, "2026-01-03", "detail.jpg", "v1", samplePrediction(), byteArrayOf(7))
         })
@@ -212,6 +245,42 @@ class HistoryViewModelTest {
         advanceUntilIdle()
 
         assertEquals(HistoryDetailContract(), viewModel.state.value)
+    }
+
+    @Test
+    fun signOutCancelsHistoryRequestAndDiscardsItsResult() = runHistoryTest {
+        val gate = CompletableDeferred<Unit>()
+        var requestCancelled = false
+        val repository = FakeHistoryRepository(historyProvider = {
+            try {
+                gate.await()
+                listOf(RecognitionHistoryItem(4, "2026-01-04", "old.jpg", "v1", "old"))
+            } finally {
+                requestCancelled = true
+            }
+        })
+        val session = AuthSessionStore()
+        session.setAuthenticated(User(1, "user@example.com", null, null))
+        val viewModel = HistoryViewModel(
+            GetRecognitionHistoryUseCase(repository),
+            session,
+            HistoryRefreshStore(),
+        )
+        viewModel.startObservers()
+        runCurrent()
+
+        viewModel.onEvent(HistoryEvent.LoadRequested)
+        runCurrent()
+        assertTrue(viewModel.state.value.isLoading)
+
+        session.setGuest()
+        runCurrent()
+        gate.complete(Unit)
+        advanceUntilIdle()
+
+        assertTrue(requestCancelled)
+        assertTrue(viewModel.state.value.items.isEmpty())
+        assertFalse(viewModel.state.value.isLoading)
     }
 
     private fun TestScope.createViewModel(repository: FakeHistoryRepository): HistoryViewModel = HistoryViewModel(
@@ -249,7 +318,7 @@ private class FakeHistoryRepository(
     var historyError: Throwable? = null,
     var detailError: Throwable? = null,
     private val historyProvider: (suspend () -> List<RecognitionHistoryItem>)? = null,
-    private val detailProvider: (suspend () -> RecognitionDetail)? = null,
+    private val detailProvider: (suspend (Long) -> RecognitionDetail)? = null,
 ) : HistoryRepository {
     var detailRequests: Int = 0
     var lastDetailId: Long? = null
@@ -263,7 +332,7 @@ private class FakeHistoryRepository(
         detailRequests += 1
         lastDetailId = id
         detailError?.let { throw it }
-        return detailProvider?.invoke() ?: detail
+        return detailProvider?.invoke(id) ?: detail
     }
 }
 

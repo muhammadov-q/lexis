@@ -110,7 +110,7 @@ private data class PersistedCookie(
         if (!hostMatches) return false
 
         val requestPath = requestUrl.encodedPath.ifBlank { "/" }
-        return requestPath.startsWith(path)
+        return cookiePathMatches(path, requestPath)
     }
 
     fun toCookie(): Cookie = Cookie(
@@ -141,4 +141,10 @@ private data class PersistedCookie(
             )
         }
     }
+
 }
+
+internal fun cookiePathMatches(cookiePath: String, requestPath: String): Boolean =
+    requestPath == cookiePath ||
+        (requestPath.startsWith(cookiePath) &&
+            (cookiePath.endsWith("/") || requestPath.getOrNull(cookiePath.length) == '/'))

@@ -11,6 +11,7 @@ import org.example.project.core.persistence.SessionCookieStore
 import org.example.project.feature.auth.data.network.AuthApi
 import org.example.project.feature.auth.data.network.AuthConfig
 import org.example.project.feature.auth.domain.model.AuthApiException
+import org.example.project.feature.auth.domain.model.User
 import org.example.project.feature.auth.domain.session.AuthSessionStore
 import org.example.project.feature.auth.domain.session.SessionMode
 import kotlin.test.Test
@@ -96,6 +97,22 @@ class AuthRepositoryImplTest {
         val repository = repositoryWithEngine(engine, cookieStore, sessionStore)
 
         repository.signOut()
+
+        assertEquals(1, cookieStore.clearCount)
+        assertTrue(sessionStore.mode.value is SessionMode.Guest)
+    }
+
+    @Test
+    fun signOutClearsLocalSessionWhenBackendRequestFails() = runTest {
+        val cookieStore = FakeCookieStore()
+        val sessionStore = AuthSessionStore()
+        sessionStore.setAuthenticated(User(1, "user@example.com", null, null))
+        val engine = MockEngine {
+            respond(content = "", status = HttpStatusCode.InternalServerError)
+        }
+        val repository = repositoryWithEngine(engine, cookieStore, sessionStore)
+
+        assertFailsWith<AuthApiException> { repository.signOut() }
 
         assertEquals(1, cookieStore.clearCount)
         assertTrue(sessionStore.mode.value is SessionMode.Guest)

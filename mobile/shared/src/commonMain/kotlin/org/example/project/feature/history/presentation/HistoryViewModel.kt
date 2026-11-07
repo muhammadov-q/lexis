@@ -3,6 +3,7 @@ package org.example.project.feature.history.presentation
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.drop
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -28,6 +29,8 @@ class HistoryViewModel(
     private val _state = MutableStateFlow(HistoryContract())
     val state = _state.asStateFlow()
     private var observersStarted: Boolean = false
+    private var historyRequest: Job? = null
+    private var requestId = 0L
 
     fun startObservers() {
         if (observersStarted) return
@@ -45,12 +48,14 @@ class HistoryViewModel(
     }
 
     private fun loadHistory() {
-        if (_state.value.isLoading) return
+        if (historyRequest?.isActive == true) return
 
-        viewModelScope.launch {
+        val currentRequestId = ++requestId
+        historyRequest = viewModelScope.launch {
             _state.setState { it.copy(isLoading = true, error = null) }
             try {
                 val items = getRecognitionHistory()
+                if (currentRequestId != requestId) return@launch
                 _state.setState {
                     it.copy(
                         isLoading = false,
@@ -62,6 +67,7 @@ class HistoryViewModel(
             } catch (cancellation: CancellationException) {
                 throw cancellation
             } catch (exception: Exception) {
+                if (currentRequestId != requestId) return@launch
                 if (isUnauthorized(exception)) authSessionStore.setGuest()
                 _state.setState {
                     it.copy(
@@ -74,6 +80,12 @@ class HistoryViewModel(
         }
     }
 
+    private fun cancelHistoryRequest() {
+        requestId++
+        historyRequest?.cancel()
+        historyRequest = null
+    }
+
     private fun isUnauthorized(exception: Exception): Boolean =
         exception is AuthApiException && exception.status == 401
 
@@ -81,6 +93,7 @@ class HistoryViewModel(
         viewModelScope.launch {
             authSessionStore.mode.collectLatest { mode ->
                 if (mode is SessionMode.Guest) {
+                    cancelHistoryRequest()
                     _state.setState {
                         it.copy(
                             items = emptyList(),

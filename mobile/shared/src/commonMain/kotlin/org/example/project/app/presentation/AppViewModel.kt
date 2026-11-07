@@ -27,6 +27,7 @@ class AppViewModel(
     val effects = effectChannel.receiveAsFlow()
 
     private var previousSessionMode: SessionMode? = null
+    private var navigateAfterSignIn = false
 
     init {
         observeSession()
@@ -35,7 +36,10 @@ class AppViewModel(
 
     fun onEvent(event: AppEvent) {
         when (event) {
-            is AppEvent.SignInRequested -> sendEffect(AppEffect.NavigateToAuth(event.mode))
+            is AppEvent.SignInRequested -> {
+                navigateAfterSignIn = true
+                sendEffect(AppEffect.NavigateToAuth(event.mode))
+            }
             is AppEvent.SignOutRequested -> requestSignOut()
             is AppEvent.GuestContinueRequested -> sendEffect(AppEffect.NavigateToDashboard)
             is AppEvent.DismissErrorRequested -> _state.update { it.copy(error = null) }
@@ -46,7 +50,12 @@ class AppViewModel(
         viewModelScope.launch {
             authSessionStore.mode.collect { mode ->
                 _state.update { it.copy(isAuthenticated = mode is SessionMode.Authenticated) }
-                if (mode is SessionMode.Authenticated && previousSessionMode !is SessionMode.Authenticated) {
+                if (
+                    navigateAfterSignIn &&
+                    mode is SessionMode.Authenticated &&
+                    previousSessionMode !is SessionMode.Authenticated
+                ) {
+                    navigateAfterSignIn = false
                     sendEffect(AppEffect.NavigateToDashboard)
                 }
                 previousSessionMode = mode
@@ -63,7 +72,12 @@ class AppViewModel(
             } catch (exception: Exception) {
                 _state.update { it.copy(error = mapAuthError(exception)) }
             } finally {
-                _state.update { it.copy(isSessionChecking = false) }
+                _state.update {
+                    it.copy(
+                        isAuthenticated = authSessionStore.isAuthenticated(),
+                        isSessionChecking = false,
+                    )
+                }
             }
         }
     }
@@ -71,7 +85,15 @@ class AppViewModel(
     private fun requestSignOut() {
         if (_state.value.isSigningOut) return
 
-        _state.update { it.copy(isSigningOut = true, error = null) }
+        _state.update {
+            it.copy(
+                isAuthenticated = false,
+                isSigningOut = true,
+                error = null,
+            )
+        }
+        navigateAfterSignIn = false
+        authSessionStore.setGuest()
         sendEffect(AppEffect.NavigateToCameraRoot)
         viewModelScope.launch {
             try {

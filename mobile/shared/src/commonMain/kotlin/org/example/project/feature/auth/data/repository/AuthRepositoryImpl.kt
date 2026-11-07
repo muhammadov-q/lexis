@@ -38,9 +38,12 @@ class AuthRepositoryImpl(
     }
 
     override suspend fun signOut() {
-        api.signOut()
-        sessionCookieStore.clearSessionCookie()
-        sessionStore.setGuest()
+        try {
+            api.signOut()
+        } finally {
+            sessionCookieStore.clearSessionCookie()
+            sessionStore.setGuest()
+        }
     }
 
     override suspend fun currentUserOrNull(): User? {
