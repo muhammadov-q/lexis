@@ -28,7 +28,6 @@ import org.example.project.core.navigation.AppRoutes
 import org.example.project.core.navigation.Screen
 import org.example.project.core.navigation.navigateAuth
 import org.example.project.core.navigation.navigateCameraRoot
-import org.example.project.core.navigation.navigateDashboard
 import org.example.project.feature.auth.presentation.AuthMode
 import org.koin.compose.viewmodel.koinViewModel
 
@@ -46,11 +45,7 @@ internal fun AppContent() {
         appViewModel.effects.collect { effect ->
             when (effect) {
                 is AppEffect.NavigateToAuth -> navController.navigateAuth(effect.mode)
-                is AppEffect.NavigateToDashboard ->
-                    if (navController.currentDestination?.route in AppRoutes.AUTH_ROUTES) {
-                        navController.navigateDashboard()
-                    }
-
+                is AppEffect.NavigateToDashboard -> navController.navigateCameraRoot()
                 is AppEffect.NavigateToCameraRoot -> navController.navigateCameraRoot()
             }
         }

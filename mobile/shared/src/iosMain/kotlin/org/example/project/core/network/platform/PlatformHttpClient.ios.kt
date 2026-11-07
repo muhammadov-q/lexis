@@ -13,4 +13,4 @@ actual fun createHttpClient(cookieStorage: CookiesStorage): HttpClient =
         }
     }
 
-actual fun localBackendBaseUrl(): String = "http://192.168.205.88:8000"
+actual fun localBackendBaseUrl(): String = "http://127.0.0.1:8000"

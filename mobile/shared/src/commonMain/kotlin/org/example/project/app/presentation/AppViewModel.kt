@@ -41,7 +41,10 @@ class AppViewModel(
                 sendEffect(AppEffect.NavigateToAuth(event.mode))
             }
             is AppEvent.SignOutRequested -> requestSignOut()
-            is AppEvent.GuestContinueRequested -> sendEffect(AppEffect.NavigateToDashboard)
+            is AppEvent.GuestContinueRequested -> {
+                navigateAfterSignIn = false
+                sendEffect(AppEffect.NavigateToDashboard)
+            }
             is AppEvent.DismissErrorRequested -> _state.update { it.copy(error = null) }
         }
     }
