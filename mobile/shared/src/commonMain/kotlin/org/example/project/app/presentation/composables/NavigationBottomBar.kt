@@ -1,4 +1,4 @@
-package org.example.project.core.navigation
+package org.example.project.app.presentation.composables
 
 import androidx.compose.foundation.layout.size
 import androidx.compose.material3.Icon
@@ -10,9 +10,10 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import org.example.project.common.presentation.ui.theme.ScriptLensColors
+import org.example.project.core.navigation.Screen
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
-import org.example.project.common.presentation.ui.theme.ScriptLensColors
 
 @Composable
 fun NavigationBottomBar(
@@ -61,7 +62,6 @@ private fun NavigationBottomBarPreview() {
         destinations = screens,
     )
 }
-
 
 
 

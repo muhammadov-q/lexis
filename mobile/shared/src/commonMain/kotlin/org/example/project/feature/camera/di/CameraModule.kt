@@ -14,14 +14,21 @@ val cameraModule = module {
     single {
         PhotoUploadConfig(
             baseUrl = localBackendBaseUrl(),
-            uploadPath = "/predict",
+            guestUploadPath = "/predict",
+            authenticatedUploadPath = "/recognitions",
             multipartFieldName = "image",
         )
     }
     single { PhotoUploadApi(get(), get()) }
-    single<PhotoRepository> { PhotoRepositoryImpl(api = get()) }
+    single<PhotoRepository> {
+        PhotoRepositoryImpl(
+            api = get(),
+            config = get(),
+            authSessionStore = get(),
+            sessionCookieStore = get(),
+            historyRefreshStore = get(),
+        )
+    }
     factory { UploadPhotoUseCase(get()) }
     viewModelOf(::CameraViewModel)
 }
-
-

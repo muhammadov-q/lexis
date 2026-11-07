@@ -23,7 +23,8 @@ import kotlin.test.assertTrue
 class PhotoUploadApiTest {
     private val config = PhotoUploadConfig(
         baseUrl = "http://localhost:8000/",
-        uploadPath = "/predict",
+        guestUploadPath = "/predict",
+        authenticatedUploadPath = "/recognitions",
         multipartFieldName = "image",
     )
     private val jsonHeaders = headersOf(HttpHeaders.ContentType, "application/json")
@@ -41,7 +42,7 @@ class PhotoUploadApiTest {
             )
         }
 
-        val result = api.upload(byteArrayOf(1, 2, 3))
+        val result = api.upload(byteArrayOf(1, 2, 3), "/predict")
 
         assertEquals("v1", result.modelVersion)
         assertEquals("λόγος", result.predictions.single().text)
@@ -61,7 +62,7 @@ class PhotoUploadApiTest {
             respond("""{"predictions":[],"model_version":"v1"}""", HttpStatusCode.OK, jsonHeaders)
         }
 
-        api.upload(byteArrayOf(1))
+        api.upload(byteArrayOf(1), "/predict")
 
         assertEquals(HttpMethod.Post, method)
         assertEquals("http://localhost:8000/predict", url)
@@ -76,7 +77,7 @@ class PhotoUploadApiTest {
             respond("""{"predictions":[],"model_version":"v1"}""", HttpStatusCode.OK, jsonHeaders)
         }
 
-        api.upload(byteArrayOf(1, 2, 3))
+        api.upload(byteArrayOf(1, 2, 3), "/predict")
 
         assertTrue(body.contains("image/jpeg"), body)
         assertTrue(body.contains("filename=\"photo.jpg\""), body)
@@ -92,7 +93,7 @@ class PhotoUploadApiTest {
             )
         }
 
-        val result = api.upload(byteArrayOf(1, 2, 3))
+        val result = api.upload(byteArrayOf(1, 2, 3), "/predict")
 
         assertEquals("λόγος", result.predictions.single().text)
         assertEquals(null, result.predictions.single().gloss)
@@ -108,7 +109,7 @@ class PhotoUploadApiTest {
             )
         }
 
-        val result = api.upload(byteArrayOf(1, 2, 3))
+        val result = api.upload(byteArrayOf(1, 2, 3), "/predict")
         val gloss = result.predictions.single().gloss
 
         assertEquals("λόγος", result.predictions.single().text)
@@ -122,7 +123,7 @@ class PhotoUploadApiTest {
         listOf(400, 413, 415, 422, 500, 502).forEach { status ->
             val api = api { respond("""{"detail":"nope"}""", HttpStatusCode.fromValue(status), jsonHeaders) }
 
-            val error = assertFailsWith<ApiException>("status $status") { api.upload(byteArrayOf(1)) }
+            val error = assertFailsWith<ApiException>("status $status") { api.upload(byteArrayOf(1), "/predict") }
 
             assertEquals(status, error.status)
         }
@@ -132,7 +133,7 @@ class PhotoUploadApiTest {
     fun nonOkStatusWithoutBodyStillThrowsApiException() = runTest {
         val api = api { respond("", HttpStatusCode.InternalServerError) }
 
-        val error = assertFailsWith<ApiException> { api.upload(byteArrayOf(1)) }
+        val error = assertFailsWith<ApiException> { api.upload(byteArrayOf(1), "/predict") }
 
         assertEquals(500, error.status)
     }
@@ -141,7 +142,7 @@ class PhotoUploadApiTest {
     fun connectionFailureThrowsApiExceptionWithStatusZero() = runTest {
         val api = api { throw RuntimeException("connection refused") }
 
-        val error = assertFailsWith<ApiException> { api.upload(byteArrayOf(1)) }
+        val error = assertFailsWith<ApiException> { api.upload(byteArrayOf(1), "/predict") }
 
         assertEquals(0, error.status)
     }
@@ -150,14 +151,13 @@ class PhotoUploadApiTest {
     fun malformedSuccessBodyThrowsSerializationException() = runTest {
         val api = api { respond("not json", HttpStatusCode.OK, jsonHeaders) }
 
-        assertFailsWith<SerializationException> { api.upload(byteArrayOf(1)) }
+        assertFailsWith<SerializationException> { api.upload(byteArrayOf(1), "/predict") }
     }
 
     @Test
     fun cancellationIsNotConvertedToApiException() = runTest {
         val api = api { throw CancellationException("cancelled") }
 
-        assertFailsWith<CancellationException> { api.upload(byteArrayOf(1)) }
+        assertFailsWith<CancellationException> { api.upload(byteArrayOf(1), "/predict") }
     }
 }
-

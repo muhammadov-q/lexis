@@ -1,8 +1,67 @@
 <resources>
     <!-- Navigation / screen titles -->
     <string name="nav_camera">Camera</string>
-    <string name="nav_documents">Documents</string>
-    <string name="nav_source">Source</string>
+    <string name="nav_documents">History</string>
+    <string name="nav_source">Account</string>
+
+    <!-- Authentication -->
+    <string name="auth_branding">Team4 | ScriptLens</string>
+    <string name="auth_sign_in_title">Sign in</string>
+    <string name="auth_sign_in_subtitle">Use the email and password you signed up with.</string>
+    <string name="auth_create_title">Create an account</string>
+    <string name="auth_create_subtitle">Creating an account is optional. Fields marked * are required.</string>
+    <string name="auth_email_label">Email</string>
+    <string name="auth_password_label">Password</string>
+    <string name="auth_password_show">Show</string>
+    <string name="auth_password_hide">Hide</string>
+    <string name="auth_first_name_label">First name (optional)</string>
+    <string name="auth_last_name_label">Last name (optional)</string>
+    <string name="auth_action_sign_in">Sign in</string>
+    <string name="auth_action_create_account">Create account</string>
+    <string name="auth_action_signing_in">Signing in...</string>
+    <string name="auth_action_creating_account">Creating account...</string>
+    <string name="auth_action_sign_out">Sign out</string>
+    <string name="auth_action_continue_as_guest">Continue as guest</string>
+    <string name="auth_no_account_create">Don&apos;t have an account? Create one.</string>
+    <string name="auth_have_account_sign_in">Already have an account? Sign in.</string>
+    <string name="auth_error_validation">Check your input and try again.</string>
+    <string name="auth_error_password_min_length">Password must be at least 8 characters.</string>
+    <string name="auth_error_unauthorized">Wrong email or password.</string>
+    <string name="auth_error_conflict">An account with this email already exists. Sign in instead.</string>
+    <string name="auth_error_network">Could not reach the server. Check your network and try again.</string>
+    <string name="auth_error_unknown">Authentication failed. Please try again.</string>
+
+    <!-- History access -->
+    <string name="history_header_title">History</string>
+    <string name="history_header_subtitle">Pages you read before, newest first.</string>
+    <string name="history_guest_title">Recognition history</string>
+    <string name="history_guest_message">Sign in to access your recognition history and save your previous results.</string>
+    <string name="history_sign_in">Sign in</string>
+    <string name="history_create_account">Create account</string>
+    <string name="history_count_result">%1$d result</string>
+    <string name="history_count_results">%1$d results</string>
+    <string name="history_read_on">Read on %1$s</string>
+    <string name="history_empty_title">No results yet</string>
+    <string name="history_action_read_page">Read a page</string>
+    <string name="history_retry">Retry</string>
+    <string name="history_back_to_list">Back to history</string>
+    <string name="navigation_back">Back</string>
+    <string name="history_error_title">Could not load your history</string>
+    <string name="history_authenticated_placeholder">Your recognition history is available from your account.</string>
+    <string name="history_error_unauthorized">Sign in to load your recognition history.</string>
+    <string name="history_error_not_found">Saved recognition was not found.</string>
+    <string name="history_error_general">Could not load recognition history. Please try again.</string>
+    <string name="history_detail_read_on">Read on %1$s</string>
+    <string name="history_detail_model_version">Model: %1$s</string>
+    <string name="history_detail_image_unavailable">This image cannot be displayed on this device.</string>
+
+    <!-- Account -->
+    <string name="account_signed_in_title">Account</string>
+    <string name="account_signed_in_as">Signed in as %1$s</string>
+    <string name="account_sign_out_action">Sign out</string>
+    <string name="account_guest_title">Sign in</string>
+    <string name="account_guest_message">Sign in to save recognitions and access your history.</string>
+    <string name="account_sign_in_action">Sign in</string>
 
     <!-- Camera screen -->
     <string name="camera_title">Read historical manuscripts</string>
