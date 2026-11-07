@@ -1,6 +1,7 @@
 package org.example.project.feature.historydetail.presentation
 
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.rememberTransformableState
 import androidx.compose.foundation.gestures.transformable
 import androidx.compose.foundation.layout.Arrangement
@@ -69,12 +70,14 @@ fun HistoryDetailScreen(
         viewModel.load(id)
     }
 
-    HistoryDetailContent(
-        state = state,
-        onRetry = { viewModel.load(id) },
-        onPredictionSelected = viewModel::selectPrediction,
-        onSignInRequested = onSignInRequested,
-    )
+    Box(modifier = Modifier.fillMaxSize().background(ScriptLensColors.Background)) {
+        HistoryDetailContent(
+            state = state,
+            onRetry = { viewModel.load(id) },
+            onPredictionSelected = viewModel::selectPrediction,
+            onSignInRequested = onSignInRequested,
+        )
+    }
 }
 
 @Composable

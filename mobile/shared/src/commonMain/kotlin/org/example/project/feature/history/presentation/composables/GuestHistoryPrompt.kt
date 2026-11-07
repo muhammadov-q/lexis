@@ -1,5 +1,6 @@
 package org.example.project.feature.history.presentation.composables
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -13,6 +14,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
+import org.example.project.common.presentation.ui.theme.ScriptLensColors
 import org.example.project.common.presentation.ui.theme.ScriptLensSpacing
 import org.example.project.common.presentation.ui.theme.ScriptLensTheme
 import org.jetbrains.compose.resources.stringResource
@@ -30,6 +32,7 @@ internal fun GuestHistoryPrompt(
     Column(
         modifier = Modifier
             .fillMaxSize()
+            .background(ScriptLensColors.Background)
             .padding(ScriptLensSpacing.padding_24),
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally,

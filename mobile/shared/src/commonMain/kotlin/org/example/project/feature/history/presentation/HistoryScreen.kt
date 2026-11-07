@@ -89,6 +89,7 @@ private fun HistoryListScreen(
     Column(
         modifier = Modifier
             .fillMaxSize()
+            .background(ScriptLensColors.Background)
             .imePadding()
             .padding(ScriptLensSpacing.padding_24),
         verticalArrangement = Arrangement.spacedBy(ScriptLensSpacing.padding_16),

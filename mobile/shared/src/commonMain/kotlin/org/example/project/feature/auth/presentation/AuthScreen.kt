@@ -1,5 +1,6 @@
 package org.example.project.feature.auth.presentation
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -89,6 +90,7 @@ private fun AuthScreenContent(
     Column(
         modifier = Modifier
             .fillMaxSize()
+            .background(ScriptLensColors.Background)
             .verticalScroll(rememberScrollState())
             .imePadding()
             .navigationBarsPadding()
