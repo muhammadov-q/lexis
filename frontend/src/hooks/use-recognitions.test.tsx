@@ -96,7 +96,7 @@ describe('guest recognition', () => {
     const { result } = renderWithClient(useRecognize)
     const file = new File(['bytes'], 'digits.png', { type: 'image/png' })
 
-    await act(() => result.current.mutateAsync({ file }))
+    await act(() => result.current.mutateAsync({ file, model: 'kraken' }))
 
     await waitFor(() => expect(result.current.isSuccess).toBe(true))
 
@@ -104,8 +104,9 @@ describe('guest recognition', () => {
     expect(result.current.data?.recognition).toEqual(prediction)
     expect(result.current.data?.savedId).toBeUndefined()
 
-    const init = fetch.mock.calls[1][1] as RequestInit
-    expect((init.body as FormData).get('image')).toBe(file)
+    const forms = fetch.mock.calls.map(([, init]) => (init as RequestInit).body as FormData)
+    expect(forms.map((form) => form.get('model'))).toEqual(['kraken', 'kraken'])
+    expect(forms[1].get('image')).toBe(file)
   })
 
   it('does not fall back to public prediction for server errors', async () => {

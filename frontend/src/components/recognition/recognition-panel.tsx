@@ -8,29 +8,35 @@ import { Card } from '@/components/ui/card'
 import { LoadingOrb } from '@/components/ui/loading-orb'
 import { Skeleton } from '@/components/ui/skeleton'
 import { useElapsed } from '@/hooks/use-elapsed'
+import type { ModelChoice } from '@/hooks/use-models'
 import type { useRecognize } from '@/hooks/use-recognitions'
 import type { WordSelection } from '@/hooks/use-word-selection'
 import { formatDuration } from '@/lib/format'
 import type { ImageSource } from '@/lib/image-file'
 import { describeRecognitionError } from './describe-error'
+import { ModelPicker } from './model-picker'
 import { RecognitionResult } from './recognition-result'
 
 interface RecognitionPanelProps {
   hasPage: boolean
   run: ReturnType<typeof useRecognize>
+  models: ModelChoice
   selection: WordSelection
   image?: ImageSource
   onRecognize: () => void
   onCancel: () => void
+  onReadAgain: () => void
 }
 
 export function RecognitionPanel({
   hasPage,
   run,
+  models,
   selection,
   image,
   onRecognize,
   onCancel,
+  onReadAgain,
 }: RecognitionPanelProps) {
   const label = run.isPending ? 'Recognizing…' : run.isError ? 'Try again' : 'Recognize page'
 
@@ -65,6 +71,9 @@ export function RecognitionPanel({
             to save future results to your history.
           </p>
         )}
+        <Button variant="outline" className="w-full" onClick={onReadAgain}>
+          Read with another model
+        </Button>
       </Card>
     )
   }
@@ -79,14 +88,17 @@ export function RecognitionPanel({
         </p>
       </div>
 
-      <Button
-        size="lg"
-        className="w-full"
-        disabled={!hasPage || run.isPending}
-        onClick={onRecognize}
-      >
-        {label}
-      </Button>
+      <div className="space-y-4">
+        <ModelPicker choice={models} disabled={run.isPending} />
+        <Button
+          size="lg"
+          className="w-full"
+          disabled={!hasPage || run.isPending}
+          onClick={onRecognize}
+        >
+          {label}
+        </Button>
+      </div>
 
       {run.isIdle && <IdleState hasPage={hasPage} />}
       {run.isPending && <PendingState submittedAt={run.submittedAt} onCancel={onCancel} />}

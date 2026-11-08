@@ -7,10 +7,15 @@ type RecognitionForm = NonNullable<CreateOperation['requestBody']>['content']['m
 export type Recognition = CreateOperation['responses'][201]['content']['application/json']
 
 const IMAGE_FIELD: keyof RecognitionForm = 'image'
+const MODEL_FIELD: keyof RecognitionForm = 'model'
 
-export function recognizePage(file: File, signal?: AbortSignal): Promise<Recognition> {
+export function recognizePage(
+  file: File,
+  { model, signal }: { model?: string; signal?: AbortSignal } = {}
+): Promise<Recognition> {
   const body = new FormData()
   body.append(IMAGE_FIELD, file)
+  if (model) body.append(MODEL_FIELD, model)
   return apiRequest<Recognition>('/recognitions', {
     method: 'POST',
     body,

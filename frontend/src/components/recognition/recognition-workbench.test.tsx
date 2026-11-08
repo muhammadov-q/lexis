@@ -2,6 +2,7 @@ import { act, fireEvent, screen, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { toast } from 'sonner'
 import { afterEach, describe, expect, it, vi } from 'vitest'
+import { makeModelList } from '@/test/models'
 import { renderWithProviders } from '@/test/render'
 import { RecognitionWorkbench } from './recognition-workbench'
 
@@ -70,6 +71,21 @@ const greekResponse = {
   model_version: 'eparchos-6791',
 }
 
+type Upload = (url: string, init: RequestInit) => Promise<Response>
+
+function stubBackend<T extends Upload>(upload: T, models = () => Response.json(makeModelList())) {
+  vi.stubGlobal(
+    'fetch',
+    vi.fn(async (url: string, init: RequestInit = {}) =>
+      url === '/api/models' ? models() : upload(url, init)
+    )
+  )
+  return upload
+}
+
+const sentModel = (upload: ReturnType<typeof vi.fn>, call = 0) =>
+  ((upload.mock.calls[call][1] as RequestInit).body as FormData).get('model')
+
 function setup({ applyAccept = true } = {}) {
   const user = userEvent.setup({ applyAccept })
   renderWithProviders(<RecognitionWorkbench />)
@@ -91,7 +107,7 @@ describe('RecognitionWorkbench', () => {
       .mockResolvedValueOnce(Response.json({ detail: 'Sign in to continue.' }, { status: 401 }))
       .mockResolvedValueOnce(Response.json(prediction))
 
-    vi.stubGlobal('fetch', fetch)
+    stubBackend(fetch)
     const { user } = setup()
 
     await user.upload(screen.getByLabelText('Page image'), page())
@@ -128,7 +144,7 @@ describe('RecognitionWorkbench', () => {
 
   it('sends the chosen page to the backend and shows the response', async () => {
     const fetch = vi.fn().mockResolvedValue(Response.json(mockResponse(['2', '5', '0'])))
-    vi.stubGlobal('fetch', fetch)
+    stubBackend(fetch)
     const { user } = setup()
 
     expect(recognizeButton()).toBeDisabled()
@@ -158,7 +174,7 @@ describe('RecognitionWorkbench', () => {
   })
 
   it('shows the translation of a word picked in the transcript or on the page', async () => {
-    vi.stubGlobal('fetch', vi.fn().mockResolvedValue(Response.json(greekResponse)))
+    stubBackend(vi.fn().mockResolvedValue(Response.json(greekResponse)))
     const { user } = setup()
 
     await user.upload(screen.getByLabelText('Page image'), page())
@@ -193,7 +209,7 @@ describe('RecognitionWorkbench', () => {
 
   it('rejects a file that is not a page image before it reaches the backend', async () => {
     const fetch = vi.fn()
-    vi.stubGlobal('fetch', fetch)
+    stubBackend(fetch)
     const { user } = setup({ applyAccept: false })
 
     await user.upload(
@@ -209,8 +225,7 @@ describe('RecognitionWorkbench', () => {
   })
 
   it("shows the backend's reason when it rejects the image", async () => {
-    vi.stubGlobal(
-      'fetch',
+    stubBackend(
       vi.fn().mockResolvedValue(Response.json({ detail: 'File must be an image' }, { status: 415 }))
     )
     const { user } = setup()
@@ -225,8 +240,7 @@ describe('RecognitionWorkbench', () => {
   })
 
   it('explains when the recognition service is offline', async () => {
-    vi.stubGlobal(
-      'fetch',
+    stubBackend(
       vi
         .fn()
         .mockResolvedValue(
@@ -250,14 +264,16 @@ describe('RecognitionWorkbench', () => {
           )
         })
     )
-    vi.stubGlobal('fetch', fetch)
+    stubBackend(fetch)
     const { user } = setup()
 
     await user.upload(screen.getByLabelText('Page image'), page())
+    await screen.findByRole('combobox', { name: 'Model' })
     await user.click(recognizeButton())
 
     expect(await screen.findByText('Reading the page')).toBeInTheDocument()
     expect(screen.getByRole('button', { name: /recognizing/i })).toBeDisabled()
+    expect(screen.getByRole('combobox', { name: 'Model' })).toBeDisabled()
 
     await user.click(screen.getByRole('button', { name: 'Cancel' }))
 
@@ -267,7 +283,7 @@ describe('RecognitionWorkbench', () => {
   })
 
   it('clears the previous result when the page is replaced', async () => {
-    vi.stubGlobal('fetch', vi.fn().mockResolvedValue(Response.json(mockResponse(['1']))))
+    stubBackend(vi.fn().mockResolvedValue(Response.json(mockResponse(['1']))))
     const { user } = setup()
 
     await user.upload(screen.getByLabelText('Page image'), page())
@@ -303,7 +319,7 @@ describe('RecognitionWorkbench', () => {
   it('sends the cropped image to the backend after applying a crop', async () => {
     const fetch = vi.fn().mockResolvedValue(Response.json(mockResponse(['7'])))
 
-    vi.stubGlobal('fetch', fetch)
+    stubBackend(fetch)
 
     const { user } = setup()
 
@@ -330,6 +346,44 @@ describe('RecognitionWorkbench', () => {
     expect((uploadedImage as File).name).toBe('folio-1r-cropped.png')
   })
 
+  it('reads with the default model, then again with the model chosen', async () => {
+    const upload = stubBackend(vi.fn(async () => Response.json(greekResponse)))
+    const { user } = setup()
+
+    await user.upload(screen.getByLabelText('Page image'), page())
+    expect(await screen.findByRole('combobox', { name: 'Model' })).toHaveTextContent(
+      'Kraken, fine-tuned on Eparchos'
+    )
+    await user.click(recognizeButton())
+    await screen.findByRole('region', { name: 'Model response' })
+    expect(sentModel(upload)).toBe('kraken')
+
+    await user.click(screen.getByRole('button', { name: 'Read with another model' }))
+    expect(screen.queryByRole('region', { name: 'Transcript' })).not.toBeInTheDocument()
+    expect(screen.getByRole('img', { name: 'Preview of folio-1r.png' })).toBeInTheDocument()
+
+    await user.click(screen.getByRole('combobox', { name: 'Model' }))
+    await user.click(screen.getByRole('option', { name: /Kraken, not fine-tuned/ }))
+    await user.click(recognizeButton())
+
+    await screen.findByRole('region', { name: 'Model response' })
+    expect(sentModel(upload, 1)).toBe('kraken-base')
+  })
+
+  it('still reads the page with the default model when the models cannot be listed', async () => {
+    const upload = stubBackend(vi.fn().mockResolvedValue(Response.json(greekResponse)), () =>
+      Response.json({ detail: 'Not reachable' }, { status: 502 })
+    )
+    const { user } = setup()
+
+    await user.upload(screen.getByLabelText('Page image'), page())
+    expect(await screen.findByText(/Couldn't load the models/)).toBeInTheDocument()
+    await user.click(recognizeButton())
+
+    await screen.findByRole('region', { name: 'Model response' })
+    expect(sentModel(upload)).toBeNull()
+  })
+
   it('takes a page pasted from the clipboard', () => {
     setup()
     const paste = new Event('paste', { cancelable: true })
@@ -350,6 +404,9 @@ describe('RecognitionWorkbench with a phone', () => {
     create = () => true,
   }: { uploads?: () => number; create?: () => boolean } = {}) {
     const fetch = vi.fn(async (url: string, init: RequestInit = {}) => {
+      if (url === '/api/models') {
+        return Response.json(makeModelList())
+      }
       if (url === '/api/capture-sessions') {
         return create()
           ? Response.json({ id: 'abc', upload_count: 0 }, { status: 201 })
@@ -453,11 +510,12 @@ describe('RecognitionWorkbench with a phone', () => {
 
   it('offers a new code when the old one expired', async () => {
     const fetch = stubPhoneBackend()
+    const { user } = setupPhone()
+    await screen.findByRole('combobox', { name: 'Model' })
     fetch.mockImplementationOnce(async () =>
       Response.json({ id: 'old', upload_count: 0 }, { status: 201 })
     )
     fetch.mockImplementationOnce(async () => Response.json({ detail: 'Expired' }, { status: 404 }))
-    const { user } = setupPhone()
 
     await user.click(screen.getByRole('button', { name: 'Use your phone' }))
     const dialog = await screen.findByRole('dialog', { name: 'Use your phone' })

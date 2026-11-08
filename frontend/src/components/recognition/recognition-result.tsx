@@ -8,7 +8,7 @@ import type { Prediction } from '@/lib/api/predict'
 import { formatDuration } from '@/lib/format'
 import type { ImageSource } from '@/lib/image-file'
 
-const MOCK_MODEL_VERSION = 'mock'
+const PLACEHOLDER_MODEL_VERSION = /^(mock|eparchos-.+)$/
 
 interface RecognitionResultProps {
   recognition: Prediction
@@ -24,7 +24,7 @@ export function RecognitionResult({
   durationMs,
 }: RecognitionResultProps) {
   const { predictions: words, model_version: modelVersion } = recognition
-  const isMock = modelVersion === MOCK_MODEL_VERSION
+  const isPlaceholder = PLACEHOLDER_MODEL_VERSION.test(modelVersion)
 
   return (
     <section aria-label="Model response" className="space-y-6">
@@ -54,11 +54,8 @@ export function RecognitionResult({
             </>
           )}
         </p>
-        {isMock && (
-          <p>
-            Placeholder output from the mock model. Real transcriptions arrive with the trained
-            models.
-          </p>
+        {isPlaceholder && (
+          <p>Placeholder output. This model returns the same words for every page.</p>
         )}
       </div>
     </section>

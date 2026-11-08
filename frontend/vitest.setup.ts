@@ -27,3 +27,9 @@ if (typeof globalThis.ResizeObserver !== 'function') {
     disconnect() {}
   }
 }
+
+if (typeof Element !== 'undefined') {
+  Element.prototype.hasPointerCapture ??= () => false
+  Element.prototype.releasePointerCapture ??= () => {}
+  Element.prototype.scrollIntoView ??= () => {}
+}

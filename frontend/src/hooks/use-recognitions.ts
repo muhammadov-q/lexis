@@ -22,16 +22,18 @@ export function useRecognize() {
     mutationKey: ['recognize'],
     mutationFn: async ({
       file,
+      model,
       signal,
     }: {
       file: File
+      model?: string
       signal?: AbortSignal
     }): Promise<RecognizeResult> => {
       const startedAt = performance.now()
 
       if (queryClient.getQueryData<User | null>(CURRENT_USER_KEY) !== null) {
         try {
-          const recognition = await recognizePage(file, signal)
+          const recognition = await recognizePage(file, { model, signal })
           return { recognition, savedId: recognition.id, durationMs: performance.now() - startedAt }
         } catch (error) {
           if (!(error instanceof ApiError) || error.status !== 401) throw error
@@ -40,7 +42,7 @@ export function useRecognize() {
         }
       }
 
-      const recognition = await predictPage(file, signal)
+      const recognition = await predictPage(file, { model, signal })
       return { recognition, durationMs: performance.now() - startedAt }
     },
     onSuccess: (result) => {
