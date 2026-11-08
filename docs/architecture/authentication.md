@@ -19,7 +19,7 @@ People sign up with an email, a password and, if they like, their first and last
 - A wrong password and an unknown email get the same answer in about the same time, so sign-in doesn't reveal who has an account.
 - A session lasts 7 days. Signing out ends it right away.
 - The cookie `team4_session` is `HttpOnly` and `SameSite=Lax`, so page scripts can't read it and other sites can't send it. It isn't `Secure`, because the app runs over plain http on a laptop.
-- `/predict` and `/capture-sessions` don't need a session: the mobile app and the phone in the QR flow don't sign in.
+- `/predict` and `/capture-sessions` don't need a session. The mobile app can use `/predict` as a guest or `/recognitions` while signed in; the phone in the QR flow does not sign in.
 - `/recognitions` (the results history) needs one, and only ever returns your own results.
 
 The rules live in `AuthService` in `backend/src/app/auth/service.py`; the routes in `backend/src/app/auth/router.py` only translate errors to status codes. A route that needs a signed-in user takes `CurrentUser` from the router module.

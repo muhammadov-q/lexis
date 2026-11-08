@@ -21,9 +21,9 @@ class PhotoUploadApi(
 ) {
     private val json = Json { ignoreUnknownKeys = true }
 
-    suspend fun upload(photo: ByteArray): PredictionDto {
-        val endpoint = "${config.baseUrl.trimEnd('/')}/${config.uploadPath.trimStart('/')}"
-        val endpointId = config.uploadPath.trimStart('/').ifBlank { "predict" }
+    suspend fun upload(photo: ByteArray, uploadPath: String): PredictionDto {
+        val endpoint = "${config.baseUrl.trimEnd('/')}/${uploadPath.trimStart('/')}"
+        val endpointId = uploadPath.trimStart('/').ifBlank { "predict" }
 
         val status: Int
         val body: String
@@ -40,10 +40,9 @@ class PhotoUploadApi(
         }
 
         println("$TAG: response endpoint=$endpointId status=$status")
-        if (status != HttpStatusCode.OK.value) {
+        if (status != HttpStatusCode.OK.value && status != HttpStatusCode.Created.value) {
             throw ApiException(status)
         }
-        // A malformed 200 body throws SerializationException, which the view model maps to RecognitionFailed.
         return json.decodeFromString(body)
     }
 
@@ -64,5 +63,3 @@ class PhotoUploadApi(
         const val TAG = "PhotoUploadApi"
     }
 }
-
-
