@@ -84,7 +84,7 @@ print_header "TEAM4 BACKEND CHECKS"
 if [ "${CHECK_SKIP_INSTALL:-0}" = "1" ] && [ -d .venv ]; then
     print_step "Skipping install (CHECK_SKIP_INSTALL=1)"
 else
-    run_step "Install" "uv lock, then uv sync" uv sync --locked
+    run_step "Install" "uv lock, then uv sync" uv sync --locked --inexact
 fi
 
 if ! command -v npx >/dev/null 2>&1; then

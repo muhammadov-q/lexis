@@ -21,12 +21,20 @@ dependencies = [
     "uvicorn[standard]>=0.53.0",
 ]
 
+[project.optional-dependencies]
+# KrakenPredictor pulls in torch, so it stays out of the default install
+ml = ["kraken>=7.1.1,<7.2; python_version < '3.14'"]
+
 [project.scripts]
 app = "app:main"
 
 [build-system]
 requires = ["uv_build>=0.12.11,<0.13.0"]
 build-backend = "uv_build"
+
+[tool.uv]
+# kraken pins scikit-learn~=1.7.2 but never imports it; keep the version the KNN needs
+override-dependencies = ["scikit-learn>=1.9.1"]
 
 [tool.uv.build-backend]
 module-name = ["app", "ml"]
@@ -60,7 +68,7 @@ warn_unreachable = true
 enable_error_code = ["ignore-without-code", "redundant-expr", "truthy-bool"]
 
 [[tool.mypy.overrides]]
-module = ["sklearn.*", "joblib.*"]
+module = ["sklearn.*", "joblib.*", "kraken.*"]
 ignore_missing_imports = true
 
 [[tool.mypy.overrides]]

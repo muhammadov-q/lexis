@@ -70,6 +70,18 @@ cd backend
 ML_PREDICTOR="eparchos" uv run uvicorn app.main:app --reload
 ```
 
+To read the uploaded page for real, run the `kraken` predictor. It needs the optional `ml` dependencies (kraken and torch, about 1 GB) and the recognition model in `src/ml/models/`, which git ignores. The model is fine-tuned on Eparchos and published as a release ([model card](../docs/models/kraken-eparchos.md)). A page takes about 8 seconds on a laptop CPU.
+
+```bash
+cd backend
+uv sync --extra ml
+curl -L -o src/ml/models/kraken_eparchos.safetensors \
+  https://github.com/muhammadov-q/team4/releases/download/model-kraken-eparchos-v1/kraken_eparchos.safetensors
+ML_PREDICTOR="kraken" uv run uvicorn app.main:app --reload
+```
+
+`KRAKEN_MODEL=/path/to/model.safetensors` uses another kraken recognition model.
+
 ## Run the tests
 
 ### pytest (no server needed)

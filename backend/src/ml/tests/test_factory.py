@@ -1,7 +1,10 @@
+from importlib.util import find_spec
+
 import pytest
 
 from ml.factory import PREDICTORS, create_predictor
 from ml.knn_predictor import MODEL_PATH
+from ml.kraken_predictor import MODEL_PATH as KRAKEN_MODEL_PATH
 from ml.predictor import AbstractPredictor, DummyPredictor, Prediction
 
 
@@ -58,6 +61,10 @@ def test_each_call_returns_a_new_instance():
 def test_every_registered_predictor_follows_the_contract(name, digit_image):
     if name == "knn" and not MODEL_PATH.exists():
         pytest.skip("KNN model not trained (run train_knn.py)")
+    if name == "kraken" and (
+        find_spec("kraken") is None or not KRAKEN_MODEL_PATH.exists()
+    ):
+        pytest.skip("needs the ml extra and the kraken model, see backend/README.md")
 
     predictor = create_predictor(name)
     assert isinstance(predictor, AbstractPredictor)

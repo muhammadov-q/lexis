@@ -29,6 +29,7 @@ classDiagram
     class DummyPredictor
     class KnnPredictor
     class EparchosPredictor
+    class KrakenPredictor
     class TranslatingPredictor {
         +AbstractPredictor predictor
         +AbstractTranslator translator
@@ -45,6 +46,7 @@ classDiagram
     AbstractPredictor <|-- DummyPredictor
     AbstractPredictor <|-- KnnPredictor
     AbstractPredictor <|-- EparchosPredictor
+    AbstractPredictor <|-- KrakenPredictor
     AbstractPredictor <|-- TranslatingPredictor
     TranslatingPredictor o-- AbstractPredictor : wraps
     TranslatingPredictor o-- AbstractTranslator

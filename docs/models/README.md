@@ -1,6 +1,6 @@
 # Model cards
 
-One card per model we use, named after the model. None yet: the backend runs a mock ([[ml/README]]).
+One card per model we use, named after the model: [[models/KNN]] and [[models/kraken-eparchos]].
 
 ## Template
 
