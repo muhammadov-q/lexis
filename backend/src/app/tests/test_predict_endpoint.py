@@ -6,8 +6,6 @@ from ml.predictor import AbstractPredictor, Prediction
 from ml.translating_predictor import TranslatingPredictor
 from ml.translator import GlossaryTranslator
 
-BOX = {"x": 1, "y": 2, "w": 3, "h": 4}
-
 
 class FailingPredictor(AbstractPredictor):
     """Simulates an image the model cannot read."""
@@ -72,7 +70,8 @@ def test_each_word_carries_its_lines_translation():
 
 
 def test_a_result_saved_before_line_translations_still_reads():
-    saved = {"text": "καὶ", "probabilities": {"καὶ": 0.9}, "box": BOX}
+    box = {"x": 1, "y": 2, "w": 3, "h": 4}
+    saved = {"text": "καὶ", "probabilities": {"καὶ": 0.9}, "box": box}
 
     assert PredictionItem.model_validate(saved).line_translation is None
 
