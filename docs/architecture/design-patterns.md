@@ -8,7 +8,7 @@ Patterns that are in the code today. When a new one lands, add a row with the fi
 | Registry             | `ModelRegistry` in `backend/src/ml/registry.py`                                                    | Lists the models this install can run and shares one instance of each, built on first use, so a request only names the model it wants.       |
 | Strategy             | `AbstractPredictor` in `backend/src/ml/predictor.py`                                               | Every model has the same `predict` and `model_version`, so `/predict` works with any of them.                                                |
 | Strategy             | `AbstractTranslator` in `backend/src/ml/translator.py`                                             | The glossary mock and a real translation model can be swapped without touching the predictors.                                               |
-| Decorator            | `TranslatingPredictor` in `backend/src/ml/translating_predictor.py`                                | Wraps any predictor and adds a gloss to each word, so no predictor has to know about translation.                                            |
+| Decorator            | `TranslatingPredictor` in `backend/src/ml/translating_predictor.py`                                | Wraps any predictor and adds a gloss to each word that has none, so no predictor has to know about translation.                              |
 | Dependency injection | `get_predictor` in `backend/src/app/prediction.py`, `capped_image` in `backend/src/app/uploads.py` | FastAPI `Depends` hands the route the predictor the request chose and the checked image bytes, so the route doesn't build them itself.       |
 | Repository           | `InMemoryCaptureSessionRepository` in `backend/src/app/capture/repository.py`                      | All storage of phone capture sessions goes through it, so `CaptureService` doesn't know where they live.                                     |
 | Repository           | `RecognitionRepository` in `backend/src/app/recognitions/repository.py`                            | All access to saved results goes through it, and every query is scoped to one user.                                                          |
@@ -16,6 +16,7 @@ Patterns that are in the code today. When a new one lands, add a row with the fi
 | Service layer        | `CaptureService` in `backend/src/app/capture/service.py`                                           | Holds the session rules (random ids, 30 minute expiry, one photo at a time), so the routes in `backend/src/app/capture/router.py` stay thin. |
 | Service layer        | `RecognitionService` in `backend/src/app/recognitions/service.py`                                  | Runs the chosen predictor and saves the page with its result, so the history routes only map errors to status codes.                         |
 | Service layer        | `AuthService` in `backend/src/app/auth/service.py`                                                 | Holds the account rules (email format, password length, session expiry), so the auth routes only map errors to status codes.                 |
+| Adapter              | `ClaudeCodePredictor` in `backend/src/ml/claude_code_predictor.py`                                 | Runs the Claude Code command line behind `AbstractPredictor`, so Claude is chosen like any other model.                                      |
 | Adapter              | `LoadingOrb` in `frontend/src/components/ui/loading-orb.tsx`                                       | The only import of `thinking-orbs`, so the animation library can be swapped in one place.                                                    |
 
 ## Predictor classes
@@ -35,6 +36,7 @@ classDiagram
     class EparchosPredictor
     class KrakenPredictor
     class KrakenBasePredictor
+    class ClaudeCodePredictor
     class TranslatingPredictor {
         +AbstractPredictor predictor
         +AbstractTranslator translator
@@ -53,6 +55,8 @@ classDiagram
     AbstractPredictor <|-- EparchosPredictor
     AbstractPredictor <|-- KrakenPredictor
     KrakenPredictor <|-- KrakenBasePredictor
+    AbstractPredictor <|-- ClaudeCodePredictor
+    ClaudeCodePredictor o-- KrakenPredictor : finds lines with
     AbstractPredictor <|-- TranslatingPredictor
     TranslatingPredictor o-- AbstractPredictor : wraps
     TranslatingPredictor o-- AbstractTranslator

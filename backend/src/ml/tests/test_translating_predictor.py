@@ -1,4 +1,5 @@
 from collections.abc import Sequence
+from dataclasses import replace
 
 from ml.predictor import AbstractPredictor, Prediction
 from ml.translating_predictor import TranslatingPredictor
@@ -26,6 +27,22 @@ class KnowsAnd(AbstractTranslator):
     def translate(self, words: Sequence[str]) -> list[Gloss | None]:
         self.calls.append(list(words))
         return [AND if word == "καὶ" else None for word in words]
+
+
+class GivesItsOwnGloss(TwoWords):
+    def predict(self, image: bytes) -> list[Prediction]:
+        first, second = super().predict(image)
+        return [replace(first, gloss=OWN), second]
+
+
+OWN = Gloss(lemma="καί", translation="also", definition="adverb: also, even")
+
+
+def test_keeps_a_gloss_the_predictor_already_gave():
+    first, second = TranslatingPredictor(GivesItsOwnGloss(), KnowsAnd()).predict(b"x")
+
+    assert first.gloss == OWN
+    assert second.gloss is None
 
 
 def test_is_an_abstract_predictor():

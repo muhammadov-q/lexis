@@ -1,5 +1,6 @@
 import os
 
+from ml.claude_code_predictor import ClaudeCodePredictor
 from ml.eparchos_predictor import EparchosPredictor
 from ml.knn_predictor import KnnPredictor
 from ml.kraken_predictor import KrakenBasePredictor, KrakenPredictor
@@ -8,6 +9,7 @@ from ml.predictor import AbstractPredictor, DummyPredictor
 PREDICTORS: dict[str, type[AbstractPredictor]] = {
     "kraken": KrakenPredictor,
     "kraken-base": KrakenBasePredictor,
+    "claude-code": ClaudeCodePredictor,
     "knn": KnnPredictor,
     "eparchos": EparchosPredictor,
     "dummy": DummyPredictor,
