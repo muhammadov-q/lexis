@@ -29,7 +29,7 @@ The 24 test pages, 3728 words. Both read the uploaded page end to end, with krak
 
 Claude Code reads a third more words exactly and puts the right word in the right place more often, but it gets more letters wrong overall: it had the lower CER on only 8 of the 24 pages. The validation pages showed the same pattern (71.4% of words exactly against 54.0%, CER 13.3% against 11.3%).
 
-A page used $0.27 of Claude Code usage on average. The evaluation script is not in the repo yet (#80).
+A page used $0.27 of Claude Code usage on average. These runs gave Claude Code the page through its Read tool. It now gets the same image inside the request, with no tools. The evaluation script is not in the repo yet (#80).
 
 ## Limits
 

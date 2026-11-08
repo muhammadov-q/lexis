@@ -111,7 +111,7 @@ The default model loads when the API starts, the others on their first page, whi
 
 - A page takes one to two minutes.
 - The page is sent to Anthropic. Use it on your own computer with your own login, never on a shared server for other people.
-- Claude Code only gets its Read tool and an empty folder that holds the page, so writing on a page can't make it run anything.
+- Claude Code gets no tools. The page goes inside the request, so writing on a page can't make it open a file or run anything.
 - `RUN_CLAUDE_CODE=1 uv run pytest` also runs the tests that call Claude Code.
 
 To add a model, add its predictor to `PREDICTORS` in `src/ml/factory.py`. Give it a `display_name`, a `description` and, if it needs files, an `is_available`.

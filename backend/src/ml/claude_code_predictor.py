@@ -1,3 +1,4 @@
+import base64
 import io
 import json
 import shutil
@@ -8,7 +9,6 @@ from collections.abc import Callable, Sequence
 from dataclasses import replace
 from difflib import SequenceMatcher
 from itertools import groupby
-from pathlib import Path
 
 import numpy as np
 from numpy.typing import NDArray
@@ -21,11 +21,11 @@ from ml.translator import Gloss
 MODEL = "claude-opus-5-5"
 EFFORT = "medium"
 MAX_SIDE = 1568
-TIMEOUT_S = 600
+TIMEOUT_S = 280
 UNCONFIRMED = 0.5
 
 LineBox = tuple[int, int, int, int]
-Run = Callable[[list[str], Path], str]
+Run = Callable[[list[str], str], str]
 
 WORD_FIELDS = ("text", "lemma", "translation", "definition")
 SCHEMA = {
@@ -57,12 +57,12 @@ SCHEMA = {
 }
 
 
-def run_claude(command: list[str], folder: Path) -> str:
+def run_claude(command: list[str], message: str) -> str:
     try:
         done = subprocess.run(
             command,
-            cwd=folder,
-            stdin=subprocess.DEVNULL,
+            input=message,
+            cwd=tempfile.gettempdir(),
             capture_output=True,
             text=True,
             timeout=TIMEOUT_S,
@@ -75,34 +75,46 @@ def run_claude(command: list[str], folder: Path) -> str:
     return done.stdout
 
 
-def claude_command(prompt: str) -> list[str]:
+def claude_command() -> list[str]:
     return [
         "claude",
         "-p",
-        prompt,
         "--model",
         MODEL,
         "--effort",
         EFFORT,
         "--tools",
-        "Read",
-        "--allowedTools",
-        "Read",
+        "",
         "--strict-mcp-config",
         "--no-session-persistence",
+        "--input-format",
+        "stream-json",
         "--output-format",
-        "json",
+        "stream-json",
+        "--verbose",
         "--json-schema",
         json.dumps(SCHEMA),
     ]
 
 
+def claude_message(png: bytes, prompt: str) -> str:
+    image = base64.b64encode(png).decode()
+    content = [
+        {
+            "type": "image",
+            "source": {"type": "base64", "media_type": "image/png", "data": image},
+        },
+        {"type": "text", "text": prompt},
+    ]
+    return json.dumps({"type": "user", "message": {"role": "user", "content": content}})
+
+
 def page_prompt(size: tuple[int, int], boxes: Sequence[LineBox]) -> str:
     listed = "\n".join(f"{i}: {list(box)}" for i, box in enumerate(boxes))
     return (
-        f"page.png in this folder is a scanned page of a Greek manuscript, "
-        f"{size[0]} x {size[1]} pixels. Read it with the Read tool. A line finder "
-        f"found these text lines, top to bottom, as [x0, y0, x1, y1] pixel boxes:\n"
+        f"This is a scanned page of a Greek manuscript, {size[0]} x {size[1]} "
+        "pixels. A line finder found these text lines, top to bottom, as "
+        "[x0, y0, x1, y1] pixel boxes:\n"
         f"{listed}\n"
         "For every numbered line, write its words in reading order exactly as "
         "written, in Unicode Greek with accents and breathings, keeping the "
@@ -118,9 +130,11 @@ def page_prompt(size: tuple[int, int], boxes: Sequence[LineBox]) -> str:
 
 def parse_answer(output: str) -> dict[int, list[dict[str, str]]]:
     try:
-        result = json.loads(output)
+        events = [json.loads(line) for line in output.splitlines() if line.strip()]
     except json.JSONDecodeError as e:
         raise RuntimeError("Claude Code did not answer in JSON") from e
+    results = [e for e in events if e.get("type") == "result"]
+    result = results[-1] if results else {}
     lines = (result.get("structured_output") or {}).get("lines")
     if result.get("is_error") or lines is None:
         raise RuntimeError(f"Claude Code failed: {str(result.get('result'))[:300]}")
@@ -247,10 +261,12 @@ class ClaudeCodePredictor(AbstractPredictor):
             (round(page.width * scale), round(page.height * scale)),
             Image.Resampling.LANCZOS,
         )
-        with tempfile.TemporaryDirectory() as folder:
-            sent.save(Path(folder) / "page.png")
-            prompt = page_prompt(sent.size, [scaled(box, scale) for box in boxes])
-            read = parse_answer(self.run(claude_command(prompt), Path(folder)))
+        png = io.BytesIO()
+        sent.save(png, format="PNG")
+        prompt = page_prompt(sent.size, [scaled(box, scale) for box in boxes])
+        read = parse_answer(
+            self.run(claude_command(), claude_message(png.getvalue(), prompt))
+        )
 
         gray = np.asarray(page.convert("L"), dtype=np.uint8)
         words: list[Prediction] = []

@@ -1,7 +1,9 @@
+import base64
 import io
 import json
 import os
 import subprocess
+import tempfile
 
 import numpy as np
 import pytest
@@ -46,16 +48,15 @@ def read(text, lemma="λῆμμα", translation="word", definition="noun: a word
 
 
 def answer(*lines):
-    return json.dumps(
-        {
-            "type": "result",
-            "subtype": "success",
-            "is_error": False,
-            "structured_output": {
-                "lines": [{"line": i, "words": words} for i, words in lines]
-            },
-        }
-    )
+    result = {
+        "type": "result",
+        "subtype": "success",
+        "is_error": False,
+        "structured_output": {
+            "lines": [{"line": i, "words": words} for i, words in lines]
+        },
+    }
+    return json.dumps({"type": "system"}) + "\n" + json.dumps(result) + "\n"
 
 
 class FoundLines(AbstractPredictor):
@@ -75,14 +76,16 @@ class Claude:
         self.output = output
         self.calls = []
 
-    def __call__(self, command, folder):
-        saved = Image.open(folder / "page.png")
+    def __call__(self, command, message):
+        image, text = json.loads(message)["message"]["content"]
+        sent = Image.open(io.BytesIO(base64.b64decode(image["source"]["data"])))
         self.calls.append(
             {
                 "command": command,
-                "files": sorted(p.name for p in folder.iterdir()),
-                "format": saved.format,
-                "size": saved.size,
+                "media_type": image["source"]["media_type"],
+                "format": sent.format,
+                "size": sent.size,
+                "prompt": text["text"],
             }
         )
         return self.output
@@ -192,33 +195,33 @@ def test_no_lines_found_means_no_call_to_claude():
     assert claude.calls == []
 
 
-def test_claude_code_only_gets_the_read_tool():
+def test_claude_code_gets_no_tools():
     claude = Claude(answer((0, [read("αβ"), read("γδ")])))
     ClaudeCodePredictor(lines=FoundLines(TWO_WORDS), run=claude).predict(page())
     command = claude.calls[0]["command"]
 
     assert command[:2] == ["claude", "-p"]
-    assert command[command.index("--tools") + 1] == "Read"
-    assert command[command.index("--allowedTools") + 1] == "Read"
+    assert command[command.index("--tools") + 1] == ""
+    assert "--allowedTools" not in command
     assert command[command.index("--model") + 1] == MODEL
     assert command[command.index("--effort") + 1] == EFFORT
     assert {"--strict-mcp-config", "--no-session-persistence"} <= set(command)
 
 
-def test_claude_sees_only_the_page_as_png():
+def test_the_page_goes_inside_the_request_as_png():
     claude = Claude(answer((0, [read("αβ"), read("γδ")])))
     ClaudeCodePredictor(lines=FoundLines(TWO_WORDS), run=claude).predict(
         page(image_format="JPEG")
     )
 
-    assert claude.calls[0]["files"] == ["page.png"]
+    assert claude.calls[0]["media_type"] == "image/png"
     assert claude.calls[0]["format"] == "PNG"
 
 
 def test_the_prompt_lists_each_line_box():
     claude = Claude(answer((0, [read("αβ"), read("γδ")])))
     ClaudeCodePredictor(lines=FoundLines(TWO_WORDS), run=claude).predict(page())
-    prompt = claude.calls[0]["command"][2]
+    prompt = claude.calls[0]["prompt"]
 
     assert "300 x 100 pixels" in prompt
     assert "0: [20, 30, 180, 65]" in prompt
@@ -233,7 +236,7 @@ def test_a_large_page_is_scaled_down_with_its_line_boxes():
     )
 
     assert claude.calls[0]["size"] == (MAX_SIDE, 500)
-    assert "0: [100, 50, 300, 75]" in claude.calls[0]["command"][2]
+    assert "0: [100, 50, 300, 75]" in claude.calls[0]["prompt"]
 
 
 @pytest.mark.parametrize(
@@ -241,6 +244,7 @@ def test_a_large_page_is_scaled_down_with_its_line_boxes():
     [
         "not json",
         json.dumps({"type": "result", "is_error": True, "result": "Not logged in"}),
+        json.dumps({"type": "system"}),
     ],
 )
 def test_an_answer_without_words_is_an_error(output):
@@ -248,7 +252,7 @@ def test_an_answer_without_words_is_an_error(output):
         predictor(TWO_WORDS, output).predict(page())
 
 
-def test_run_claude_runs_in_the_folder_with_a_time_limit(monkeypatch, tmp_path):
+def test_run_claude_sends_the_message_with_a_time_limit(monkeypatch):
     seen = {}
 
     def fake_run(command, **kwargs):
@@ -257,13 +261,17 @@ def test_run_claude_runs_in_the_folder_with_a_time_limit(monkeypatch, tmp_path):
 
     monkeypatch.setattr("ml.claude_code_predictor.subprocess.run", fake_run)
 
-    assert run_claude(["claude"], tmp_path) == "out"
-    assert seen["cwd"] == tmp_path
-    assert seen["stdin"] is subprocess.DEVNULL
+    assert run_claude(["claude"], "message") == "out"
+    assert seen["input"] == "message"
+    assert seen["cwd"] == tempfile.gettempdir()
     assert seen["timeout"] == TIMEOUT_S
 
 
-def test_run_claude_reports_a_failed_run(monkeypatch, tmp_path):
+def test_the_time_limit_is_under_the_web_proxys():
+    assert TIMEOUT_S < 300
+
+
+def test_run_claude_reports_a_failed_run(monkeypatch):
     monkeypatch.setattr(
         "ml.claude_code_predictor.subprocess.run",
         lambda command, **kwargs: subprocess.CompletedProcess(
@@ -271,16 +279,16 @@ def test_run_claude_reports_a_failed_run(monkeypatch, tmp_path):
         ),
     )
     with pytest.raises(RuntimeError, match="Not logged in"):
-        run_claude(["claude"], tmp_path)
+        run_claude(["claude"], "message")
 
 
-def test_run_claude_reports_a_timeout(monkeypatch, tmp_path):
+def test_run_claude_reports_a_timeout(monkeypatch):
     def too_slow(command, **kwargs):
         raise subprocess.TimeoutExpired(command, TIMEOUT_S)
 
     monkeypatch.setattr("ml.claude_code_predictor.subprocess.run", too_slow)
     with pytest.raises(RuntimeError, match="did not answer"):
-        run_claude(["claude"], tmp_path)
+        run_claude(["claude"], "message")
 
 
 def test_available_with_kraken_and_claude_installed(monkeypatch):

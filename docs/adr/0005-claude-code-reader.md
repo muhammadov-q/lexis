@@ -12,7 +12,7 @@ kraken reads about one letter in twelve wrong on Eparchos and gives no translati
 
 - Add a `claude-code` model that runs the `claude` command on the computer that runs the backend, with that person's Claude Code login.
 - kraken still finds the lines and word boxes. Claude reads the words and translates them.
-- Claude Code only gets its Read tool, in an empty temporary folder that holds the page.
+- Claude Code gets no tools. The page goes inside the request, so it can't open files or run commands.
 - The model is only listed when kraken works and `claude` is installed.
 
 ## Consequences
