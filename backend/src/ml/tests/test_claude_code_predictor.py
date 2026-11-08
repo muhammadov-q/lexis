@@ -95,7 +95,13 @@ TWO_WORDS = [found("αβ", (20, 30, 40, 30)), found("γδ", (120, 35, 60, 30))]
 
 
 def predictor(words, output):
-    return ClaudeCodePredictor(lines=FoundLines(words), run=Claude(output))
+    return ClaudeCodePredictor(finder=FoundLines(words), run=Claude(output))
+
+
+def sent_to_claude(words=TWO_WORDS, image=None):
+    claude = Claude(answer((0, [read(w.text) for w in words])))
+    ClaudeCodePredictor(finder=FoundLines(words), run=claude).predict(image or page())
+    return claude.calls[0]
 
 
 def test_is_an_abstract_predictor():
@@ -130,7 +136,7 @@ def test_a_word_keeps_krakens_confidence_only_when_both_read_it_the_same():
 
 
 def test_words_are_nfc():
-    decomposed = "ἀ"
+    decomposed = "α\u0313"
     words = predictor(TWO_WORDS, answer((0, [read(decomposed), read("γδ")]))).predict(
         page()
     )
@@ -191,14 +197,12 @@ def test_an_empty_line_is_dropped_and_the_next_one_renumbered():
 def test_no_lines_found_means_no_call_to_claude():
     claude = Claude(answer())
 
-    assert ClaudeCodePredictor(lines=FoundLines([]), run=claude).predict(page()) == []
+    assert ClaudeCodePredictor(finder=FoundLines([]), run=claude).predict(page()) == []
     assert claude.calls == []
 
 
 def test_claude_code_gets_no_tools():
-    claude = Claude(answer((0, [read("αβ"), read("γδ")])))
-    ClaudeCodePredictor(lines=FoundLines(TWO_WORDS), run=claude).predict(page())
-    command = claude.calls[0]["command"]
+    command = sent_to_claude()["command"]
 
     assert command[:2] == ["claude", "-p"]
     assert command[command.index("--tools") + 1] == ""
@@ -209,34 +213,26 @@ def test_claude_code_gets_no_tools():
 
 
 def test_the_page_goes_inside_the_request_as_png():
-    claude = Claude(answer((0, [read("αβ"), read("γδ")])))
-    ClaudeCodePredictor(lines=FoundLines(TWO_WORDS), run=claude).predict(
-        page(image_format="JPEG")
-    )
+    sent = sent_to_claude(image=page(image_format="JPEG"))
 
-    assert claude.calls[0]["media_type"] == "image/png"
-    assert claude.calls[0]["format"] == "PNG"
+    assert sent["media_type"] == "image/png"
+    assert sent["format"] == "PNG"
 
 
 def test_the_prompt_lists_each_line_box():
-    claude = Claude(answer((0, [read("αβ"), read("γδ")])))
-    ClaudeCodePredictor(lines=FoundLines(TWO_WORDS), run=claude).predict(page())
-    prompt = claude.calls[0]["prompt"]
+    prompt = sent_to_claude()["prompt"]
 
     assert "300 x 100 pixels" in prompt
     assert "0: [20, 30, 180, 65]" in prompt
 
 
 def test_a_large_page_is_scaled_down_with_its_line_boxes():
-    claude = Claude(answer((0, [read("αβ")])))
     big = [found("αβ", (200, 100, 400, 50))]
 
-    ClaudeCodePredictor(lines=FoundLines(big), run=claude).predict(
-        page(width=2 * MAX_SIDE, height=1000, ink=())
-    )
+    sent = sent_to_claude(big, page(width=2 * MAX_SIDE, height=1000, ink=()))
 
-    assert claude.calls[0]["size"] == (MAX_SIDE, 500)
-    assert "0: [100, 50, 300, 75]" in claude.calls[0]["prompt"]
+    assert sent["size"] == (MAX_SIDE, 500)
+    assert "0: [100, 50, 300, 75]" in sent["prompt"]
 
 
 @pytest.mark.parametrize(
