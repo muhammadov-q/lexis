@@ -27,9 +27,9 @@ tests {
     expect(predictions.map((p) => p.text)).to.eql(["2", "5", "0", "0", "0", "0"]);
   });
 
-  test("each prediction has text, probabilities, box, line and gloss", function () {
+  test("each prediction has text, probabilities, box, line, gloss and line translation", function () {
     for (const p of predictions) {
-      expect(p).to.have.all.keys("text", "probabilities", "box", "line", "gloss");
+      expect(p).to.have.all.keys("text", "probabilities", "box", "line", "gloss", "line_translation");
       expect(p.box).to.have.all.keys("x", "y", "w", "h");
     }
   });

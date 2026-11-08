@@ -14,6 +14,7 @@ const word = (text: string, box: Word['box'], line = 0): Word => ({
   box,
   line,
   gloss: null,
+  line_translation: null,
 })
 
 const words = [

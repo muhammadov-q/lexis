@@ -99,6 +99,28 @@ describe('Transcript', () => {
     expect(within(region).getByRole('button', { name: '? ·' })).toBeInTheDocument()
   })
 
+  it('shows the translation of each line under it, instead of word by word', async () => {
+    const translated = words.map((word) => ({
+      ...word,
+      line_translation: word.line === 0 ? 'Nature is.' : 'Unclear.',
+    }))
+    const region = renderTranscript(makeSelection(), translated)
+
+    expect(within(region).queryByText('Nature is.')).not.toBeInTheDocument()
+    await userEvent.click(within(region).getByRole('button', { name: 'With translation' }))
+
+    expect(within(region).getByText('Nature is.')).toBeInTheDocument()
+    expect(within(region).getByText('Unclear.')).toBeInTheDocument()
+    expect(within(region).getByRole('button', { name: 'Φύσις' })).toBeInTheDocument()
+  })
+
+  it('offers the translation view when only the lines are translated', () => {
+    const translated = words.map((word) => ({ ...word, gloss: null, line_translation: 'A line.' }))
+    const region = renderTranscript(makeSelection(), translated)
+
+    expect(within(region).getByRole('group', { name: 'Transcript view' })).toBeInTheDocument()
+  })
+
   it('offers no translation view when no word has a translation', () => {
     const untranslated = words.map((word) => ({ ...word, gloss: null }))
     const region = renderTranscript(makeSelection(), untranslated)

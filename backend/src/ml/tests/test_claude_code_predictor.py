@@ -13,6 +13,7 @@ from ml.claude_code_predictor import (
     EFFORT,
     MAX_SIDE,
     MODEL,
+    SCHEMA,
     TIMEOUT_S,
     UNCONFIRMED,
     ClaudeCodePredictor,
@@ -53,7 +54,10 @@ def answer(*lines):
         "subtype": "success",
         "is_error": False,
         "structured_output": {
-            "lines": [{"line": i, "words": words} for i, words in lines]
+            "lines": [
+                {"line": i, "words": words, "translation": f"Line {i} in English."}
+                for i, words in lines
+            ]
         },
     }
     return json.dumps({"type": "system"}) + "\n" + json.dumps(result) + "\n"
@@ -126,6 +130,18 @@ def test_each_word_gets_claudes_translation():
     assert words[0].gloss == Gloss(
         lemma="λῆμμα", translation="word", definition="noun: a word"
     )
+
+
+def test_each_word_carries_the_translation_of_its_line():
+    words = predictor(TWO_WORDS, answer((0, [read("ἀβ"), read("γδ")]))).predict(page())
+
+    assert [w.line_translation for w in words] == ["Line 0 in English."] * 2
+
+
+def test_claude_must_translate_every_line():
+    line = SCHEMA["properties"]["lines"]["items"]
+
+    assert "translation" in line["required"]
 
 
 def test_a_word_keeps_krakens_confidence_only_when_both_read_it_the_same():

@@ -17,6 +17,7 @@ export interface BoxPercent {
 
 export interface Line {
   number: number
+  translation: string | null
   words: { word: Word; index: number }[]
 }
 
@@ -28,7 +29,11 @@ export function groupLines(words: Word[]): Line[] {
   const lines = new Map<number, Line>()
 
   words.forEach((word, index) => {
-    const line = lines.get(word.line) ?? { number: word.line + 1, words: [] }
+    const line = lines.get(word.line) ?? {
+      number: word.line + 1,
+      translation: word.line_translation || null,
+      words: [],
+    }
     line.words.push({ word, index })
     lines.set(word.line, line)
   })

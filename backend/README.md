@@ -107,7 +107,7 @@ The default model loads when the API starts, the others on their first page, whi
 
 ## Read with Claude Code
 
-`claude-code` reads a page with Claude Opus 5.5 through Claude Code on your computer ([model card](../docs/models/claude-code.md)). kraken finds the lines and word boxes, and Claude reads the words and translates each one. It is listed once kraken works (see above) and the `claude` command is installed and signed in. It uses your Claude Code plan, not an API key.
+`claude-code` reads a page with Claude Opus 5.5 through Claude Code on your computer ([model card](../docs/models/claude-code.md)). kraken finds the lines and word boxes. Claude reads the words, translates each word, and translates each line so it reads naturally. The web app shows the line translations under each line in its translation view. It is listed once kraken works (see above) and the `claude` command is installed and signed in. It uses your Claude Code plan, not an API key.
 
 - A page takes one to two minutes.
 - The page is sent to Anthropic. Use it on your own computer with your own login, never on a shared server for other people.
