@@ -79,8 +79,8 @@ describe('confidenceOf', () => {
     expect(confidenceOf(word('7', 0, { '1': 0.08, '7': 0.92 }))).toBe(0.92)
   })
 
-  it('is 0 when the predicted text has no probability', () => {
-    expect(confidenceOf(word('7', 0, { '1': 1 }))).toBe(0)
+  it('is unknown when the predicted text has no probability', () => {
+    expect(confidenceOf(word('7', 0, { '1': 1 }))).toBeNull()
   })
 })
 

@@ -47,8 +47,8 @@ export function positionOf(words: Word[], index: number): { line: number; word: 
   return { line: line + 1, word: before + 1 }
 }
 
-export function confidenceOf(word: Word): number {
-  return word.probabilities[word.text] ?? 0
+export function confidenceOf(word: Word): number | null {
+  return word.probabilities[word.text] ?? null
 }
 
 export function hasBox(box: WordBox): boolean {

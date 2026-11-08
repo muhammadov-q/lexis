@@ -23,7 +23,6 @@ MODEL = "claude-opus-5-5"
 EFFORT = "medium"
 MAX_SIDE = 1568
 TIMEOUT_S = 280
-UNCONFIRMED = 0.5
 
 LineBox = tuple[int, int, int, int]
 Run = Callable[[list[str], str], str]
@@ -208,15 +207,15 @@ def read_line(
     for text, entry, (word_box, kraken) in zip(
         texts, read, place_words(texts, found, box, gray), strict=True
     ):
-        confidence = (
-            kraken.probabilities[kraken.text]
+        probabilities = (
+            {text: kraken.probabilities[kraken.text]}
             if kraken is not None and kraken.text == text
-            else UNCONFIRMED
+            else {}
         )
         words.append(
             Prediction(
                 text=text,
-                probabilities={text: confidence},
+                probabilities=probabilities,
                 box=word_box,
                 line=line,
                 gloss=Gloss(
