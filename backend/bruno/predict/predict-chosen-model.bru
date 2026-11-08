@@ -1,0 +1,22 @@
+meta {
+  name: Predict - chosen model
+  type: http
+  seq: 4
+}
+
+post {
+  url: {{baseUrl}}/predict
+  body: multipartForm
+  auth: none
+}
+
+body:multipart-form {
+  image: @file(fixtures/test.png)
+  model: eparchos
+}
+
+assert {
+  res.status: eq 200
+  res.body.model_version: eq eparchos-6791
+  res.body.predictions: isArray
+}

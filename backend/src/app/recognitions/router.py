@@ -35,9 +35,8 @@ router = APIRouter(
 
 def get_recognition_service(
     db: Annotated[Session, Depends(get_db)],
-    predictor: Annotated[AbstractPredictor, Depends(get_predictor)],
 ) -> RecognitionService:
-    return RecognitionService(RecognitionRepository(db), predictor)
+    return RecognitionService(RecognitionRepository(db))
 
 
 Service = Annotated[RecognitionService, Depends(get_recognition_service)]
@@ -72,11 +71,12 @@ def create_recognition(
     user: CurrentUser,
     service: Service,
     upload: Annotated[ImageUpload, Depends(capped_upload)],
+    predictor: Annotated[AbstractPredictor, Depends(get_predictor)],
 ) -> RecognitionResponse:
     if upload.content_type not in PAGE_TYPES:
         raise HTTPException(status_code=415, detail=ERROR_415_PAGE)
     try:
-        recognition = service.recognize(user.id, upload)
+        recognition = service.recognize(user.id, upload, predictor)
     except ValueError as e:
         raise HTTPException(status_code=422, detail=str(e)) from e
     return RecognitionResponse.of(recognition)

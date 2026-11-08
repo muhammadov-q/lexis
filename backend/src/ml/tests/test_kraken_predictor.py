@@ -1,11 +1,11 @@
 import unicodedata
-from importlib.util import find_spec
 
 import numpy as np
 import pytest
 
 from ml.kraken_predictor import (
-    MODEL_PATH,
+    BASE_MODEL_PATH,
+    KrakenBasePredictor,
     KrakenPredictor,
     bounds,
     ink_box,
@@ -90,8 +90,52 @@ def test_missing_model_says_where_it_looked(tmp_path):
         KrakenPredictor(tmp_path / "nope.safetensors")
 
 
+def test_available_with_the_extra_and_the_model(monkeypatch, tmp_path):
+    weights = tmp_path / "weights.safetensors"
+    weights.touch()
+    monkeypatch.setenv("KRAKEN_MODEL", str(weights))
+    monkeypatch.setattr("ml.kraken_predictor.find_spec", lambda _: object())
+    assert KrakenPredictor.is_available()
+
+
+def test_not_available_without_the_model(monkeypatch, tmp_path):
+    monkeypatch.setenv("KRAKEN_MODEL", str(tmp_path / "missing.safetensors"))
+    monkeypatch.setattr("ml.kraken_predictor.find_spec", lambda _: object())
+    assert not KrakenPredictor.is_available()
+
+
+def test_not_available_without_the_extra(monkeypatch, tmp_path):
+    weights = tmp_path / "weights.safetensors"
+    weights.touch()
+    monkeypatch.setenv("KRAKEN_MODEL", str(weights))
+    monkeypatch.setattr("ml.kraken_predictor.find_spec", lambda _: None)
+    assert not KrakenPredictor.is_available()
+
+
+@pytest.mark.parametrize("path", ["", "."])
+def test_not_available_when_the_path_is_not_a_file(monkeypatch, path):
+    monkeypatch.setenv("KRAKEN_MODEL", path)
+    monkeypatch.setattr("ml.kraken_predictor.find_spec", lambda _: object())
+    assert not KrakenPredictor.is_available()
+
+
+def test_base_model_ignores_the_fine_tuned_model_setting(monkeypatch, tmp_path):
+    monkeypatch.setenv("KRAKEN_MODEL", str(tmp_path / "other.safetensors"))
+    assert KrakenBasePredictor.weights_path() == BASE_MODEL_PATH
+
+
+def test_base_model_is_available_once_downloaded(monkeypatch, tmp_path):
+    weights = tmp_path / "base.safetensors"
+    monkeypatch.setattr("ml.kraken_predictor.BASE_MODEL_PATH", weights)
+    monkeypatch.setattr("ml.kraken_predictor.find_spec", lambda _: object())
+    assert not KrakenBasePredictor.is_available()
+
+    weights.touch()
+    assert KrakenBasePredictor.is_available()
+
+
 needs_model = pytest.mark.skipif(
-    find_spec("kraken") is None or not MODEL_PATH.exists(),
+    not KrakenPredictor.is_available(),
     reason="needs the ml extra and the kraken model, see backend/README.md",
 )
 

@@ -54,6 +54,12 @@ class EparchosPredictor(AbstractPredictor):
     page's coordinates (788 x 805 px for 6791).
     """
 
+    display_name = "Eparchos page 6791 (mock)"
+    description = (
+        "Ignores the page and returns the words of Eparchos page 6791, "
+        "with translations. For demos."
+    )
+
     def __init__(self, xml_path: Path = XML_PATH) -> None:
         super().__init__()
         self.model_name = f"eparchos-{xml_path.stem.removeprefix('eparchos_')}"

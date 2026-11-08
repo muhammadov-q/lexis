@@ -1,10 +1,7 @@
-from importlib.util import find_spec
-
 import pytest
 
-from ml.factory import PREDICTORS, create_predictor
-from ml.knn_predictor import MODEL_PATH
-from ml.kraken_predictor import MODEL_PATH as KRAKEN_MODEL_PATH
+from ml.factory import PREDICTORS, create_predictor, default_predictor_name
+from ml.knn_predictor import KnnPredictor
 from ml.predictor import AbstractPredictor, DummyPredictor, Prediction
 
 
@@ -53,18 +50,24 @@ def test_unknown_env_var_raises(monkeypatch):
         create_predictor()
 
 
+def test_default_name_comes_from_the_env_var(monkeypatch):
+    monkeypatch.setenv("ML_PREDICTOR", "fake")
+    assert default_predictor_name() == "fake"
+
+
+def test_default_name_is_dummy_without_the_env_var(monkeypatch):
+    monkeypatch.delenv("ML_PREDICTOR", raising=False)
+    assert default_predictor_name() == "dummy"
+
+
 def test_each_call_returns_a_new_instance():
     assert create_predictor("dummy") is not create_predictor("dummy")
 
 
 @pytest.mark.parametrize("name", sorted(PREDICTORS))
 def test_every_registered_predictor_follows_the_contract(name, digit_image):
-    if name == "knn" and not MODEL_PATH.exists():
-        pytest.skip("KNN model not trained (run train_knn.py)")
-    if name == "kraken" and (
-        find_spec("kraken") is None or not KRAKEN_MODEL_PATH.exists()
-    ):
-        pytest.skip("needs the ml extra and the kraken model, see backend/README.md")
+    if not PREDICTORS[name].is_available():
+        pytest.skip(f"{name} can't run in this install, see backend/README.md")
 
     predictor = create_predictor(name)
     assert isinstance(predictor, AbstractPredictor)
@@ -77,3 +80,23 @@ def test_every_registered_predictor_follows_the_contract(name, digit_image):
         assert isinstance(r.text, str)
         assert isinstance(r.probabilities, dict)
         assert len(r.box) == 4
+
+
+@pytest.mark.parametrize("name", sorted(PREDICTORS))
+def test_every_registered_predictor_describes_itself(name):
+    predictor_class = PREDICTORS[name]
+    assert predictor_class.display_name
+    assert predictor_class.description
+
+
+def test_a_predictor_without_requirements_is_available():
+    assert DummyPredictor.is_available()
+
+
+def test_knn_is_available_only_once_trained(monkeypatch, tmp_path):
+    model = tmp_path / "knn_mnist.joblib"
+    monkeypatch.setattr("ml.knn_predictor.MODEL_PATH", model)
+    assert not KnnPredictor.is_available()
+
+    model.touch()
+    assert KnnPredictor.is_available()

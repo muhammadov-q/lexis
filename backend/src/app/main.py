@@ -13,12 +13,18 @@ from app.capture.router import capture_session_not_found
 from app.capture.router import router as capture_router
 from app.capture.service import CaptureSessionNotFound
 from app.db import engine, migrate
-from app.prediction import PredictionItem, get_predictor
+from app.prediction import (
+    ModelResponse,
+    ModelsResponse,
+    PredictionItem,
+    get_predictor,
+    get_registry,
+)
 from app.recognitions.router import recognition_not_found
 from app.recognitions.router import router as recognitions_router
 from app.recognitions.service import RecognitionNotFound
 from app.uploads import UPLOAD_ERRORS, capped_image
-from ml import AbstractPredictor
+from ml import AbstractPredictor, ModelRegistry
 
 
 @asynccontextmanager
@@ -41,14 +47,24 @@ class PredictResponse(BaseModel):
     model_version: str
 
 
+@app.get("/models")
+def list_models(
+    registry: Annotated[ModelRegistry, Depends(get_registry)],
+) -> ModelsResponse:
+    return ModelsResponse(
+        models=[ModelResponse.of(m) for m in registry.available()],
+        default_model=registry.default,
+    )
+
+
 @app.post(
     "/predict",
     response_model=PredictResponse,
     responses=UPLOAD_ERRORS,
 )
 async def predict(
-    predictor: Annotated[AbstractPredictor, Depends(get_predictor)],
     content: Annotated[bytes, Depends(capped_image)],
+    predictor: Annotated[AbstractPredictor, Depends(get_predictor)],
 ) -> PredictResponse:
     try:
         results = await run_in_threadpool(predictor.predict, content)

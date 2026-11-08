@@ -1,19 +1,60 @@
 from dataclasses import asdict
+from typing import Annotated
 
+from fastapi import Depends, Form, HTTPException
 from pydantic import BaseModel, ConfigDict
 
-from ml import AbstractPredictor, create_predictor
+from ml import (
+    AbstractPredictor,
+    ModelInfo,
+    ModelRegistry,
+    UnknownModel,
+    create_predictor,
+)
 from ml.predictor import Prediction
 from ml.translating_predictor import TranslatingPredictor
 from ml.translator import GlossaryTranslator
 
-predictor: AbstractPredictor = TranslatingPredictor(
-    create_predictor(), GlossaryTranslator()
-)
+translator = GlossaryTranslator()
 
 
-def get_predictor() -> AbstractPredictor:
-    return predictor
+def build_predictor(name: str) -> AbstractPredictor:
+    return TranslatingPredictor(create_predictor(name), translator)
+
+
+registry = ModelRegistry(build=build_predictor)
+
+
+def get_registry() -> ModelRegistry:
+    return registry
+
+
+def get_predictor(
+    registry: Annotated[ModelRegistry, Depends(get_registry)],
+    model: Annotated[
+        str | None,
+        Form(description="A model id from GET /models. Without it, the default model."),
+    ] = None,
+) -> AbstractPredictor:
+    try:
+        return registry.get(model)
+    except UnknownModel as e:
+        raise HTTPException(status_code=422, detail=str(e)) from e
+
+
+class ModelResponse(BaseModel):
+    id: str
+    name: str
+    description: str
+
+    @classmethod
+    def of(cls, model: ModelInfo) -> "ModelResponse":
+        return cls(**asdict(model))
+
+
+class ModelsResponse(BaseModel):
+    models: list[ModelResponse]
+    default_model: str
 
 
 class BoxResponse(BaseModel):

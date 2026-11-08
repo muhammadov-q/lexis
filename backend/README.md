@@ -75,12 +75,37 @@ To read the uploaded page for real, run the `kraken` predictor. It needs the opt
 ```bash
 cd backend
 uv sync --extra ml
-curl -L -o src/ml/models/kraken_eparchos.safetensors \
+curl -fL -o src/ml/models/kraken_eparchos.safetensors \
   https://github.com/muhammadov-q/team4/releases/download/model-kraken-eparchos-v1/kraken_eparchos.safetensors
 ML_PREDICTOR="kraken" uv run uvicorn app.main:app --reload
 ```
 
 `KRAKEN_MODEL=/path/to/model.safetensors` uses another kraken recognition model.
+
+To compare, `kraken-base` reads with the same model before fine-tuning ([model card](../docs/models/ppocrv6-small.md)). It needs the `ml` dependencies too, and its own weights from Zenodo:
+
+```bash
+cd backend
+curl -fL -o src/ml/models/ppocrv6_small.safetensors \
+  https://zenodo.org/records/21788405/files/small.safetensors
+```
+
+## Choose a model
+
+`ML_PREDICTOR` sets the default model, and a request can pick another one:
+
+- `GET /models` lists the models this install can run, and the default. A model that needs weights or the `ml` extra is only listed once they are there.
+- `POST /predict` and `POST /recognitions` take an optional form field `model` next to `image`. Without it they use the default. A model that isn't on the list gets a 422.
+
+```bash
+curl -F image=@page.png -F model=kraken http://localhost:8000/predict
+```
+
+`model_version` in the response says which model read the page, and the results history saves it.
+
+The default model loads when the API starts, the others on their first page, which takes a few seconds longer. A loaded model stays in memory until the API stops. On a laptop, kraken took 4 to 5 GB while reading, and about 5.5 GB with both kraken models loaded.
+
+To add a model, add its predictor to `PREDICTORS` in `src/ml/factory.py`. Give it a `display_name`, a `description` and, if it needs files, an `is_available`.
 
 ## Run the tests
 

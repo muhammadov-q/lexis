@@ -1,0 +1,36 @@
+meta {
+  name: Models - list
+  type: http
+  seq: 6
+}
+
+get {
+  url: {{baseUrl}}/models
+  body: none
+  auth: none
+}
+
+assert {
+  res.status: eq 200
+  res.body.default_model: eq dummy
+  res.body.models: isArray
+}
+
+tests {
+  const { models, default_model } = res.getBody();
+  const ids = models.map((m) => m.id);
+
+  test("each model has an id, a name and a description", function () {
+    for (const m of models) {
+      expect(m).to.have.all.keys("id", "name", "description");
+    }
+  });
+
+  test("the default is one of the choices", function () {
+    expect(ids).to.include(default_model);
+  });
+
+  test("the mocks need nothing installed, so they are always there", function () {
+    expect(ids).to.include.members(["eparchos", "dummy"]);
+  });
+}

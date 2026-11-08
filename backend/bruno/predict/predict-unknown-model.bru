@@ -1,0 +1,21 @@
+meta {
+  name: Predict - unknown model
+  type: http
+  seq: 5
+}
+
+post {
+  url: {{baseUrl}}/predict
+  body: multipartForm
+  auth: none
+}
+
+body:multipart-form {
+  image: @file(fixtures/test.png)
+  model: does-not-exist
+}
+
+assert {
+  res.status: eq 422
+  res.body.detail: contains Choose one of
+}

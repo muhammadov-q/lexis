@@ -174,6 +174,23 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/models": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List Models */
+        get: operations["list_models_models_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/predict": {
         parameters: {
             query?: never;
@@ -199,11 +216,21 @@ export interface components {
         Body_create_recognition_recognitions_post: {
             /** Image */
             image: string;
+            /**
+             * Model
+             * @description A model id from GET /models. Without it, the default model.
+             */
+            model?: string | null;
         };
         /** Body_predict_predict_post */
         Body_predict_predict_post: {
             /** Image */
             image: string;
+            /**
+             * Model
+             * @description A model id from GET /models. Without it, the default model.
+             */
+            model?: string | null;
         };
         /** Body_upload_capture_image_capture_sessions__session_id__image_put */
         Body_upload_capture_image_capture_sessions__session_id__image_put: {
@@ -253,6 +280,22 @@ export interface components {
         HTTPValidationError: {
             /** Detail */
             detail?: components["schemas"]["ValidationError"][];
+        };
+        /** ModelResponse */
+        ModelResponse: {
+            /** Id */
+            id: string;
+            /** Name */
+            name: string;
+            /** Description */
+            description: string;
+        };
+        /** ModelsResponse */
+        ModelsResponse: {
+            /** Models */
+            models: components["schemas"]["ModelResponse"][];
+            /** Default Model */
+            default_model: string;
         };
         /** PredictResponse */
         PredictResponse: {
@@ -869,6 +912,26 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    list_models_models_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ModelsResponse"];
                 };
             };
         };

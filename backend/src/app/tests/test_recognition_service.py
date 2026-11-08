@@ -32,13 +32,11 @@ def bob(make_user):
 
 @pytest.fixture
 def service(db):
-    return RecognitionService(
-        RecognitionRepository(db), DummyPredictor(), clock=lambda: NOON
-    )
+    return RecognitionService(RecognitionRepository(db), clock=lambda: NOON)
 
 
 def test_recognize_saves_the_page_and_what_the_model_read(service, db, ada):
-    recognition = service.recognize(ada, PAGE)
+    recognition = service.recognize(ada, PAGE, DummyPredictor())
     db.expire_all()
 
     saved = service.get(ada, recognition.id)
@@ -57,17 +55,15 @@ def test_recognize_saves_the_page_and_what_the_model_read(service, db, ada):
     assert [r.id for r in service.history(ada)] == [recognition.id]
 
 
-def test_an_image_the_model_cannot_read_is_not_saved(db, ada):
-    service = RecognitionService(RecognitionRepository(db), UnreadablePredictor())
-
+def test_an_image_the_model_cannot_read_is_not_saved(service, ada):
     with pytest.raises(ValueError, match="decode"):
-        service.recognize(ada, PAGE)
+        service.recognize(ada, PAGE, UnreadablePredictor())
 
     assert service.history(ada) == []
 
 
 def test_someone_elses_result_is_not_found(service, ada, bob):
-    recognition = service.recognize(ada, PAGE)
+    recognition = service.recognize(ada, PAGE, DummyPredictor())
 
     with pytest.raises(RecognitionNotFound):
         service.get(bob, recognition.id)
@@ -83,4 +79,4 @@ def test_an_unknown_result_is_not_found(service, ada):
 def test_long_filenames_are_shortened(service, ada):
     upload = ImageUpload(content=b"x", content_type="image/png", filename="a" * 300)
 
-    assert len(service.recognize(ada, upload).filename) == 255
+    assert len(service.recognize(ada, upload, DummyPredictor()).filename) == 255
