@@ -64,9 +64,10 @@ class AuthRepositoryImplTest {
     }
 
     @Test
-    fun currentUserOrNullReturnsNullAndClearsCookieOnUnauthorized() = runTest {
+    fun currentUserOrNullReturnsNullWithoutClearingCookieOnUnauthorized() = runTest {
         val cookieStore = FakeCookieStore()
         val sessionStore = AuthSessionStore()
+        sessionStore.setAuthenticated(User(1, "user@example.com", null, null))
         val engine = MockEngine {
             respond(
                 content = """{"detail":"Sign in to continue."}""",
@@ -79,8 +80,8 @@ class AuthRepositoryImplTest {
         val result = repository.currentUserOrNull()
 
         assertNull(result)
-        assertEquals(1, cookieStore.clearCount)
-        assertTrue(sessionStore.mode.value is SessionMode.Guest)
+        assertEquals(0, cookieStore.clearCount)
+        assertTrue(sessionStore.mode.value is SessionMode.Authenticated)
     }
 
     @Test
@@ -134,7 +135,7 @@ class AuthRepositoryImplTest {
     private class FakeCookieStore : SessionCookieStore {
         var clearCount: Int = 0
 
-        override fun clearSessionCookie() {
+        override suspend fun clearSessionCookie() {
             clearCount += 1
         }
     }

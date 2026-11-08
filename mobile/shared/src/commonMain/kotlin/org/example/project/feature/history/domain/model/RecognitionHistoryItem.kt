@@ -16,6 +16,5 @@ data class RecognitionDetail(
     val filename: String,
     val modelVersion: String,
     val prediction: Prediction,
-    val imageBytes: ByteArray,
+    val imageBytes: ByteArray?,
 )
-

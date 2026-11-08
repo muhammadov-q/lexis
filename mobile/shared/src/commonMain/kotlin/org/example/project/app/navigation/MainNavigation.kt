@@ -11,6 +11,7 @@ import androidx.savedstate.read
 import org.example.project.app.presentation.AppEvent
 import org.example.project.core.navigation.AppRoutes
 import org.example.project.core.navigation.Screen
+import org.example.project.core.navigation.navigateCameraRoot
 import org.example.project.core.navigation.navigateHistoryDetail
 import org.example.project.feature.auth.presentation.AuthMode
 import org.example.project.feature.auth.presentation.AuthScreen
@@ -46,7 +47,7 @@ internal fun MainNavigation(
                 viewModel = historyViewModel,
                 onSignInRequested = { onEvent(AppEvent.SignInRequested(AuthMode.SignIn)) },
                 onCreateAccountRequested = { onEvent(AppEvent.SignInRequested(AuthMode.SignUp)) },
-                onReadPageRequested = { navController.navigate(Screen.CameraView.route) },
+                onReadPageRequested = navController::navigateCameraRoot,
                 onOpenDetail = navController::navigateHistoryDetail,
             )
         }

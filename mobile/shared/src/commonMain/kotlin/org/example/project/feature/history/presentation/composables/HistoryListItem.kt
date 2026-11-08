@@ -17,11 +17,13 @@ import androidx.compose.ui.tooling.preview.Preview
 import org.example.project.common.presentation.ui.theme.ScriptLensColors
 import org.example.project.common.presentation.ui.theme.ScriptLensSpacing
 import org.example.project.common.presentation.ui.theme.ScriptLensTheme
+import org.example.project.common.presentation.helpers.HistoryDateTimeFormatter
 import org.example.project.feature.history.domain.model.RecognitionHistoryItem
-import org.example.project.feature.history.presentation.formatHistoryDateTime
 import org.jetbrains.compose.resources.stringResource
 import scriptlens.shared.generated.resources.Res
+import scriptlens.shared.generated.resources.history_no_words
 import scriptlens.shared.generated.resources.history_read_on
+import scriptlens.shared.generated.resources.history_untitled_page
 
 @Composable
 internal fun HistoryListItem(
@@ -48,21 +50,29 @@ internal fun HistoryListItem(
                 verticalArrangement = Arrangement.spacedBy(ScriptLensSpacing.padding_4),
             ) {
                 Text(
-                    text = if (item.filename.isBlank()) "Untitled page" else item.filename,
+                    text = if (item.filename.isBlank()) {
+                        stringResource(Res.string.history_untitled_page)
+                    } else {
+                        item.filename
+                    },
                     style = MaterialTheme.typography.titleSmall,
                     color = MaterialTheme.colorScheme.onSurface,
                 )
                 Text(
                     text = stringResource(
                         Res.string.history_read_on,
-                        formatHistoryDateTime(item.createdAt)
+                        HistoryDateTimeFormatter.format(item.createdAt)
                     ),
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
             }
             Text(
-                text = if (item.previewText.isBlank()) "No words" else item.previewText,
+                text = if (item.previewText.isBlank()) {
+                    stringResource(Res.string.history_no_words)
+                } else {
+                    item.previewText
+                },
                 style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.onSurface,
                 modifier = Modifier.weight(1f),

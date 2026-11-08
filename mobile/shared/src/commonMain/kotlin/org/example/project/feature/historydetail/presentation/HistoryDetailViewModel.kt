@@ -61,9 +61,6 @@ class HistoryDetailViewModel(
                 throw cancellation
             } catch (exception: Exception) {
                 if (currentRequestId != requestId) return@launch
-                if (exception is AuthApiException && exception.status == 401) {
-                    authSessionStore.setGuest()
-                }
                 _state.setState {
                     it.copy(
                         isLoading = false,

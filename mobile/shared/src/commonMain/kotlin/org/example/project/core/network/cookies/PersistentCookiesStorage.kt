@@ -8,7 +8,7 @@ import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
-import org.example.project.core.persistence.AuthCookiePersistence
+import org.example.project.core.persistence.CookiePersistence
 import org.example.project.core.persistence.SessionCookieStore
 
 private const val SESSION_COOKIE_NAME = "team4_session"
@@ -16,7 +16,9 @@ private const val SESSION_COOKIE_NAME = "team4_session"
 /**
  * Persists auth cookies so mobile sessions survive app restarts.
  */
-class PersistentCookiesStorage : CookiesStorage, SessionCookieStore {
+class PersistentCookiesStorage(
+    private val persistence: CookiePersistence,
+) : CookiesStorage, SessionCookieStore {
     private val lock = Mutex()
     private val json = Json { ignoreUnknownKeys = true }
     private val cookies = loadCookies().toMutableList()
@@ -50,15 +52,17 @@ class PersistentCookiesStorage : CookiesStorage, SessionCookieStore {
         // No resources to close.
     }
 
-    override fun clearSessionCookie() {
-        val filtered = cookies.filterNot { it.name == SESSION_COOKIE_NAME }
-        cookies.clear()
-        cookies.addAll(filtered)
-        persistCookies()
+    override suspend fun clearSessionCookie() {
+        lock.withLock {
+            val filtered = cookies.filterNot { it.name == SESSION_COOKIE_NAME }
+            cookies.clear()
+            cookies.addAll(filtered)
+            persistCookies()
+        }
     }
 
     private fun loadCookies(): List<PersistedCookie> {
-        val raw = AuthCookiePersistence.read().orEmpty()
+        val raw = persistence.read().orEmpty()
         if (raw.isBlank()) return emptyList()
 
         return runCatching {
@@ -79,10 +83,10 @@ class PersistentCookiesStorage : CookiesStorage, SessionCookieStore {
 
     private fun persistCookies() {
         if (cookies.isEmpty()) {
-            AuthCookiePersistence.clear()
+            persistence.clear()
             return
         }
-        AuthCookiePersistence.write(json.encodeToString(cookies))
+        persistence.write(json.encodeToString(cookies))
     }
 }
 

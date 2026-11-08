@@ -1,9 +1,8 @@
 package org.example.project.core.persistence
 
-expect object AuthCookiePersistence {
-    fun read(): String?
-    fun write(value: String)
-    fun clear()
+expect object AuthCookiePersistence : CookiePersistence {
+    override fun read(): String?
+    override fun write(value: String)
+    override fun clear()
 }
-
 

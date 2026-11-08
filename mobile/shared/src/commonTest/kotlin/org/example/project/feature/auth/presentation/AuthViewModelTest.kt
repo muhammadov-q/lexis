@@ -35,6 +35,17 @@ class AuthViewModelTest {
     }
 
     @Test
+    fun initializeModeOnlyAppliesOnce() = runAuthTest {
+        val viewModel = createViewModel(FakeAuthRepository())
+
+        viewModel.initializeMode(AuthMode.SignUp)
+        viewModel.onEvent(AuthEvent.ToggleModeRequested)
+        viewModel.initializeMode(AuthMode.SignUp)
+
+        assertEquals(AuthMode.SignIn, viewModel.state.value.mode)
+    }
+
+    @Test
     fun submitSignInCallsUseCaseAndClearsPassword() = runAuthTest {
         val repository = FakeAuthRepository()
         val viewModel = createViewModel(repository)
@@ -66,7 +77,7 @@ class AuthViewModelTest {
         val repository = FakeAuthRepository()
         val viewModel = createViewModel(repository)
 
-        viewModel.setMode(AuthMode.SignUp)
+        viewModel.initializeMode(AuthMode.SignUp)
         viewModel.onEvent(AuthEvent.EmailChanged("new@example.com"))
         viewModel.onEvent(AuthEvent.PasswordChanged("short"))
         viewModel.onEvent(AuthEvent.SubmitRequested)

@@ -21,7 +21,6 @@ import org.example.project.feature.camera.domain.model.WordPrediction
 import org.example.project.feature.history.domain.model.RecognitionDetail
 import org.example.project.feature.history.domain.model.RecognitionHistoryItem
 import org.example.project.feature.history.domain.repository.HistoryRepository
-import org.example.project.feature.history.domain.session.HistoryRefreshStore
 import org.example.project.feature.history.domain.usecase.GetRecognitionDetailUseCase
 import org.example.project.feature.history.domain.usecase.GetRecognitionHistoryUseCase
 import org.example.project.feature.historydetail.presentation.HistoryDetailContract
@@ -31,6 +30,10 @@ import kotlin.test.assertEquals
 import kotlin.test.assertFalse
 import kotlin.test.assertTrue
 import kotlin.test.assertNull
+import scriptlens.shared.generated.resources.Res
+import scriptlens.shared.generated.resources.history_error_general
+import scriptlens.shared.generated.resources.history_error_not_found
+import scriptlens.shared.generated.resources.history_error_unauthorized
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class HistoryViewModelTest {
@@ -79,7 +82,10 @@ class HistoryViewModelTest {
         viewModel.onEvent(HistoryEvent.LoadRequested)
         advanceUntilIdle()
 
-        assertEquals(UiText.Plain("Sign in to load your recognition history."), viewModel.state.value.error)
+        assertEquals(
+            UiText.Resource(Res.string.history_error_unauthorized),
+            viewModel.state.value.error,
+        )
         assertTrue(viewModel.state.value.requiresSignIn)
         assertFalse(viewModel.state.value.isLoading)
     }
@@ -93,7 +99,10 @@ class HistoryViewModelTest {
         viewModel.onEvent(HistoryEvent.LoadRequested)
         advanceUntilIdle()
 
-        assertEquals(UiText.Plain("Could not load recognition history. Please try again."), viewModel.state.value.error)
+        assertEquals(
+            UiText.Resource(Res.string.history_error_general),
+            viewModel.state.value.error,
+        )
         assertFalse(viewModel.state.value.isLoading)
     }
 
@@ -160,11 +169,14 @@ class HistoryViewModelTest {
         viewModel.load(99)
         advanceUntilIdle()
 
-        assertEquals(UiText.Plain("Saved recognition was not found."), viewModel.state.value.error)
+        assertEquals(
+            UiText.Resource(Res.string.history_error_not_found),
+            viewModel.state.value.error,
+        )
     }
 
     @Test
-    fun unauthorizedDetailRequestClearsSession() = runHistoryTest {
+    fun unauthorizedDetailRequestDoesNotChangeSession() = runHistoryTest {
         val session = AuthSessionStore()
         session.setAuthenticated(User(1, "user@example.com", null, null))
         val repository = FakeHistoryRepository(detailError = AuthApiException(401))
@@ -173,7 +185,7 @@ class HistoryViewModelTest {
         viewModel.load(99)
         advanceUntilIdle()
 
-        assertFalse(session.isAuthenticated())
+        assertTrue(session.isAuthenticated())
         assertNull(viewModel.state.value.selectedDetail)
     }
 
@@ -264,7 +276,6 @@ class HistoryViewModelTest {
         val viewModel = HistoryViewModel(
             GetRecognitionHistoryUseCase(repository),
             session,
-            HistoryRefreshStore(),
         )
         viewModel.startObservers()
         runCurrent()
@@ -286,7 +297,6 @@ class HistoryViewModelTest {
     private fun TestScope.createViewModel(repository: FakeHistoryRepository): HistoryViewModel = HistoryViewModel(
         getRecognitionHistory = GetRecognitionHistoryUseCase(repository),
         authSessionStore = AuthSessionStore(),
-        historyRefreshStore = HistoryRefreshStore(),
     )
 
     private fun TestScope.createDetailViewModel(repository: FakeHistoryRepository): HistoryDetailViewModel {

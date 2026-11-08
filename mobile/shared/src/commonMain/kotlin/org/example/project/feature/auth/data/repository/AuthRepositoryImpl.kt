@@ -53,8 +53,6 @@ class AuthRepositoryImpl(
             user
         } catch (exception: AuthApiException) {
             if (exception.status == 401) {
-                sessionCookieStore.clearSessionCookie()
-                sessionStore.setGuest()
                 null
             } else {
                 throw exception

@@ -25,8 +25,6 @@ val cameraModule = module {
             api = get(),
             config = get(),
             authSessionStore = get(),
-            sessionCookieStore = get(),
-            historyRefreshStore = get(),
         )
     }
     factory { UploadPhotoUseCase(get()) }

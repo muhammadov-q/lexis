@@ -181,11 +181,6 @@ private fun HistorySkeleton() {
     }
 }
 
-internal fun formatHistoryDateTime(raw: String): String {
-    val normalized = raw.removeSuffix("Z").replace('T', ' ')
-    return if (normalized.length >= 16) normalized.substring(0, 16) else normalized
-}
-
 @Preview(showBackground = true)
 @Composable
 private fun HistoryScreenPreview() {

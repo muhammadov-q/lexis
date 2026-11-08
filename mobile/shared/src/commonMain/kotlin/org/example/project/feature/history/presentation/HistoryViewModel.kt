@@ -4,27 +4,24 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Job
-import kotlinx.coroutines.flow.collectLatest
-import kotlinx.coroutines.flow.drop
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import org.example.project.common.presentation.ui.helpers.UiText
 import org.example.project.core.mvi.setState
 import org.example.project.feature.auth.domain.model.AuthApiException
 import org.example.project.feature.auth.domain.session.AuthSessionStore
 import org.example.project.feature.auth.domain.session.SessionMode
-import org.example.project.feature.history.domain.session.HistoryRefreshStore
 import org.example.project.feature.history.domain.usecase.GetRecognitionHistoryUseCase
-
-private const val HISTORY_ERROR_UNAUTHORIZED = "Sign in to load your recognition history."
-private const val HISTORY_ERROR_NOT_FOUND = "Saved recognition was not found."
-private const val HISTORY_ERROR_GENERAL = "Could not load recognition history. Please try again."
+import scriptlens.shared.generated.resources.Res
+import scriptlens.shared.generated.resources.history_error_general
+import scriptlens.shared.generated.resources.history_error_not_found
+import scriptlens.shared.generated.resources.history_error_unauthorized
 
 class HistoryViewModel(
     private val getRecognitionHistory: GetRecognitionHistoryUseCase,
     private val authSessionStore: AuthSessionStore,
-    private val historyRefreshStore: HistoryRefreshStore,
 ) : ViewModel() {
     private val _state = MutableStateFlow(HistoryContract())
     val state = _state.asStateFlow()
@@ -36,7 +33,6 @@ class HistoryViewModel(
         if (observersStarted) return
         observersStarted = true
         observeAuthMode()
-        observeHistoryRefresh()
     }
 
     fun onEvent(event: HistoryEvent) {
@@ -68,12 +64,11 @@ class HistoryViewModel(
                 throw cancellation
             } catch (exception: Exception) {
                 if (currentRequestId != requestId) return@launch
-                if (isUnauthorized(exception)) authSessionStore.setGuest()
                 _state.setState {
                     it.copy(
                         isLoading = false,
                         error = historyError(exception),
-                        requiresSignIn = isUnauthorized(exception),
+                        requiresSignIn = exception is AuthApiException && exception.status == 401,
                     )
                 }
             }
@@ -85,9 +80,6 @@ class HistoryViewModel(
         historyRequest?.cancel()
         historyRequest = null
     }
-
-    private fun isUnauthorized(exception: Exception): Boolean =
-        exception is AuthApiException && exception.status == 401
 
     private fun observeAuthMode() {
         viewModelScope.launch {
@@ -107,27 +99,15 @@ class HistoryViewModel(
         }
     }
 
-    private fun observeHistoryRefresh() {
-        viewModelScope.launch {
-            historyRefreshStore.refreshVersion
-                .drop(1)
-                .collectLatest {
-                    if (authSessionStore.isAuthenticated()) {
-                        loadHistory()
-                    }
-                }
-
-        }
-    }
 }
 
 internal fun historyError(exception: Exception): UiText {
     if (exception is AuthApiException) {
         return when (exception.status) {
-            401 -> UiText.Plain(HISTORY_ERROR_UNAUTHORIZED)
-            404 -> UiText.Plain(HISTORY_ERROR_NOT_FOUND)
-            else -> UiText.Plain(HISTORY_ERROR_GENERAL)
+            401 -> UiText.Resource(Res.string.history_error_unauthorized)
+            404 -> UiText.Resource(Res.string.history_error_not_found)
+            else -> UiText.Resource(Res.string.history_error_general)
         }
     }
-    return UiText.Plain(HISTORY_ERROR_GENERAL)
+    return UiText.Resource(Res.string.history_error_general)
 }

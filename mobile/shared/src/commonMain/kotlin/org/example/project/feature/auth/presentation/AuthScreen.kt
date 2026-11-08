@@ -68,8 +68,8 @@ fun AuthScreen(
     val viewModel: AuthViewModel = koinViewModel()
     val state by viewModel.state.collectAsStateWithLifecycle()
 
-    LaunchedEffect(viewModel, initialMode) {
-        viewModel.setMode(initialMode)
+    LaunchedEffect(viewModel) {
+        viewModel.initializeMode(initialMode)
     }
 
     AuthScreenContent(

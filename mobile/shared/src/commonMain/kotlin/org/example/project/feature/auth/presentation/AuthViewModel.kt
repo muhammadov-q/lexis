@@ -22,10 +22,14 @@ class AuthViewModel(
 ) : ViewModel() {
     private val _state = MutableStateFlow(AuthContract())
     val state = _state.asStateFlow()
+    private var initialModeSet = false
 
-    fun setMode(mode: AuthMode) {
+    fun initializeMode(mode: AuthMode) {
+        if (initialModeSet) return
+        initialModeSet = true
         _state.setState { it.copy(mode = mode, error = null) }
     }
+
     fun onEvent(event: AuthEvent) {
         when (event) {
             is AuthEvent.EmailChanged -> _state.setState { it.copy(email = event.value, error = null) }

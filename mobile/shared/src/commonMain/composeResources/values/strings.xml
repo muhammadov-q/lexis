@@ -2,7 +2,7 @@
     <!-- Navigation / screen titles -->
     <string name="nav_camera">Camera</string>
     <string name="nav_documents">History</string>
-    <string name="nav_source">Account</string>
+    <string name="nav_source">Source</string>
 
     <!-- Authentication -->
     <string name="auth_branding">Team4 | ScriptLens</string>
@@ -51,6 +51,8 @@
     <string name="history_error_unauthorized">Sign in to load your recognition history.</string>
     <string name="history_error_not_found">Saved recognition was not found.</string>
     <string name="history_error_general">Could not load recognition history. Please try again.</string>
+    <string name="history_untitled_page">Untitled page</string>
+    <string name="history_no_words">No words</string>
     <string name="history_detail_read_on">Read on %1$s</string>
     <string name="history_detail_model_version">Model: %1$s</string>
     <string name="history_detail_image_unavailable">This image cannot be displayed on this device.</string>

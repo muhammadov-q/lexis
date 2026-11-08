@@ -32,6 +32,7 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.ContentScale
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import org.example.project.common.presentation.helpers.HistoryDateTimeFormatter
 import org.example.project.common.presentation.ui.helpers.asString
 import org.example.project.common.presentation.ui.theme.ScriptLensColors
 import org.example.project.common.presentation.ui.theme.ScriptLensSpacing
@@ -42,12 +43,12 @@ import org.example.project.feature.camera.presentation.mappers.mapPredictionToUi
 import org.example.project.feature.history.presentation.composables.GuestHistoryPrompt
 import org.example.project.feature.history.presentation.composables.HistoryErrorCard
 import org.example.project.feature.history.presentation.composables.UnauthorizedHistoryCard
-import org.example.project.feature.history.presentation.formatHistoryDateTime
 import org.jetbrains.compose.resources.stringResource
 import scriptlens.shared.generated.resources.Res
 import scriptlens.shared.generated.resources.history_detail_image_unavailable
 import scriptlens.shared.generated.resources.history_detail_model_version
 import scriptlens.shared.generated.resources.history_detail_read_on
+import scriptlens.shared.generated.resources.history_untitled_page
 
 @Composable
 fun HistoryDetailScreen(
@@ -107,7 +108,7 @@ private fun HistoryDetailContent(
 
     detail ?: return
     val predictionModel = remember(detail.id) { mapPredictionToUiModel(detail.prediction) }
-    val imageBitmap = remember(detail.id) { decodePhoto(detail.imageBytes) }
+    val imageBitmap = remember(detail.id) { detail.imageBytes?.let(::decodePhoto) }
 
     var zoomScale by remember { mutableStateOf(1f) }
     var panOffset by remember { mutableStateOf(Offset.Zero) }
@@ -125,12 +126,19 @@ private fun HistoryDetailContent(
         verticalArrangement = Arrangement.spacedBy(ScriptLensSpacing.padding_12),
     ) {
         Text(
-            text = if (detail.filename.isBlank()) "Untitled page" else detail.filename,
+            text = if (detail.filename.isBlank()) {
+                stringResource(Res.string.history_untitled_page)
+            } else {
+                detail.filename
+            },
             style = MaterialTheme.typography.headlineSmall,
             color = MaterialTheme.colorScheme.onSurface,
         )
         Text(
-            text = stringResource(Res.string.history_detail_read_on, formatHistoryDateTime(detail.createdAt)),
+            text = stringResource(
+                Res.string.history_detail_read_on,
+                HistoryDateTimeFormatter.format(detail.createdAt),
+            ),
             style = MaterialTheme.typography.bodyMedium,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
         )

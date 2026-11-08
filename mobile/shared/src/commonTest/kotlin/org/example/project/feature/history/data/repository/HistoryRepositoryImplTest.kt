@@ -74,6 +74,18 @@ class HistoryRepositoryImplTest {
     }
 
     @Test
+    fun getRecognitionDetailKeepsDetailWhenImageRequestFails() = runTest {
+        val api = historyApi(imageStatus = HttpStatusCode.InternalServerError)
+        val repository = HistoryRepositoryImpl(api)
+
+        val detail = repository.getRecognitionDetail(7)
+
+        assertEquals(1, detail.id)
+        assertEquals("f.png", detail.filename)
+        assertEquals(null, detail.imageBytes)
+    }
+
+    @Test
     fun getRecognitionDetailPropagatesNotFound() = runTest {
         val api = historyApi(detailStatus = HttpStatusCode.NotFound)
         val repository = HistoryRepositoryImpl(api)
@@ -91,6 +103,7 @@ class HistoryRepositoryImplTest {
             """.trimIndent(),
         detailStatus: HttpStatusCode = HttpStatusCode.OK,
         imageBody: ByteArray = byteArrayOf(),
+        imageStatus: HttpStatusCode = HttpStatusCode.OK,
     ): HistoryApi {
         val engine = MockEngine { request ->
             when (request.url.encodedPath) {
@@ -106,7 +119,7 @@ class HistoryRepositoryImplTest {
                 )
                 "/recognitions/7/image", "/recognitions/55/image", "/recognitions/1/image" -> respond(
                     content = imageBody,
-                    status = HttpStatusCode.OK,
+                    status = imageStatus,
                     headers = headersOf(HttpHeaders.ContentType, "image/png"),
                 )
                 else -> error("Unexpected path: ${request.url.encodedPath}")
@@ -115,4 +128,3 @@ class HistoryRepositoryImplTest {
         return HistoryApi(HttpClient(engine), "http://localhost:8000")
     }
 }
-

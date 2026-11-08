@@ -8,12 +8,11 @@ import io.ktor.http.HttpHeaders
 import io.ktor.http.HttpStatusCode
 import io.ktor.http.headersOf
 import kotlinx.coroutines.test.runTest
-import org.example.project.core.persistence.SessionCookieStore
+import org.example.project.core.network.platform.handleUnauthorizedResponses
 import org.example.project.feature.auth.domain.model.User
 import org.example.project.feature.auth.domain.session.AuthSessionStore
 import org.example.project.feature.camera.data.network.PhotoUploadApi
 import org.example.project.feature.camera.data.network.PhotoUploadConfig
-import org.example.project.feature.history.domain.session.HistoryRefreshStore
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFalse
@@ -31,7 +30,7 @@ class PhotoRepositoryImplTest {
         val api = apiWithJson(
             """{"predictions":[{"text":"logos","probabilities":{"logos":1.0},"box":{"x":10,"y":20,"w":30,"h":40},"line":2,"gloss":null}],"model_version":"v1"}"""
         )
-        val repository = PhotoRepositoryImpl(api, config, AuthSessionStore(), FakeSessionCookieStore(), HistoryRefreshStore())
+        val repository = PhotoRepositoryImpl(api, config, AuthSessionStore())
 
         val result = repository.uploadPhoto(byteArrayOf(1, 2, 3))
         val word = result.predictions.single()
@@ -47,7 +46,7 @@ class PhotoRepositoryImplTest {
         val api = apiWithJson(
             """{"predictions":[{"text":"logos","probabilities":{"logos":1.0},"box":{"x":10,"y":20,"w":30,"h":40},"line":2,"gloss":{"lemma":"","translation":" ","definition":""}}],"model_version":"v1"}"""
         )
-        val repository = PhotoRepositoryImpl(api, config, AuthSessionStore(), FakeSessionCookieStore(), HistoryRefreshStore())
+        val repository = PhotoRepositoryImpl(api, config, AuthSessionStore())
 
         val result = repository.uploadPhoto(byteArrayOf(1, 2, 3))
         val word = result.predictions.single()
@@ -77,8 +76,6 @@ class PhotoRepositoryImplTest {
             api = PhotoUploadApi(HttpClient(engine), config),
             config = config,
             authSessionStore = authSessionStore,
-            sessionCookieStore = FakeSessionCookieStore(),
-            historyRefreshStore = HistoryRefreshStore(),
         )
 
         repository.uploadPhoto(byteArrayOf(1))
@@ -91,8 +88,6 @@ class PhotoRepositoryImplTest {
         val authSessionStore = AuthSessionStore().apply {
             setAuthenticated(User(1, "user@example.com", "John", "Doe"))
         }
-        val cookieStore = FakeSessionCookieStore()
-        val refreshStore = HistoryRefreshStore()
         val paths = mutableListOf<String>()
         val engine = MockEngine { request: HttpRequestData ->
             paths += request.url.encodedPath
@@ -112,19 +107,20 @@ class PhotoRepositoryImplTest {
         }
 
         val repository = PhotoRepositoryImpl(
-            api = PhotoUploadApi(HttpClient(engine), config),
+            api = PhotoUploadApi(
+                HttpClient(engine) {
+                    handleUnauthorizedResponses(authSessionStore)
+                },
+                config,
+            ),
             config = config,
             authSessionStore = authSessionStore,
-            sessionCookieStore = cookieStore,
-            historyRefreshStore = refreshStore,
         )
 
         repository.uploadPhoto(byteArrayOf(1))
 
         assertEquals(listOf("/recognitions", "/predict"), paths)
         assertFalse(authSessionStore.isAuthenticated())
-        assertEquals(1, cookieStore.clearCalls)
-        assertEquals(0L, refreshStore.refreshVersion.value)
     }
 
     private fun apiWithJson(responseJson: String): PhotoUploadApi {
@@ -138,12 +134,3 @@ class PhotoRepositoryImplTest {
         return PhotoUploadApi(HttpClient(engine), config)
     }
 }
-
-private class FakeSessionCookieStore : SessionCookieStore {
-    var clearCalls = 0
-
-    override fun clearSessionCookie() {
-        clearCalls += 1
-    }
-}
-

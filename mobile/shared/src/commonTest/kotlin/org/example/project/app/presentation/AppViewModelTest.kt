@@ -92,7 +92,7 @@ class AppViewModelTest {
         advanceUntilIdle()
 
         viewModel.onEvent(AppEvent.SignInRequested(mode))
-        authViewModel.setMode(mode)
+        authViewModel.initializeMode(mode)
         authViewModel.onEvent(AuthEvent.EmailChanged("user@example.com"))
         authViewModel.onEvent(AuthEvent.PasswordChanged("password123"))
         authViewModel.onEvent(AuthEvent.SubmitRequested)
@@ -118,7 +118,7 @@ class AppViewModelTest {
             advanceUntilIdle()
 
             viewModel.onEvent(AppEvent.SignInRequested(mode))
-            authViewModel.setMode(mode)
+            authViewModel.initializeMode(mode)
             authViewModel.onEvent(AuthEvent.EmailChanged("user@example.com"))
             authViewModel.onEvent(AuthEvent.PasswordChanged("password123"))
             authViewModel.onEvent(AuthEvent.SubmitRequested)

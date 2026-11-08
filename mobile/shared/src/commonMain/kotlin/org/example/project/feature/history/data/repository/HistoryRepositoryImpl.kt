@@ -1,5 +1,8 @@
 package org.example.project.feature.history.data.repository
 
+import kotlinx.coroutines.async
+import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.CancellationException
 import org.example.project.feature.history.data.network.HistoryApi
 import org.example.project.feature.history.data.network.models.RecognitionDto
 import org.example.project.feature.camera.domain.model.Prediction
@@ -18,9 +21,19 @@ class HistoryRepositoryImpl(
     }
 
     override suspend fun getRecognitionDetail(id: Long): RecognitionDetail {
-        val recognition = api.getRecognition(id)
-        val imageBytes = api.getRecognitionImage(id)
-        return recognition.toDetail(imageBytes)
+        return coroutineScope {
+            val recognition = async { api.getRecognition(id) }
+            val image = async {
+                try {
+                    api.getRecognitionImage(id)
+                } catch (cancellation: CancellationException) {
+                    throw cancellation
+                } catch (_: Exception) {
+                    null
+                }
+            }
+            recognition.await().toDetail(image.await())
+        }
     }
 
     private fun RecognitionDto.toHistoryItem(): RecognitionHistoryItem {
@@ -34,7 +47,7 @@ class HistoryRepositoryImpl(
         )
     }
 
-    private fun RecognitionDto.toDetail(imageBytes: ByteArray): RecognitionDetail {
+    private fun RecognitionDto.toDetail(imageBytes: ByteArray?): RecognitionDetail {
         return RecognitionDetail(
             id = id,
             createdAt = createdAt,
@@ -65,4 +78,3 @@ class HistoryRepositoryImpl(
         )
     }
 }
-
