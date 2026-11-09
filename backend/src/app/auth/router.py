@@ -22,7 +22,7 @@ from app.auth.service import (
 from app.db import get_db
 from app.uploads import ErrorResponse
 
-COOKIE_NAME = "team4_session"
+COOKIE_NAME = "lexis_session"
 
 ERROR_401 = "Sign in to continue."
 ERROR_401_CREDENTIALS = "Wrong email or password."

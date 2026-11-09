@@ -17,7 +17,7 @@ Lime is the only accent. Errors use an icon, wording and a muted surface rather 
 
 ## Type
 
-Schibsted Grotesk for everything, JetBrains Mono for technical labels, sizes and code. Greek text the model read is set in Noto Serif (`font-greek`), since Schibsted Grotesk has no Greek letters.
+Schibsted Grotesk for everything, JetBrains Mono for technical labels, sizes and code. Greek text the model read is set in Noto Serif (`font-greek`), since Schibsted Grotesk has no Greek letters. So is the app's name, Λέξις (`Wordmark`).
 
 ## Surfaces
 

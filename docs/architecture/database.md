@@ -1,6 +1,6 @@
 # Database
 
-The backend keeps its data in SQLite, in `backend/data/team4.db` (not committed). Why SQLite: [[adr/0003-sqlite-database]].
+The backend keeps its data in SQLite, in `backend/data/lexis.db` (not committed). Why SQLite: [[adr/0003-sqlite-database]].
 
 ## Tables
 

@@ -5,7 +5,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import org.example.project.common.presentation.ui.composables.webview.WebView
 
-private const val DOCS_URL = "https://github.com/muhammadov-q/team4/tree/develop/docs"
+private const val DOCS_URL = "https://github.com/muhammadov-q/lexis/tree/develop/docs"
 
 @Composable
 fun DocumentsScreen() {

@@ -5,7 +5,7 @@
     <string name="nav_source">Source</string>
 
     <!-- Authentication -->
-    <string name="auth_branding">Team4 | ScriptLens</string>
+    <string name="auth_branding">Lexis | ScriptLens</string>
     <string name="auth_sign_in_title">Sign in</string>
     <string name="auth_sign_in_subtitle">Use the email and password you signed up with.</string>
     <string name="auth_create_title">Create an account</string>

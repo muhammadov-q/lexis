@@ -6,7 +6,8 @@ describe('SiteHeader', () => {
   it('links home and switches the theme', () => {
     render(<SiteHeader />)
 
-    expect(screen.getByRole('link', { name: 'Team4' })).toHaveAttribute('href', '/')
+    expect(screen.getByRole('link', { name: 'Λέξις' })).toHaveAttribute('href', '/')
+    expect(screen.getByText('Λέξις')).toHaveAttribute('lang', 'el')
     expect(screen.getByRole('button', { name: 'Switch theme' })).toBeInTheDocument()
   })
 

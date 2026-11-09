@@ -36,7 +36,7 @@ sequenceDiagram
 
 ## Signing in
 
-- `/sign-in` and `/sign-up` post to the backend, which sets the `team4_session` cookie. The rules are in [[architecture/authentication]].
+- `/sign-in` and `/sign-up` post to the backend, which sets the `lexis_session` cookie. The rules are in [[architecture/authentication]].
 - `frontend/src/proxy.ts` sends visitors without the cookie to `/sign-in`, and signed-in visitors away from it. It only checks that the cookie is there; the backend checks the session.
 - When a session has ended, `/auth/me` answers 401 and clears the cookie, and `useCurrentUser` in `frontend/src/hooks/use-auth.ts` sends the page to `/sign-in`.
 - `/api/*` and the phone's `/capture/*` page stay open, since the phone never signs in.

@@ -1,6 +1,6 @@
 # Architecture
 
-How Team4 is built today. Start with the overview.
+How Lexis is built today. Start with the overview.
 
 | Note                             | What it covers                                             |
 | -------------------------------- | ---------------------------------------------------------- |

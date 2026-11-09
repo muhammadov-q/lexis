@@ -8,13 +8,13 @@ import SignUpPage, { metadata as signUpMetadata } from './sign-up/page'
 vi.mock('next/navigation', () => ({ useRouter: () => ({ replace: vi.fn() }) }))
 
 describe('auth pages', () => {
-  it('shows the sign-in form under the Team4 name', () => {
+  it('shows the sign-in form under the Λέξις name', () => {
     renderWithProviders(
       <AuthLayout>
         <SignInPage />
       </AuthLayout>
     )
-    expect(screen.getByRole('main')).toHaveTextContent(/^Team4/)
+    expect(screen.getByRole('main')).toHaveTextContent(/^Λέξις/)
     expect(screen.getByRole('heading', { name: 'Sign in' })).toBeInTheDocument()
     expect(signInMetadata.title).toBe('Sign in')
   })

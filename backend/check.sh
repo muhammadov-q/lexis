@@ -79,7 +79,7 @@ start_server() {
     exit 1
 }
 
-print_header "TEAM4 BACKEND CHECKS"
+print_header "LEXIS BACKEND CHECKS"
 
 if [ "${CHECK_SKIP_INSTALL:-0}" = "1" ] && [ -d .venv ]; then
     print_step "Skipping install (CHECK_SKIP_INSTALL=1)"

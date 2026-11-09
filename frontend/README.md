@@ -1,4 +1,4 @@
-# Team4 frontend
+# Lexis frontend
 
 Next.js 16 (App Router) + React 19 + TypeScript + Tailwind CSS 4 + shadcn/ui. Why this stack:
 [ADR 0001](../docs/adr/0001-web-frontend-stack.md).
@@ -91,8 +91,8 @@ photo with the phone camera and sends it to the backend. The page on the compute
 ## Docker
 
 ```bash
-docker build -t team4-frontend .
-docker run -p 3000:3000 -e API_INTERNAL_URL=http://host.docker.internal:8000 team4-frontend
+docker build -t lexis-frontend .
+docker run -p 3000:3000 -e API_INTERNAL_URL=http://host.docker.internal:8000 lexis-frontend
 ```
 
 `API_INTERNAL_URL` is read at runtime, so one image works against any backend.

@@ -42,7 +42,7 @@ run_step() {
     fi
 }
 
-print_header "TEAM4 FRONTEND CHECKS"
+print_header "LEXIS FRONTEND CHECKS"
 
 if [ "${CHECK_SKIP_INSTALL:-0}" = "1" ] && [ -d node_modules ]; then
     print_step "Skipping install (CHECK_SKIP_INSTALL=1)"

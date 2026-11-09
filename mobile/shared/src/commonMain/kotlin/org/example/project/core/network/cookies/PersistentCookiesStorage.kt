@@ -11,7 +11,7 @@ import kotlinx.serialization.json.Json
 import org.example.project.core.persistence.CookiePersistence
 import org.example.project.core.persistence.SessionCookieStore
 
-private const val SESSION_COOKIE_NAME = "team4_session"
+private const val SESSION_COOKIE_NAME = "lexis_session"
 
 /**
  * Persists auth cookies so mobile sessions survive app restarts.

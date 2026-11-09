@@ -11,7 +11,7 @@ Sign-in (#31) needs to store users and sessions, so the backend needs a database
 
 ## Decision
 
-- SQLite, one file at `backend/data/team4.db`, over PostgreSQL. Nobody has to install or start a database server, and CI needs no database container.
+- SQLite, one file at `backend/data/lexis.db`, over PostgreSQL. Nobody has to install or start a database server, and CI needs no database container.
 - SQLAlchemy 2 for models and queries, Alembic for migrations. Only repositories talk to the database.
 - The backend applies migrations when it starts, so a fresh clone gets its database on the first run.
 - `DATABASE_URL` overrides the location. `backend/check.sh` and the tests use a throwaway file.

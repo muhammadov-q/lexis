@@ -26,8 +26,8 @@ class PersistentCookiesStorageTest {
         val persistence = InMemoryCookiePersistence()
         val storage = PersistentCookiesStorage(persistence)
 
-        storage.addCookie(requestUrl, Cookie(name = "team4_session", value = "old"))
-        storage.addCookie(requestUrl, Cookie(name = "team4_session", value = "new"))
+        storage.addCookie(requestUrl, Cookie(name = "lexis_session", value = "old"))
+        storage.addCookie(requestUrl, Cookie(name = "lexis_session", value = "new"))
 
         assertEquals(listOf("new"), storage.get(requestUrl).map { it.value })
     }
@@ -39,7 +39,7 @@ class PersistentCookiesStorageTest {
 
         storage.addCookie(
             requestUrl,
-            Cookie(name = "team4_session", value = "expired", expires = GMTDate(0L)),
+            Cookie(name = "lexis_session", value = "expired", expires = GMTDate(0L)),
         )
 
         assertTrue(storage.get(requestUrl).isEmpty())
@@ -50,7 +50,7 @@ class PersistentCookiesStorageTest {
     fun clearingSessionCookieKeepsOtherCookies() = runTest {
         val persistence = InMemoryCookiePersistence()
         val storage = PersistentCookiesStorage(persistence)
-        storage.addCookie(requestUrl, Cookie(name = "team4_session", value = "session"))
+        storage.addCookie(requestUrl, Cookie(name = "lexis_session", value = "session"))
         storage.addCookie(requestUrl, Cookie(name = "preference", value = "dark"))
 
         storage.clearSessionCookie()
@@ -62,7 +62,7 @@ class PersistentCookiesStorageTest {
     fun cookiesReloadFromPersistenceAfterStorageIsRecreated() = runTest {
         val persistence = InMemoryCookiePersistence()
         PersistentCookiesStorage(persistence)
-            .addCookie(requestUrl, Cookie(name = "team4_session", value = "saved"))
+            .addCookie(requestUrl, Cookie(name = "lexis_session", value = "saved"))
 
         val restartedStorage = PersistentCookiesStorage(persistence)
 
