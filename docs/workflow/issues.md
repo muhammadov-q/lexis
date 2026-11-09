@@ -1,6 +1,6 @@
 # Issues
 
-All work is a GitHub issue on `muhammadov-q/team4`, grouped into milestones. Every PR closes one issue ([[workflow/git-workflow]]).
+All work is a GitHub issue on `muhammadov-q/lexis`, grouped into milestones. Every PR closes one issue ([[workflow/git-workflow]]).
 
 The issue form (`.github/ISSUE_TEMPLATE/task.yml`) has three parts:
 
@@ -13,5 +13,5 @@ The issue form (`.github/ISSUE_TEMPLATE/task.yml`) has three parts:
 `gh issue edit` and `gh pr edit` fail on this repo with a GraphQL error about Projects (classic). Use the REST API instead:
 
 ```bash
-gh api -X PATCH repos/muhammadov-q/team4/issues/<n> -F body=@body.md
+gh api -X PATCH repos/muhammadov-q/lexis/issues/<n> -F body=@body.md
 ```

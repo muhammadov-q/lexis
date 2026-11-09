@@ -25,9 +25,9 @@ def test_other_databases_get_no_sqlite_settings(monkeypatch):
         "app.db.create_engine", lambda url, **kwargs: calls.append((url, kwargs))
     )
 
-    create_db_engine("postgresql://localhost/team4")
+    create_db_engine("postgresql://localhost/lexis")
 
-    assert calls == [("postgresql://localhost/team4", {})]
+    assert calls == [("postgresql://localhost/lexis", {})]
 
 
 def test_migrate_creates_the_folder_and_can_run_again(tmp_path):

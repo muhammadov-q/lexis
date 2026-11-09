@@ -2,7 +2,7 @@ package org.example.project.core.persistence
 
 import org.example.project.core.platform.AndroidPlatformContext
 
-private const val AUTH_PREFS = "team4_auth"
+private const val AUTH_PREFS = "lexis_auth"
 private const val AUTH_COOKIE_KEY = "session_cookies"
 
 actual object AuthCookiePersistence : CookiePersistence {

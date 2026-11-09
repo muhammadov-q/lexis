@@ -21,8 +21,8 @@ beforeEach(() => {
 })
 
 const PROJECT_LINKS = [
-  ['Docs', 'https://github.com/muhammadov-q/team4/tree/develop/docs'],
-  ['Source', 'https://github.com/muhammadov-q/team4'],
+  ['Docs', 'https://github.com/muhammadov-q/lexis/tree/develop/docs'],
+  ['Source', 'https://github.com/muhammadov-q/lexis'],
 ]
 
 describe('DashboardMenu', () => {
@@ -30,7 +30,7 @@ describe('DashboardMenu', () => {
     render(<DashboardMenu />)
 
     expect(screen.getByText('Account card expanded')).toBeInTheDocument()
-    expect(screen.getByRole('link', { name: 'Team4' })).toHaveAttribute('href', '/dashboard')
+    expect(screen.getByRole('link', { name: 'Λέξις' })).toHaveAttribute('href', '/dashboard')
     expect(screen.getByRole('button', { name: 'Collapse navigation' })).toHaveAttribute(
       'aria-expanded',
       'true'
@@ -44,19 +44,19 @@ describe('DashboardMenu', () => {
     await user.click(screen.getByRole('button', { name: 'Collapse navigation' }))
 
     expect(screen.getByText('Account card collapsed')).toBeInTheDocument()
-    expect(screen.queryByRole('link', { name: 'Team4' })).not.toBeInTheDocument()
+    expect(screen.queryByRole('link', { name: 'Λέξις' })).not.toBeInTheDocument()
     expect(screen.queryByRole('link', { name: /Docs/ })).not.toBeInTheDocument()
     expect(screen.getByRole('link', { name: 'Read' })).toBeVisible()
     expect(screen.getByRole('button', { name: 'Expand navigation' })).toHaveAttribute(
       'aria-expanded',
       'false'
     )
-    expect(screen.getByRole('button', { name: 'Expand navigation' })).toHaveTextContent('T4')
+    expect(screen.getByRole('button', { name: 'Expand navigation' })).toHaveTextContent('Λ')
 
     await user.click(screen.getByRole('button', { name: 'Expand navigation' }))
 
     expect(screen.getByText('Account card expanded')).toBeInTheDocument()
-    expect(screen.getByRole('link', { name: 'Team4' })).toBeVisible()
+    expect(screen.getByRole('link', { name: 'Λέξις' })).toBeVisible()
   })
 
   it('names a page on hover when collapsed', async () => {
@@ -88,7 +88,7 @@ describe('DashboardMenu', () => {
     render(<DashboardMenu />)
 
     await user.tab()
-    expect(screen.getByRole('link', { name: 'Team4' })).toHaveFocus()
+    expect(screen.getByRole('link', { name: 'Λέξις' })).toHaveFocus()
     await user.tab()
     expect(screen.getByRole('button', { name: 'Collapse navigation' })).toHaveFocus()
 

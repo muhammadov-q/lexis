@@ -7,7 +7,7 @@ import androidx.compose.ui.Modifier
 import org.example.project.common.presentation.ui.composables.webview.WebView
 import org.example.project.common.presentation.ui.theme.ScriptLensColors
 
-private const val SOURCE_URL = "https://github.com/muhammadov-q/team4"
+private const val SOURCE_URL = "https://github.com/muhammadov-q/lexis"
 
 @Composable
 fun SourceScreen() {

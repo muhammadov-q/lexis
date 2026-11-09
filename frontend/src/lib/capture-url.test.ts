@@ -8,8 +8,8 @@ const at = (href: string) => {
 
 describe('captureUrl', () => {
   it('keeps the address when the page is not on localhost', () => {
-    expect(captureUrl('abc', at('https://team4.example.ch/'), '192.168.1.20')).toBe(
-      'https://team4.example.ch/capture/abc'
+    expect(captureUrl('abc', at('https://lexis.example.ch/'), '192.168.1.20')).toBe(
+      'https://lexis.example.ch/capture/abc'
     )
     expect(captureUrl('abc', at('http://192.168.1.20:3000/'), null)).toBe(
       'http://192.168.1.20:3000/capture/abc'
@@ -36,8 +36,8 @@ describe('captureUrl', () => {
   })
 
   it('escapes the session id', () => {
-    expect(captureUrl('a/b', at('https://team4.example.ch/'), null)).toBe(
-      'https://team4.example.ch/capture/a%2Fb'
+    expect(captureUrl('a/b', at('https://lexis.example.ch/'), null)).toBe(
+      'https://lexis.example.ch/capture/a%2Fb'
     )
   })
 })

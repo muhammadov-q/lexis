@@ -1,4 +1,6 @@
-# Team4 — Ancient Greek Text Assistant
+# Lexis — Ancient Greek Text Assistant
+
+Lexis (Greek λέξις, "word") is the project name; the web app shows it as Λέξις.
 
 A tool that helps students, researchers, and anyone interested in Ancient Greek **read, understand, and learn from Ancient Greek texts**.
 
@@ -21,8 +23,8 @@ Upload a page image and explore recognized words and their translations.
 1. Clone the repository:
 
    ```bash
-   git clone https://github.com/muhammadov-q/team4.git
-   cd team4
+   git clone https://github.com/muhammadov-q/lexis.git
+   cd lexis
    ```
 
 2. Start the backend (Terminal 1):

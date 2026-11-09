@@ -1,6 +1,6 @@
 # Mobile App
 
-The Team4 mobile app is built with **Kotlin Multiplatform** and Compose Multiplatform. It allows users to take a photo or select an existing image, upload it to the backend, and view recognition results.
+The Lexis mobile app is built with **Kotlin Multiplatform** and Compose Multiplatform. It allows users to take a photo or select an existing image, upload it to the backend, and view recognition results.
 
 ## Architecture
 

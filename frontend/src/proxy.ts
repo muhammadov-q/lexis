@@ -1,6 +1,6 @@
 import { NextResponse, type NextRequest } from 'next/server'
 
-export const SESSION_COOKIE = 'team4_session'
+export const SESSION_COOKIE = 'lexis_session'
 
 const AUTH_PAGES = new Set(['/sign-in', '/sign-up'])
 

@@ -18,7 +18,7 @@ People sign up with an email, a password and, if they like, their first and last
 - Passwords need at least 8 characters. They're stored as Argon2 hashes (`pwdlib`), never as text.
 - A wrong password and an unknown email get the same answer in about the same time, so sign-in doesn't reveal who has an account.
 - A session lasts 7 days. Signing out ends it right away.
-- The cookie `team4_session` is `HttpOnly` and `SameSite=Lax`, so page scripts can't read it and other sites can't send it. It isn't `Secure`, because the app runs over plain http on a laptop.
+- The cookie `lexis_session` is `HttpOnly` and `SameSite=Lax`, so page scripts can't read it and other sites can't send it. It isn't `Secure`, because the app runs over plain http on a laptop.
 - `/predict` and `/capture-sessions` don't need a session. The mobile app can use `/predict` as a guest or `/recognitions` while signed in; the phone in the QR flow does not sign in.
 - `/recognitions` (the results history) needs one, and only ever returns your own results.
 
@@ -39,7 +39,7 @@ sequenceDiagram
     Service->>Service: verify the password hash
     Service->>DB: add AuthSession(hash of a new token)
     Service-->>Router: user, token
-    Router-->>Client: 200 user, Set-Cookie team4_session=token
+    Router-->>Client: 200 user, Set-Cookie lexis_session=token
     Client->>Router: GET /auth/me (cookie)
     Router->>Service: current_user(token)
     Service->>DB: get session by token hash, then the user

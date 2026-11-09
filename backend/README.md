@@ -76,7 +76,7 @@ To read the uploaded page for real, run the `kraken` predictor. It needs the opt
 cd backend
 uv sync --extra ml
 curl -fL -o src/ml/models/kraken_eparchos.safetensors \
-  https://github.com/muhammadov-q/team4/releases/download/model-kraken-eparchos-v1/kraken_eparchos.safetensors
+  https://github.com/muhammadov-q/lexis/releases/download/model-kraken-eparchos-v1/kraken_eparchos.safetensors
 ML_PREDICTOR="kraken" uv run uvicorn app.main:app --reload
 ```
 
@@ -140,7 +140,7 @@ bru run --env local
 
 ## Database
 
-The backend stores accounts in SQLite at `data/team4.db` (not committed). It creates the file and runs any pending migrations when it starts, so there's no setup step. Set `DATABASE_URL` to use another file; delete `data/` to start over.
+The backend stores accounts in SQLite at `data/lexis.db` (not committed). It creates the file and runs any pending migrations when it starts, so there's no setup step. Set `DATABASE_URL` to use another file; delete `data/` to start over.
 
 After changing a model in `src/app/auth/models.py`, add a migration and read it before committing. The command compares the models with your local database, so start the backend once first:
 
@@ -153,7 +153,7 @@ More in `docs/architecture/database.md`.
 
 ## Sign-in
 
-`/auth/sign-up`, `/auth/sign-in`, `/auth/sign-out` and `/auth/me` handle accounts. A signed-in browser holds the `team4_session` cookie. The code is in `src/app/auth/`, the rules in `docs/architecture/authentication.md`.
+`/auth/sign-up`, `/auth/sign-in`, `/auth/sign-out` and `/auth/me` handle accounts. A signed-in browser holds the `lexis_session` cookie. The code is in `src/app/auth/`, the rules in `docs/architecture/authentication.md`.
 
 ## Results history
 

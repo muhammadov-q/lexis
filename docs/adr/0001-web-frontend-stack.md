@@ -6,7 +6,7 @@
 
 ## Context
 
-Team4 needs a web app to upload manuscript pages and show what the model returns. It talks to a FastAPI backend that is still changing, so the contract between the two will change often. The course grades testing and CI, so the setup has to be testable from the start.
+Lexis needs a web app to upload manuscript pages and show what the model returns. It talks to a FastAPI backend that is still changing, so the contract between the two will change often. The course grades testing and CI, so the setup has to be testable from the start.
 
 ## Decision
 

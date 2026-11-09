@@ -67,7 +67,7 @@ test('a new user signs up, signs out and signs back in', async ({ page }) => {
 
 test('an ended session allows continued access as a guest', async ({ page, context }) => {
   await context.addCookies([
-    { name: 'team4_session', value: 'ended', domain: 'localhost', path: '/' },
+    { name: 'lexis_session', value: 'ended', domain: 'localhost', path: '/' },
   ])
 
   await page.goto('/dashboard')
@@ -75,7 +75,7 @@ test('an ended session allows continued access as a guest', async ({ page, conte
   await expect(page).toHaveURL('/dashboard')
   await expect(page.getByRole('link', { name: 'Sign in', exact: true })).toBeVisible()
 
-  expect((await context.cookies()).map((cookie) => cookie.name)).not.toContain('team4_session')
+  expect((await context.cookies()).map((cookie) => cookie.name)).not.toContain('lexis_session')
 
   await page.getByRole('link', { name: 'Sign in', exact: true }).click()
   await expect(page).toHaveURL('/sign-in')

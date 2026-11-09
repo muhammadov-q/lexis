@@ -13,7 +13,7 @@ from sqlalchemy.pool import ConnectionPoolEntry
 from sqlalchemy.types import TypeDecorator
 
 BACKEND_DIR = Path(__file__).resolve().parents[2]
-DEFAULT_DATABASE_URL = f"sqlite:///{BACKEND_DIR / 'data' / 'team4.db'}"
+DEFAULT_DATABASE_URL = f"sqlite:///{BACKEND_DIR / 'data' / 'lexis.db'}"
 MIGRATIONS_DIR = Path(__file__).parent / "migrations"
 
 

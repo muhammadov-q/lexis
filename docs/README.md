@@ -1,6 +1,6 @@
-# Team4 docs
+# Lexis docs
 
-Notes on how Team4 is built and how we work. Open `docs/` as a vault in Obsidian for the graph view, or read the files on GitHub.
+Notes on how Lexis is built and how we work. Open `docs/` as a vault in Obsidian for the graph view, or read the files on GitHub.
 
 The notes only describe what exists or what the team has agreed on. Add to them in the PR that changes the thing they describe.
 

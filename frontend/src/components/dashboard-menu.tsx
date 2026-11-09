@@ -8,9 +8,10 @@ import { AccountCard } from '@/components/auth/account-card'
 import { ThemeToggle } from '@/components/theme-toggle'
 import { Button } from '@/components/ui/button'
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip'
+import { Wordmark } from '@/components/wordmark'
 import { cn } from '@/lib/utils'
 
-const REPO_URL = 'https://github.com/muhammadov-q/team4'
+const REPO_URL = 'https://github.com/muhammadov-q/lexis'
 
 const PAGES = [
   { href: '/dashboard', label: 'Read', icon: ScanLine, exact: true },
@@ -45,7 +46,7 @@ export function DashboardMenu() {
               href="/dashboard"
               className="rounded-lg text-lg font-semibold tracking-tight outline-none focus-visible:ring-2 focus-visible:ring-ring"
             >
-              Team4
+              <Wordmark />
             </Link>
           )}
           <Button
@@ -60,8 +61,11 @@ export function DashboardMenu() {
               <ChevronLeft />
             ) : (
               <>
-                <span className="text-base font-semibold tracking-tight text-foreground group-hover/button:hidden group-focus-visible/button:hidden">
-                  T4
+                <span
+                  lang="el"
+                  className="font-greek text-base font-semibold tracking-tight text-foreground group-hover/button:hidden group-focus-visible/button:hidden"
+                >
+                  Λ
                 </span>
                 <ChevronRight className="hidden group-hover/button:block group-focus-visible/button:block" />
               </>
