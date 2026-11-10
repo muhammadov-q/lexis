@@ -32,6 +32,7 @@ import scriptlens.shared.generated.resources.Res
 import scriptlens.shared.generated.resources.ic_docs
 import scriptlens.shared.generated.resources.ic_exclamation
 import scriptlens.shared.generated.resources.model_default_fallback
+import scriptlens.shared.generated.resources.model_recognition_title
 import scriptlens.shared.generated.resources.model_reload
 
 @Composable
@@ -75,7 +76,7 @@ fun ModelPickerError(
                 verticalArrangement = Arrangement.spacedBy(4.dp)
             ) {
                 Text(
-                    text = "Recognition model",
+                    text = stringResource(Res.string.model_recognition_title),
                     style = MaterialTheme.typography.titleSmall,
                     fontWeight = FontWeight.SemiBold,
                     color = errorColor

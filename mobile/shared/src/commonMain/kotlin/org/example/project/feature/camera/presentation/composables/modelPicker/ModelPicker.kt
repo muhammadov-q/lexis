@@ -18,6 +18,9 @@ import androidx.compose.ui.unit.dp
 import org.example.project.common.presentation.ui.theme.ScriptLensSpacing
 import org.example.project.feature.camera.domain.model.OcrModel
 import org.example.project.feature.camera.presentation.CameraContract
+import org.jetbrains.compose.resources.stringResource
+import scriptlens.shared.generated.resources.Res
+import scriptlens.shared.generated.resources.model_recognition_title
 
 @Composable
 fun ModelPicker(
@@ -32,7 +35,7 @@ fun ModelPicker(
         verticalArrangement = Arrangement.spacedBy(8.dp)
     ) {
         Text(
-            text = "Recognition model",
+            text = stringResource(Res.string.model_recognition_title),
             style = MaterialTheme.typography.titleSmall
         )
 

@@ -21,8 +21,11 @@ import androidx.compose.ui.unit.dp
 import org.example.project.common.presentation.ui.theme.ScriptLensColors
 import org.example.project.feature.camera.domain.model.OcrModel
 import org.jetbrains.compose.resources.painterResource
+import org.jetbrains.compose.resources.stringResource
 import scriptlens.shared.generated.resources.Res
 import scriptlens.shared.generated.resources.ic_arrow_down
+import scriptlens.shared.generated.resources.model_select
+import scriptlens.shared.generated.resources.model_select_description
 
 @Composable
 internal fun ModelPickerDropdownButton(
@@ -60,7 +63,7 @@ internal fun ModelPickerDropdownButton(
                 verticalArrangement = Arrangement.spacedBy(4.dp)
             ) {
                 Text(
-                    text = selectedModel?.name ?: "Select model",
+                    text = selectedModel?.name ?: stringResource(Res.string.model_select),
                     style = MaterialTheme.typography.bodyLarge
                 )
 
@@ -73,7 +76,7 @@ internal fun ModelPickerDropdownButton(
 
             Icon(
                 painter = painterResource(Res.drawable.ic_arrow_down),
-                contentDescription = "Select recognition model",
+                contentDescription = stringResource(Res.string.model_select_description),
                 modifier = Modifier.rotate(rotation),
                 tint = if (expanded) {
                     ScriptLensColors.Accent
