@@ -10,17 +10,21 @@ import kotlinx.coroutines.withContext
 import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.TestScope
 import kotlinx.coroutines.test.advanceUntilIdle
+import kotlinx.coroutines.test.runCurrent
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
 import org.example.project.common.presentation.ui.helpers.UiText
 import org.example.project.feature.camera.domain.model.ApiException
 import org.example.project.feature.camera.domain.model.Prediction
+import org.example.project.feature.camera.domain.model.OcrModel
+import org.example.project.feature.camera.domain.model.OcrModels
 import org.example.project.feature.camera.domain.model.PredictionBox
 import org.example.project.feature.camera.domain.model.PredictionGloss
 import org.example.project.feature.camera.domain.model.WordPrediction
 import org.example.project.feature.camera.domain.repository.PhotoRepository
 import org.example.project.feature.camera.domain.usecase.UploadPhotoUseCase
+import org.example.project.feature.camera.domain.usecase.GetModelsUseCase
 import org.example.project.feature.camera.presentation.models.CameraScreenErrorState
 import org.example.project.feature.camera.presentation.models.CameraScreenState
 import kotlin.test.Test
@@ -34,6 +38,137 @@ import kotlin.test.assertTrue
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class CameraViewModelTest {
+    @Test
+    fun discoveryRetryAndReadAgainPreservePhotoAndUseSelectedModel() = runCameraTest {
+        val gate = CompletableDeferred<Unit>()
+        var loads = 0
+        val uploads = mutableListOf<Pair<ByteArray, String?>>()
+        val models = listOf(OcrModel("first", "First", "One"), OcrModel("second", "Second", "Two"))
+        val repository = object : PhotoRepository {
+            override suspend fun getModels(): OcrModels {
+                loads++
+                if (loads == 1) {
+                    gate.await()
+                    throw ApiException(503)
+                }
+                return OcrModels(models, "first")
+            }
+            override suspend fun uploadPhoto(photo: ByteArray, model: String?): Prediction {
+                uploads += photo to model
+                return samplePrediction()
+            }
+        }
+        val viewModel = CameraViewModel(UploadPhotoUseCase(repository), GetModelsUseCase(repository))
+        runCurrent()
+        assertTrue(viewModel.state.value.modelsLoading)
+        gate.complete(Unit)
+        advanceUntilIdle()
+        assertTrue(viewModel.state.value.modelsError)
+        assertNull(viewModel.state.value.selectedModel)
+        val photo = byteArrayOf(4, 5)
+        viewModel.onEvent(CameraEvent.OnPhotoPicked(photo))
+        advanceUntilIdle()
+        assertNull(uploads.single().second)
+
+        viewModel.onEvent(CameraEvent.ReadAgain)
+        assertNull(viewModel.state.value.prediction)
+        assertContentEquals(photo, viewModel.state.value.photo)
+        viewModel.onEvent(CameraEvent.ReloadModels)
+        advanceUntilIdle()
+        assertEquals("first", viewModel.state.value.selectedModel)
+        viewModel.onEvent(CameraEvent.SelectModel("second"))
+        viewModel.onEvent(CameraEvent.OnPhotoPicked(photo))
+        advanceUntilIdle()
+        assertEquals("second", uploads.last().second)
+        assertContentEquals(photo, uploads.last().first)
+        assertEquals(2, uploads.size)
+    }
+
+    @Test
+    fun emptyModelListFallsBackToDefault() = runCameraTest {
+        val repository = object : PhotoRepository {
+            override suspend fun getModels() = OcrModels(emptyList(), "missing")
+            override suspend fun uploadPhoto(photo: ByteArray, model: String?) = samplePrediction()
+        }
+        val viewModel = CameraViewModel(UploadPhotoUseCase(repository), GetModelsUseCase(repository))
+        advanceUntilIdle()
+        assertTrue(viewModel.state.value.modelsError)
+        assertNull(viewModel.state.value.selectedModel)
+    }
+
+    @Test
+    fun selectionIsLockedDuringUploadAndValidationErrorKeepsTheImage() = runCameraTest {
+        val gate = CompletableDeferred<Unit>()
+        val repository = object : PhotoRepository {
+            override suspend fun getModels() = OcrModels(
+                listOf(OcrModel("a", "A", "A"), OcrModel("b", "B", "B")), "a",
+            )
+            override suspend fun uploadPhoto(photo: ByteArray, model: String?): Prediction {
+                gate.await()
+                throw ApiException(422)
+            }
+        }
+        val viewModel = CameraViewModel(UploadPhotoUseCase(repository), GetModelsUseCase(repository))
+        advanceUntilIdle()
+        val photo = byteArrayOf(7)
+        viewModel.onEvent(CameraEvent.OnPhotoPicked(photo))
+        runCurrent()
+        viewModel.onEvent(CameraEvent.SelectModel("b"))
+        assertEquals("a", viewModel.state.value.selectedModel)
+        gate.complete(Unit)
+        advanceUntilIdle()
+        val error = assertIs<CameraScreenState.Error>(viewModel.state.value.cameraScreenState)
+        assertIs<CameraScreenErrorState.ValidationFailed>(error.error)
+        viewModel.onEvent(CameraEvent.ReadAgain)
+        viewModel.onEvent(CameraEvent.SelectModel("b"))
+        assertEquals("b", viewModel.state.value.selectedModel)
+        assertContentEquals(photo, viewModel.state.value.photo)
+    }
+
+    @Test
+    fun changingModelAfterRecognitionReuploadsPhotoAndReloadPreservesSelection() = runCameraTest {
+        val models = listOf(
+            OcrModel("first", "First", "First model"),
+            OcrModel("second", "Second", "Second model"),
+        )
+        val uploads = mutableListOf<Pair<ByteArray, String?>>()
+        var modelLoads = 0
+        val repository = object : PhotoRepository {
+            override suspend fun getModels(): OcrModels {
+                modelLoads++
+                return OcrModels(models, "first")
+            }
+
+            override suspend fun uploadPhoto(photo: ByteArray, model: String?): Prediction {
+                uploads += photo to model
+                return samplePrediction(modelVersion = model ?: "default")
+            }
+        }
+        val viewModel = CameraViewModel(UploadPhotoUseCase(repository), GetModelsUseCase(repository))
+        val photo = byteArrayOf(3, 4, 5)
+        advanceUntilIdle()
+
+        viewModel.onEvent(CameraEvent.OnPhotoPicked(photo))
+        advanceUntilIdle()
+        viewModel.onEvent(CameraEvent.SelectModel("second"))
+        advanceUntilIdle()
+
+        assertEquals(2, uploads.size)
+        assertContentEquals(photo, uploads[1].first)
+        assertEquals("second", uploads[1].second)
+        assertEquals("second", viewModel.state.value.selectedModel)
+        assertEquals("second", viewModel.state.value.prediction?.modelVersion)
+
+        viewModel.onEvent(CameraEvent.SelectModel("unknown"))
+        assertEquals(2, uploads.size)
+        assertEquals("second", viewModel.state.value.selectedModel)
+
+        viewModel.onEvent(CameraEvent.ReloadModels)
+        advanceUntilIdle()
+        assertEquals(2, modelLoads)
+        assertEquals("second", viewModel.state.value.selectedModel)
+    }
+
     @Test
     fun capturePhotoRequestedEmitsEffectWithoutChangingState() = runCameraTest {
         val viewModel = createViewModel()
@@ -351,18 +486,18 @@ class CameraViewModelTest {
         try {
             block()
         } finally {
+            advanceUntilIdle()
             Dispatchers.resetMain()
         }
     }
 
     private fun createViewModel(
         upload: suspend (ByteArray) -> Prediction = { error("Unexpected upload") },
-    ) = CameraViewModel(
-        UploadPhotoUseCase(
-            object : PhotoRepository {
-                override suspend fun uploadPhoto(photo: ByteArray): Prediction = upload(photo)
-            },
-        ),
-    )
+    ): CameraViewModel {
+        val repository = object : PhotoRepository {
+            override suspend fun uploadPhoto(photo: ByteArray, model: String?): Prediction = upload(photo)
+            override suspend fun getModels() = OcrModels(listOf(OcrModel("default", "Default", "Default model")), "default")
+        }
+        return CameraViewModel(UploadPhotoUseCase(repository), GetModelsUseCase(repository))
+    }
 }
-

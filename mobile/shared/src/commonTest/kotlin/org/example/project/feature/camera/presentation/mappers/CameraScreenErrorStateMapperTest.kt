@@ -30,9 +30,15 @@ class CameraScreenErrorStateMapperTest {
 
     @Test
     fun rejectedStatusesMapToImageRejected() {
-        listOf(400, 415, 422).forEach { status ->
+        listOf(400, 415).forEach { status ->
             assertEquals(CameraScreenErrorState.ImageRejected, mapUploadErrorToUiModel(ApiException(status)), "status $status")
         }
+
+    }
+
+    @Test
+    fun validationFailureCanIndicateAnInvalidModel() {
+        assertEquals(CameraScreenErrorState.ValidationFailed, mapUploadErrorToUiModel(ApiException(422)))
     }
 
     @Test
@@ -52,4 +58,3 @@ class CameraScreenErrorStateMapperTest {
         assertEquals(CameraScreenErrorState.RecognitionFailed, mapUploadErrorToUiModel(SerializationException("bad body")))
     }
 }
-

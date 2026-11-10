@@ -8,8 +8,8 @@ fun mapUploadErrorToUiModel(error: Throwable): CameraScreenErrorState {
     return when (error.status) {
         0, 502, 503, 504 -> CameraScreenErrorState.ServiceOffline
         413 -> CameraScreenErrorState.ImageTooLarge
-        400, 415, 422 -> CameraScreenErrorState.ImageRejected
+        400, 415 -> CameraScreenErrorState.ImageRejected
+        422 -> CameraScreenErrorState.ValidationFailed
         else -> CameraScreenErrorState.RecognitionFailed
     }
 }
-

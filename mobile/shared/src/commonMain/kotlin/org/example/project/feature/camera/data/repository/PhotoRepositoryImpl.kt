@@ -6,6 +6,8 @@ import org.example.project.feature.camera.data.network.PhotoUploadConfig
 import org.example.project.feature.camera.data.network.models.PredictionDto
 import org.example.project.feature.camera.domain.model.ApiException
 import org.example.project.feature.camera.domain.model.Prediction
+import org.example.project.feature.camera.domain.model.OcrModel
+import org.example.project.feature.camera.domain.model.OcrModels
 import org.example.project.feature.camera.domain.model.PredictionBox
 import org.example.project.feature.camera.domain.model.PredictionGloss
 import org.example.project.feature.camera.domain.model.WordPrediction
@@ -16,7 +18,12 @@ class PhotoRepositoryImpl(
     private val config: PhotoUploadConfig,
     private val authSessionStore: AuthSessionStore,
 ) : PhotoRepository {
-    override suspend fun uploadPhoto(photo: ByteArray): Prediction {
+    override suspend fun getModels(): OcrModels {
+        val response = api.getModels()
+        return OcrModels(response.models.map { OcrModel(it.id, it.name, it.description) }, response.defaultModel)
+    }
+
+    override suspend fun uploadPhoto(photo: ByteArray, model: String?): Prediction {
         val isAuthenticatedRequest = authSessionStore.isAuthenticated()
         val uploadPath = if (isAuthenticatedRequest) {
             config.authenticatedUploadPath
@@ -25,10 +32,10 @@ class PhotoRepositoryImpl(
         }
 
         val response = try {
-            api.upload(photo, uploadPath)
+            api.upload(photo, uploadPath, model)
         } catch (exception: ApiException) {
             if (isAuthenticatedRequest && exception.status == 401) {
-                api.upload(photo, config.guestUploadPath)
+                api.upload(photo, config.guestUploadPath, model)
             } else {
                 throw exception
             }

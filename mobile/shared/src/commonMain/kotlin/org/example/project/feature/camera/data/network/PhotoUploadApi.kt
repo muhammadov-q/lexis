@@ -2,6 +2,7 @@ package org.example.project.feature.camera.data.network
 
 import io.ktor.client.HttpClient
 import io.ktor.client.request.post
+import io.ktor.client.request.get
 import io.ktor.client.request.setBody
 import io.ktor.client.statement.bodyAsText
 import io.ktor.http.ContentType
@@ -14,6 +15,7 @@ import io.ktor.client.request.forms.MultiPartFormDataContent
 import io.ktor.client.request.forms.formData
 import kotlinx.serialization.json.Json
 import org.example.project.feature.camera.data.network.models.PredictionDto
+import org.example.project.feature.camera.data.network.models.OcrModelsDto
 
 class PhotoUploadApi(
     private val client: HttpClient,
@@ -21,14 +23,27 @@ class PhotoUploadApi(
 ) {
     private val json = Json { ignoreUnknownKeys = true }
 
-    suspend fun upload(photo: ByteArray, uploadPath: String): PredictionDto {
+    suspend fun getModels(): OcrModelsDto {
+        val response = try {
+            client.get("${config.baseUrl.trimEnd('/')}/models")
+        } catch (cancellation: CancellationException) {
+            throw cancellation
+        } catch (exception: Exception) {
+            println("$TAG: request failed endpoint=models error=${exception::class.simpleName}")
+            throw ApiException(0)
+        }
+        if (response.status != HttpStatusCode.OK) throw ApiException(response.status.value)
+        return json.decodeFromString(response.bodyAsText())
+    }
+
+    suspend fun upload(photo: ByteArray, uploadPath: String, model: String? = null): PredictionDto {
         val endpoint = "${config.baseUrl.trimEnd('/')}/${uploadPath.trimStart('/')}"
         val endpointId = uploadPath.trimStart('/').ifBlank { "predict" }
 
         val status: Int
         val body: String
         try {
-            val response = client.post(endpoint) { setBody(photoBody(photo)) }
+            val response = client.post(endpoint) { setBody(photoBody(photo, model)) }
             status = response.status.value
             body = response.bodyAsText()
         } catch (cancellation: CancellationException) {
@@ -46,7 +61,7 @@ class PhotoUploadApi(
         return json.decodeFromString(body)
     }
 
-    private fun photoBody(photo: ByteArray) = MultiPartFormDataContent(
+    private fun photoBody(photo: ByteArray, model: String?) = MultiPartFormDataContent(
         formData {
             append(
                 key = config.multipartFieldName,
@@ -56,6 +71,7 @@ class PhotoUploadApi(
                     append(HttpHeaders.ContentDisposition, "filename=\"photo.jpg\"")
                 }
             )
+            if (model != null) append("model", model)
         }
     )
 

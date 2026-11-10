@@ -77,10 +77,17 @@ ML_PREDICTOR="eparchos" uv run uvicorn app.main:app --reload --host 0.0.0.0 --po
 
 ## Using the App
 
-1. Tap **Take photo and send** to capture a photo.
-2. Alternatively, tap **Choose photo** to select an existing image.
-3. The app uploads the image to the backend's `/predict` endpoint.
-4. View the returned recognition results or retry if the upload fails.
+1. Choose a model from the list; its names and descriptions come from `GET /models`.
+   The backend's default is selected initially. If the list cannot be loaded, use **Reload**
+   to retry; recognition remains available and uses the backend default.
+2. Tap **Take a photo** or **Choose from photos**. The app uploads the image with the
+   selected model to `/predict` for guests or `/recognitions` for signed-in users.
+3. View the result. To use a different model, tap **Read with another model**, select a
+   model, and tap **Recognize page**. The image preview and photo are retained.
+
+Results with a `model_version` of `mock` or `eparchos-` followed by one or more characters
+are placeholders: they return the same words for every page. An invalid image or model
+can cause a validation error; reload the model list or choose another image.
 
 ## Project Structure
 

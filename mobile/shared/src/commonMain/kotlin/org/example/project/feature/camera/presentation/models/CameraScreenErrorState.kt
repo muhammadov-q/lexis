@@ -13,6 +13,8 @@ import scriptlens.shared.generated.resources.error_recognition_failed_message
 import scriptlens.shared.generated.resources.error_recognition_failed_title
 import scriptlens.shared.generated.resources.error_service_offline_message
 import scriptlens.shared.generated.resources.error_service_offline_title
+import scriptlens.shared.generated.resources.error_validation_title
+import scriptlens.shared.generated.resources.error_validation_message
 import scriptlens.shared.generated.resources.ic_image_rejected
 import scriptlens.shared.generated.resources.ic_no_service
 import scriptlens.shared.generated.resources.image_too_large
@@ -58,6 +60,13 @@ sealed class CameraScreenErrorState(
         Res.drawable.ic_image_rejected
     )
 
+    object ValidationFailed : CameraScreenErrorState(
+        Res.string.error_validation_title,
+        Res.string.error_validation_message,
+        false,
+        Res.drawable.ic_image_rejected
+    )
+
     data class PhotoUnavailable(val detail: UiText) : CameraScreenErrorState(
         Res.string.error_photo_unavailable_title,
         detail,
@@ -65,4 +74,3 @@ sealed class CameraScreenErrorState(
         Res.drawable.ic_image_rejected
     )
 }
-

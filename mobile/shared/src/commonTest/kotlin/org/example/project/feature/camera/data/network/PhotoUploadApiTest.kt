@@ -19,6 +19,7 @@ import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFailsWith
 import kotlin.test.assertTrue
+import kotlin.test.assertFalse
 
 class PhotoUploadApiTest {
     private val config = PhotoUploadConfig(
@@ -67,6 +68,67 @@ class PhotoUploadApiTest {
         assertEquals(HttpMethod.Post, method)
         assertEquals("http://localhost:8000/predict", url)
         assertTrue(body.contains("name=image"), body)
+        assertFalse(body.contains("name=model"), body)
+    }
+
+    @Test
+    fun modelsAreFetchedAndParsed() = runTest {
+        val api = api { request ->
+            assertEquals(HttpMethod.Get, request.method)
+            assertEquals("/models", request.url.encodedPath)
+            respond(
+                """{"models":[{"id":"one","name":"First","description":"Description"}],"default_model":"one"}""",
+                HttpStatusCode.OK, jsonHeaders,
+            )
+        }
+        val result = api.getModels()
+        assertEquals("one", result.defaultModel)
+        assertEquals("Description", result.models.single().description)
+    }
+
+    @Test
+    fun modelIsSentForGuestAndAuthenticatedRequests() = runTest {
+        val paths = mutableListOf<String>()
+        val api = api { request ->
+            paths += request.url.encodedPath
+            val body = request.body.toByteArray().decodeToString()
+            assertTrue(body.contains("name=image"), body)
+            assertTrue(body.contains("name=model"), body)
+            assertTrue(body.contains("chosen-model"), body)
+            respond("""{"predictions":[],"model_version":"v1"}""", HttpStatusCode.OK, jsonHeaders)
+        }
+        api.upload(byteArrayOf(1), "/predict", "chosen-model")
+        api.upload(byteArrayOf(1), "/recognitions", "chosen-model")
+        assertEquals(listOf("/predict", "/recognitions"), paths)
+    }
+
+    @Test
+    fun modelDiscoveryHttpErrorIsReported() = runTest {
+        val api = api { respond("", HttpStatusCode.ServiceUnavailable) }
+        assertEquals(503, assertFailsWith<ApiException> { api.getModels() }.status)
+    }
+
+    @Test
+    fun modelDiscoveryConnectionFailureThrowsApiExceptionWithStatusZero() = runTest {
+        val api = api { throw RuntimeException("connection refused") }
+
+        val error = assertFailsWith<ApiException> { api.getModels() }
+
+        assertEquals(0, error.status)
+    }
+
+    @Test
+    fun malformedModelDiscoveryBodyThrowsSerializationException() = runTest {
+        val api = api { respond("not json", HttpStatusCode.OK, jsonHeaders) }
+
+        assertFailsWith<SerializationException> { api.getModels() }
+    }
+
+    @Test
+    fun modelDiscoveryCancellationIsNotConvertedToApiException() = runTest {
+        val api = api { throw CancellationException("cancelled") }
+
+        assertFailsWith<CancellationException> { api.getModels() }
     }
 
     @Test

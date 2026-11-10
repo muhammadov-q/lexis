@@ -69,6 +69,12 @@
     <string name="camera_title">Read historical manuscripts</string>
     <string name="camera_subtitle">Photograph a page and ScriptLens recognizes words and helps you read the transcription with translations.</string>
     <string name="camera_empty_hint">Lay the page flat in good light JPG, PNG or TIFF</string>
+    <string name="model_loading">Loading models...</string>
+    <string name="available_models">Available models</string>
+    <string name="model_default_fallback">Could not load models. Recognition will use the default model.</string>
+    <string name="model_reload">Reload</string>
+    <string name="action_read_again">Read with another model</string>
+    <string name="action_recognize">Recognize page</string>
     <string name="captured_photo_description">Uploaded photo with predictions</string>
 
     <!-- Actions -->
@@ -95,6 +101,8 @@
     <string name="error_image_too_large_message">The selected image exceeds the maximum allowed size. Please choose a smaller image.</string>
     <string name="error_image_rejected_title">Image rejected</string>
     <string name="error_image_rejected_message">The selected image was rejected by the recognition service. Please choose a different image.</string>
+    <string name="error_validation_title">Image or model rejected</string>
+    <string name="error_validation_message">The service could not accept this image or model. Reload the model list or choose another image.</string>
     <string name="error_recognition_failed_title">Recognition failed</string>
     <string name="error_recognition_failed_message">An error occurred during the recognition process. Please try again.</string>
 
