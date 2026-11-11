@@ -1,3 +1,5 @@
+import os
+
 import pytest
 
 from ml.factory import PREDICTORS, create_predictor, default_predictor_name
@@ -66,6 +68,8 @@ def test_each_call_returns_a_new_instance():
 
 @pytest.mark.parametrize("name", sorted(PREDICTORS))
 def test_every_registered_predictor_follows_the_contract(name, digit_image):
+    if name == "claude-code" and not os.getenv("RUN_CLAUDE_CODE"):
+        pytest.skip("calls Claude Code, set RUN_CLAUDE_CODE=1")
     if not PREDICTORS[name].is_available():
         pytest.skip(f"{name} can't run in this install, see backend/README.md")
 

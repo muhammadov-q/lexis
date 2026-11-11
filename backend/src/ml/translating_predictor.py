@@ -20,6 +20,6 @@ class TranslatingPredictor(AbstractPredictor):
         words = self.predictor.predict(image)
         glosses = self.translator.translate([word.text for word in words])
         return [
-            replace(word, gloss=gloss)
+            replace(word, gloss=word.gloss or gloss)
             for word, gloss in zip(words, glosses, strict=True)
         ]

@@ -8,3 +8,4 @@ Short notes on decisions that are hard to undo. Name them `NNNN-kebab-title.md` 
 | [[adr/0002-control-room-design-system]] | Dark control-room design with a light mode                           | accepted |
 | [[adr/0003-sqlite-database]]            | SQLite with SQLAlchemy and Alembic, migrated when the backend starts | accepted |
 | [[adr/0004-page-images-in-sqlite]]      | Page images for the history are stored in the database               | accepted |
+| [[adr/0005-claude-code-reader]]         | Claude Code reads and translates pages on the user's own computer    | accepted |

@@ -9,6 +9,8 @@ For the word by word reading, `EparchosPredictor` is a mock too: it ignores the 
 
 `KrakenBasePredictor` reads the same way with the model before fine-tuning ([[models/ppocrv6-small]]), so the two can be compared on a page.
 
+`ClaudeCodePredictor` lets Claude read and translate the page through Claude Code, with kraken's lines and word boxes ([[models/claude-code]], [[adr/0005-claude-code-reader]]).
+
 `ModelRegistry` lets a request choose which of these models reads its page: `GET /models` lists the ones this install can run, and the upload routes take a `model` form field. The usage is in `backend/README.md`.
 
 This note gets the tasks, datasets, splits and metrics once the team agrees on them. Each model we then use gets a card in [[models/README|models]].

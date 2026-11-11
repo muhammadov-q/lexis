@@ -105,6 +105,15 @@ curl -F image=@page.png -F model=kraken http://localhost:8000/predict
 
 The default model loads when the API starts, the others on their first page, which takes a few seconds longer. A loaded model stays in memory until the API stops. On a laptop, kraken took 4 to 5 GB while reading, and about 5.5 GB with both kraken models loaded.
 
+## Read with Claude Code
+
+`claude-code` reads a page with Claude Opus 5.5 through Claude Code on your computer ([model card](../docs/models/claude-code.md)). kraken finds the lines and word boxes, and Claude reads the words and translates each one. It is listed once kraken works (see above) and the `claude` command is installed and signed in. It uses your Claude Code plan, not an API key.
+
+- A page takes one to two minutes.
+- The page is sent to Anthropic. Use it on your own computer with your own login, never on a shared server for other people.
+- Claude Code gets no tools. The page goes inside the request, so writing on a page can't make it open a file or run anything.
+- `RUN_CLAUDE_CODE=1 uv run pytest` also runs the tests that call Claude Code.
+
 To add a model, add its predictor to `PREDICTORS` in `src/ml/factory.py`. Give it a `display_name`, a `description` and, if it needs files, an `is_available`.
 
 ## Run the tests
