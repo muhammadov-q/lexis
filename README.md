@@ -1,4 +1,4 @@
-# Lexis — Ancient Greek Text Assistant
+# Lexis - Ancient Greek Text Assistant
 
 Lexis (Greek λέξις, "word") is the project name; the web app shows it as Λέξις.
 
