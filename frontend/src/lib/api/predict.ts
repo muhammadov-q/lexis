@@ -7,10 +7,15 @@ type PredictForm = NonNullable<PredictOperation['requestBody']>['content']['mult
 export type Prediction = PredictOperation['responses'][200]['content']['application/json']
 
 const IMAGE_FIELD: keyof PredictForm = 'image'
+const MODEL_FIELD: keyof PredictForm = 'model'
 
-export function predictPage(file: File, signal?: AbortSignal): Promise<Prediction> {
+export function predictPage(
+  file: File,
+  { model, signal }: { model?: string; signal?: AbortSignal } = {}
+): Promise<Prediction> {
   const body = new FormData()
   body.append(IMAGE_FIELD, file)
+  if (model) body.append(MODEL_FIELD, model)
 
   return apiRequest<Prediction>('/predict', {
     method: 'POST',

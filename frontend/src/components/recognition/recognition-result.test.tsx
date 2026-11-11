@@ -59,22 +59,20 @@ describe('RecognitionResult', () => {
     expect(within(region).queryByText('Pick a word')).not.toBeInTheDocument()
   })
 
-  it('flags the mock model', () => {
-    const { region } = renderResult({
-      model_version: 'mock',
-      predictions: [
-        {
-          text: '2',
-          probabilities: { '2': 1 },
-          box: { x: 0, y: 0, w: 0, h: 0 },
-          line: 0,
-          gloss: null,
-        },
-      ],
-    })
+  it.each(['mock', 'eparchos-6791'])('flags the placeholder model %s', (modelVersion) => {
+    const { region } = renderResult({ model_version: modelVersion })
 
-    expect(within(region).getByText(/placeholder output from the mock model/i)).toBeInTheDocument()
+    expect(within(region).getByText(/^placeholder output\./i)).toBeInTheDocument()
   })
+
+  it.each(['kraken-kraken_eparchos', 'KNN-100126'])(
+    'does not flag %s, which reads the page',
+    (modelVersion) => {
+      const { region } = renderResult({ model_version: modelVersion })
+
+      expect(within(region).queryByText(/placeholder output/i)).not.toBeInTheDocument()
+    }
+  )
 
   it('shows how long the model took only when it just ran', () => {
     expect(renderResult({}, { durationMs: 120 }).region).toHaveTextContent('120 ms')

@@ -26,13 +26,24 @@ describe('recognitions API', () => {
     const page = new File(['bytes'], 'folio-1r.png', { type: 'image/png' })
     const controller = new AbortController()
 
-    await expect(recognizePage(page, controller.signal)).resolves.toEqual(recognition)
+    await expect(recognizePage(page, { signal: controller.signal })).resolves.toEqual(recognition)
 
     const [url, init] = call(fetch)
     expect(url).toBe('/api/recognitions')
     expect(init.method).toBe('POST')
     expect((init.body as FormData).get('image')).toBe(page)
+    expect((init.body as FormData).has('model')).toBe(false)
     expect(init.signal).toBe(controller.signal)
+  })
+
+  it('names the chosen model in the field `model`', async () => {
+    const fetch = stubFetch(makeRecognition())
+
+    await recognizePage(new File(['bytes'], 'folio-1r.png', { type: 'image/png' }), {
+      model: 'kraken',
+    })
+
+    expect((call(fetch)[1].body as FormData).get('model')).toBe('kraken')
   })
 
   it('lists the history', async () => {

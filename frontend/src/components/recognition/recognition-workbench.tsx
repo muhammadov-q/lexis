@@ -2,6 +2,7 @@
 
 import { useEffect, useEffectEvent, useRef, useState } from 'react'
 import { toast } from 'sonner'
+import { useModelChoice } from '@/hooks/use-models'
 import { usePhoneLink } from '@/hooks/use-phone-link'
 import { useRecognize } from '@/hooks/use-recognitions'
 import { useWordSelection } from '@/hooks/use-word-selection'
@@ -20,6 +21,7 @@ export function RecognitionWorkbench({ lanAddress = null }: { lanAddress?: strin
   const [cropping, setCropping] = useState(false)
 
   const run = useRecognize()
+  const models = useModelChoice()
   const abortRef = useRef<AbortController | null>(null)
   const recognition = run.isSuccess ? run.data.recognition : undefined
   const selection = useWordSelection(recognition, recognition?.predictions.length ?? 0)
@@ -74,6 +76,7 @@ export function RecognitionWorkbench({ lanAddress = null }: { lanAddress?: strin
 
     run.mutate({
       file: page,
+      model: models.selected,
       signal: controller.signal,
     })
   }
@@ -163,10 +166,12 @@ export function RecognitionWorkbench({ lanAddress = null }: { lanAddress?: strin
         <RecognitionPanel
           hasPage={page !== null && !cropping}
           run={run}
+          models={models}
           selection={selection}
           image={page ?? undefined}
           onRecognize={recognize}
           onCancel={stopRun}
+          onReadAgain={stopRun}
         />
 
         <PhoneLinkDialog
