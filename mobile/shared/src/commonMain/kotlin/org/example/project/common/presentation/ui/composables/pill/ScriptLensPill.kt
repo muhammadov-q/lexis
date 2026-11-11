@@ -1,7 +1,9 @@
 package org.example.project.common.presentation.ui.composables.pill
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Text
@@ -17,19 +19,34 @@ import org.example.project.common.presentation.ui.theme.ScriptLensSpacing
 
 @Composable
 fun ScriptLensPill(
-    modifier: Modifier=Modifier,
+    modifier: Modifier = Modifier,
+    isEnabled: Boolean = true,
+    onClick: (() -> Unit),
     text: UiText
 ) {
     Box(
-        modifier = modifier.clip(RoundedCornerShape(16.dp))
-            .background(ScriptLensColors.Accent).padding(
+        modifier = modifier
+            .clip(RoundedCornerShape(16.dp))
+            .clickable(enabled = isEnabled) {
+                onClick()
+            }
+            .background(
+                if (isEnabled)
+                    ScriptLensColors.Accent
+                else
+                    ScriptLensColors.Muted
+            )
+            .padding(
                 horizontal = ScriptLensSpacing.padding_8,
                 vertical = ScriptLensSpacing.padding_4
             )
     ) {
         Text(
             text = text.asString(),
-            color = ScriptLensColors.Subtext
+            color = if (isEnabled)
+                ScriptLensColors.Subtext
+            else
+                ScriptLensColors.Subtext.copy(alpha = 0.5f)
         )
     }
 }
@@ -37,5 +54,16 @@ fun ScriptLensPill(
 @Preview
 @Composable
 fun ScriptLensPillPreview() {
-    ScriptLensPill(text = UiText.Plain("Preview"))
+    Row {
+        ScriptLensPill(
+            text = UiText.Plain("Preview"),
+            onClick = {},
+            isEnabled = false
+        )
+        ScriptLensPill(
+            text = UiText.Plain("Preview"),
+            onClick = {},
+            isEnabled = true
+        )
+    }
 }

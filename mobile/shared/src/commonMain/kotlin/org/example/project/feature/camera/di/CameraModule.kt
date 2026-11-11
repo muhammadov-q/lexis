@@ -6,6 +6,7 @@ import org.example.project.feature.camera.data.network.PhotoUploadConfig
 import org.example.project.feature.camera.data.repository.PhotoRepositoryImpl
 import org.example.project.feature.camera.domain.repository.PhotoRepository
 import org.example.project.feature.camera.domain.usecase.UploadPhotoUseCase
+import org.example.project.feature.camera.domain.usecase.GetModelsUseCase
 import org.example.project.feature.camera.presentation.CameraViewModel
 import org.koin.core.module.dsl.viewModelOf
 import org.koin.dsl.module
@@ -28,5 +29,6 @@ val cameraModule = module {
         )
     }
     factory { UploadPhotoUseCase(get()) }
+    factory { GetModelsUseCase(get()) }
     viewModelOf(::CameraViewModel)
 }

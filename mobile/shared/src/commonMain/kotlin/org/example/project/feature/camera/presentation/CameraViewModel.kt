@@ -5,6 +5,7 @@ import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.receiveAsFlow
@@ -14,16 +15,18 @@ import org.example.project.common.presentation.ui.helpers.UiText.Plain
 import org.example.project.core.mvi.setEffect
 import org.example.project.core.mvi.setState
 import org.example.project.feature.camera.domain.model.ApiException
+import org.example.project.feature.camera.domain.usecase.GetModelsUseCase
 import org.example.project.feature.camera.domain.usecase.UploadPhotoUseCase
-import org.example.project.feature.camera.presentation.models.CameraScreenErrorState.PhotoUnavailable
-import org.example.project.feature.camera.presentation.models.CameraScreenState
 import org.example.project.feature.camera.presentation.mappers.mapPredictionToUiModel
 import org.example.project.feature.camera.presentation.mappers.mapUploadErrorToUiModel
+import org.example.project.feature.camera.presentation.models.CameraScreenErrorState.PhotoUnavailable
+import org.example.project.feature.camera.presentation.models.CameraScreenState
 import scriptlens.shared.generated.resources.Res
 import scriptlens.shared.generated.resources.error_photo_no_data
 
 class CameraViewModel(
     private val uploadPhoto: UploadPhotoUseCase,
+    private val getModels: GetModelsUseCase,
 ) : ViewModel() {
     private val _state = MutableStateFlow(CameraContract())
     val state = _state.asStateFlow()
@@ -31,6 +34,11 @@ class CameraViewModel(
     val effects = effectChannel.receiveAsFlow()
     private var uploadJob: Job? = null
     private var latestUploadRequestId: Long = 0
+    private var modelsJob: Job? = null
+
+    init {
+        loadModels()
+    }
 
     fun onEvent(event: CameraEvent) {
         when (event) {
@@ -49,6 +57,58 @@ class CameraViewModel(
             is CameraEvent.SelectPrediction -> onPredictionSelected(event.index)
 
             is CameraEvent.OnImagePickerProcessingStarted -> setLoading(true)
+            is CameraEvent.SelectModel -> onSelectModel(event.id)
+            is CameraEvent.ReloadModels -> loadModels()
+            is CameraEvent.ReadAgain -> _state.setState {
+                it.copy(
+                    prediction = null,
+                    selectedPredictionIndex = null,
+                    cameraScreenState = CameraScreenState.PhotoCaptured
+                )
+            }
+        }
+    }
+
+    private fun onSelectModel(id: String) {
+        if (!_state.value.isLoading && _state.value.models.any { it.id == id }) {
+            _state.setState { it.copy(selectedModel = id) }
+            if (_state.value.prediction != null) {
+                retryUpload()
+            }
+        }
+    }
+
+    private fun loadModels() {
+        modelsJob?.cancel()
+        _state.setState { it.copy(modelsLoading = true, modelsError = false) }
+        modelsJob = viewModelScope.launch {
+            try {
+                val result = getModels()
+                require(result.models.isNotEmpty() && result.models.any { it.id == result.defaultModel }) {
+                    "Model list is empty or has an invalid default"
+                }
+                _state.setState {
+                    it.copy(
+                        models = result.models,
+                        selectedModel = it.selectedModel?.takeIf { id -> result.models.any { model -> model.id == id } }
+                            ?: result.defaultModel,
+                        modelsLoading = false,
+                        modelsError = false,
+                    )
+                }
+            } catch (cancellation: CancellationException) {
+                throw cancellation
+            } catch (exception: Exception) {
+                println("$TAG: model discovery failed: ${exception.message}")
+                _state.setState {
+                    it.copy(
+                        models = emptyList(),
+                        selectedModel = null,
+                        modelsLoading = false,
+                        modelsError = true
+                    )
+                }
+            }
         }
     }
 
@@ -117,7 +177,7 @@ class CameraViewModel(
         setLoading(true)
         uploadJob = viewModelScope.launch {
             try {
-                val prediction = uploadPhoto(photo)
+                val prediction = uploadPhoto(photo, _state.value.selectedModel)
                 if (uploadRequestId != latestUploadRequestId) return@launch
                 val predictionModel = mapPredictionToUiModel(prediction)
                 _state.setState {

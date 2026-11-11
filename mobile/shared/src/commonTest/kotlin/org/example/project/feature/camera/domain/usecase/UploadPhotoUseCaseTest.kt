@@ -2,6 +2,7 @@ package org.example.project.feature.camera.domain.usecase
 
 import kotlinx.coroutines.test.runTest
 import org.example.project.feature.camera.domain.model.Prediction
+import org.example.project.feature.camera.domain.model.OcrModels
 import org.example.project.feature.camera.domain.model.PredictionBox
 import org.example.project.feature.camera.domain.model.PredictionGloss
 import org.example.project.feature.camera.domain.model.WordPrediction
@@ -17,7 +18,8 @@ class UploadPhotoUseCaseTest {
         val expectedPrediction = samplePrediction()
         var receivedPhoto: ByteArray? = null
         val repository = object : PhotoRepository {
-            override suspend fun uploadPhoto(photo: ByteArray): Prediction {
+            override suspend fun getModels() = OcrModels(emptyList(), "")
+            override suspend fun uploadPhoto(photo: ByteArray, model: String?): Prediction {
                 receivedPhoto = photo
                 return expectedPrediction
             }
@@ -35,7 +37,8 @@ class UploadPhotoUseCaseTest {
     fun invokePropagatesRepositoryExceptions() = runTest {
         val expected = IllegalStateException("upload failed")
         val repository = object : PhotoRepository {
-            override suspend fun uploadPhoto(photo: ByteArray): Prediction {
+            override suspend fun getModels() = OcrModels(emptyList(), "")
+            override suspend fun uploadPhoto(photo: ByteArray, model: String?): Prediction {
                 throw expected
             }
         }
@@ -63,5 +66,4 @@ class UploadPhotoUseCaseTest {
         modelVersion = "v2",
     )
 }
-
 

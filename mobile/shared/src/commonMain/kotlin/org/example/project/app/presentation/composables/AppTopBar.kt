@@ -51,15 +51,13 @@ internal fun AppTopBar(
         Spacer(Modifier.weight(1f))
         if (showSessionActions && isAuthenticated) {
             ScriptLensPill(
-                modifier = Modifier.clickable(
-                    enabled = !isSigningOut,
-                    onClick = onSignOutRequested
-                ),
+                isEnabled = !isSigningOut,
+                onClick = onSignOutRequested,
                 text = UiText.Plain(stringResource(Res.string.auth_action_sign_out))
             )
         } else if (showSessionActions) {
             ScriptLensPill(
-                modifier = Modifier.clickable(onClick = onSignInRequested),
+                onClick = onSignInRequested,
                 text = UiText.Plain(stringResource(Res.string.auth_action_sign_in))
             )
         }

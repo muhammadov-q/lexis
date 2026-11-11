@@ -9,8 +9,8 @@ import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
@@ -23,6 +23,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import org.example.project.common.presentation.ui.composables.buttons.ScriptLensButton
+import org.example.project.common.presentation.ui.composables.buttons.ScriptLensButtonStyle
 import org.example.project.common.presentation.ui.composables.loading.OverlayLoadingState
 import org.example.project.common.presentation.ui.theme.ScriptLensColors
 import org.example.project.common.presentation.ui.theme.ScriptLensSpacing
@@ -30,10 +32,12 @@ import org.example.project.common.presentation.ui.theme.ScriptLensTypography
 import org.example.project.feature.camera.presentation.composables.CameraPreview
 import org.example.project.feature.camera.presentation.composables.CapturedPhotoContent
 import org.example.project.feature.camera.presentation.composables.EmptyCameraState
+import org.example.project.feature.camera.presentation.composables.modelPicker.ModelPicker
 import org.example.project.feature.camera.presentation.composables.error.ErrorState
 import org.example.project.feature.camera.presentation.models.CameraScreenState
 import org.jetbrains.compose.resources.stringResource
 import scriptlens.shared.generated.resources.Res
+import scriptlens.shared.generated.resources.action_read_again
 import scriptlens.shared.generated.resources.camera_subtitle
 import scriptlens.shared.generated.resources.camera_title
 
@@ -47,6 +51,9 @@ fun CameraScreen(viewModel: CameraViewModel) {
         onChooseFromPhotosClicked = { viewModel.onEvent(CameraEvent.SelectPhotoRequested) },
         onRetryClicked = { viewModel.onEvent(CameraEvent.RetryUploadRequested) },
         onPredictionSelected = { viewModel.onEvent(CameraEvent.SelectPrediction(it)) },
+        onModelSelected = { viewModel.onEvent(CameraEvent.SelectModel(it)) },
+        onModelsReload = { viewModel.onEvent(CameraEvent.ReloadModels) },
+        onReadAgain = { viewModel.onEvent(CameraEvent.ReadAgain) }
     )
 
     CameraPreview(
@@ -78,6 +85,9 @@ private fun CameraScreenContent(
     onChooseFromPhotosClicked: () -> Unit,
     onRetryClicked: () -> Unit,
     onPredictionSelected: (Int) -> Unit,
+    onModelSelected: (String) -> Unit,
+    onModelsReload: () -> Unit,
+    onReadAgain: () -> Unit
 ) {
     Column(
         modifier = Modifier
@@ -113,31 +123,44 @@ private fun CameraScreenContent(
                     Alignment.Center
                 },
             ) {
-                when (cameraScreenState) {
-                    is CameraScreenState.NoPhotoCaptured ->
-                        EmptyCameraState(
-                            onTakePhotoClicked = onTakePhotoClicked,
-                            onChooseFromPhotosClicked = onChooseFromPhotosClicked
-                        )
+                Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                    ModelPicker(state, onModelSelected, onModelsReload)
 
-                    is CameraScreenState.PhotoCaptured ->
-                        CapturedPhotoContent(
-                            modifier = Modifier.padding(top = ScriptLensSpacing.padding_16),
-                            photo = state.photo,
-                            prediction = state.prediction,
-                            selectedPredictionIndex = state.selectedPredictionIndex,
-                            onPredictionSelected = onPredictionSelected,
-                            onTakeNewPhotoClicked = onTakePhotoClicked,
-                            onChooseFromPhotosClicked = onChooseFromPhotosClicked
-                        )
+                    when (cameraScreenState) {
+                        is CameraScreenState.NoPhotoCaptured ->
+                            EmptyCameraState(
+                                onTakePhotoClicked = onTakePhotoClicked,
+                                onChooseFromPhotosClicked = onChooseFromPhotosClicked,
+                            )
 
-                    is CameraScreenState.Error ->
-                        ErrorState(
-                            errorState = cameraScreenState.error,
-                            onTakeNewPhotoClicked = onTakePhotoClicked,
-                            onChooseFromPhotosClicked = onChooseFromPhotosClicked,
-                            onRetryClicked = onRetryClicked
-                        )
+                        is CameraScreenState.PhotoCaptured ->
+                            CapturedPhotoContent(
+                                modifier = Modifier.padding(top = ScriptLensSpacing.padding_16),
+                                photo = state.photo,
+                                prediction = state.prediction,
+                                selectedPredictionIndex = state.selectedPredictionIndex,
+                                onPredictionSelected = onPredictionSelected,
+                                onTakeNewPhotoClicked = onTakePhotoClicked,
+                                onChooseFromPhotosClicked = onChooseFromPhotosClicked
+                            )
+
+                        is CameraScreenState.Error ->
+                            Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                                ErrorState(
+                                    errorState = cameraScreenState.error,
+                                    onTakeNewPhotoClicked = onTakePhotoClicked,
+                                    onChooseFromPhotosClicked = onChooseFromPhotosClicked,
+                                    onRetryClicked = onRetryClicked,
+                                )
+                                if (state.photo != null) {
+                                    ScriptLensButton(
+                                        text = stringResource(Res.string.action_read_again),
+                                        onClick = onReadAgain,
+                                        buttonStyle = ScriptLensButtonStyle.Secondary,
+                                    )
+                                }
+                            }
+                    }
                 }
             }
         }
@@ -156,6 +179,9 @@ private fun CameraScreenPreview(
             onChooseFromPhotosClicked = {},
             onRetryClicked = {},
             onPredictionSelected = {},
+            onModelSelected = {},
+            onModelsReload = {},
+            onReadAgain = {},
         )
     }
 }
