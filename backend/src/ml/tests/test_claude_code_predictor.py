@@ -13,8 +13,8 @@ from ml.claude_code_predictor import (
     EFFORT,
     MAX_SIDE,
     MODEL,
+    SCHEMA,
     TIMEOUT_S,
-    UNCONFIRMED,
     ClaudeCodePredictor,
     run_claude,
 )
@@ -53,7 +53,10 @@ def answer(*lines):
         "subtype": "success",
         "is_error": False,
         "structured_output": {
-            "lines": [{"line": i, "words": words} for i, words in lines]
+            "lines": [
+                {"line": i, "words": words, "translation": f"Line {i} in English."}
+                for i, words in lines
+            ]
         },
     }
     return json.dumps({"type": "system"}) + "\n" + json.dumps(result) + "\n"
@@ -128,10 +131,22 @@ def test_each_word_gets_claudes_translation():
     )
 
 
-def test_a_word_keeps_krakens_confidence_only_when_both_read_it_the_same():
+def test_each_word_carries_the_translation_of_its_line():
     words = predictor(TWO_WORDS, answer((0, [read("ἀβ"), read("γδ")]))).predict(page())
 
-    assert words[0].probabilities == {"ἀβ": UNCONFIRMED}
+    assert [w.line_translation for w in words] == ["Line 0 in English."] * 2
+
+
+def test_claude_must_translate_every_line():
+    line = SCHEMA["properties"]["lines"]["items"]
+
+    assert "translation" in line["required"]
+
+
+def test_a_word_has_krakens_confidence_only_when_both_read_it_the_same():
+    words = predictor(TWO_WORDS, answer((0, [read("ἀβ"), read("γδ")]))).predict(page())
+
+    assert words[0].probabilities == {}
     assert words[1].probabilities == {"γδ": 0.8}
 
 
@@ -150,7 +165,7 @@ def test_another_word_count_splits_the_line_and_shrinks_each_word_to_its_ink():
     words = predictor(one_word, answer((0, [read("αβ"), read("γδ")]))).predict(page())
 
     assert [w.box for w in words] == [(20, 30, 40, 30), (120, 35, 60, 30)]
-    assert all(w.probabilities[w.text] == UNCONFIRMED for w in words)
+    assert all(w.probabilities == {} for w in words)
 
 
 def test_words_both_models_read_the_same_hold_the_rest_of_the_line_in_place():
@@ -170,12 +185,7 @@ def test_words_both_models_read_the_same_hold_the_rest_of_the_line_in_place():
         (150, 30, 30, 30),
         (240, 30, 30, 30),
     ]
-    assert [w.probabilities[w.text] for w in words] == [
-        0.8,
-        UNCONFIRMED,
-        UNCONFIRMED,
-        0.8,
-    ]
+    assert [w.probabilities for w in words] == [{"αα": 0.8}, {}, {}, {"δδ": 0.8}]
 
 
 def test_a_line_claude_leaves_out_keeps_what_kraken_read():

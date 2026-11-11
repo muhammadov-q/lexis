@@ -79,6 +79,7 @@ class PredictionItem(BaseModel):
     box: BoxResponse
     line: int = 0
     gloss: GlossResponse | None = None
+    line_translation: str | None = None
 
     @classmethod
     def of(cls, result: Prediction) -> "PredictionItem":
@@ -91,4 +92,5 @@ class PredictionItem(BaseModel):
             gloss=None
             if result.gloss is None
             else GlossResponse(**asdict(result.gloss)),
+            line_translation=result.line_translation,
         )

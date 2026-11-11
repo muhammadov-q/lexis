@@ -17,6 +17,7 @@ const word = (text: string, line = 0, probabilities: Record<string, number> = {}
   box: { x: 0, y: 0, w: 10, h: 10 },
   line,
   gloss: null,
+  line_translation: null,
 })
 
 const page = [word('Φύσις', 0), word('ἐστί', 0), word('δύναμις', 1)]
@@ -36,17 +37,30 @@ describe('groupLines', () => {
     expect(groupLines(page)).toEqual([
       {
         number: 1,
+        translation: null,
         words: [
           { word: page[0], index: 0 },
           { word: page[1], index: 1 },
         ],
       },
-      { number: 2, words: [{ word: page[2], index: 2 }] },
+      { number: 2, translation: null, words: [{ word: page[2], index: 2 }] },
     ])
   })
 
   it('has no lines when nothing was found', () => {
     expect(groupLines([])).toEqual([])
+  })
+
+  it('treats an empty line translation as none', () => {
+    const empty = page.map((word) => ({ ...word, line_translation: '' }))
+
+    expect(groupLines(empty).map((line) => line.translation)).toEqual([null, null])
+  })
+
+  it('takes the translation of each line from its words', () => {
+    const translated = page.map((word) => ({ ...word, line_translation: `Line ${word.line}.` }))
+
+    expect(groupLines(translated).map((line) => line.translation)).toEqual(['Line 0.', 'Line 1.'])
   })
 })
 
@@ -65,8 +79,8 @@ describe('confidenceOf', () => {
     expect(confidenceOf(word('7', 0, { '1': 0.08, '7': 0.92 }))).toBe(0.92)
   })
 
-  it('is 0 when the predicted text has no probability', () => {
-    expect(confidenceOf(word('7', 0, { '1': 1 }))).toBe(0)
+  it('is unknown when the predicted text has no probability', () => {
+    expect(confidenceOf(word('7', 0, { '1': 1 }))).toBeNull()
   })
 })
 

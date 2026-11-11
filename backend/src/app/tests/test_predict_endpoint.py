@@ -1,5 +1,5 @@
 from app.main import app
-from app.prediction import get_predictor, registry
+from app.prediction import PredictionItem, get_predictor, registry
 from app.uploads import MAX_FILE_SIZE
 from ml.eparchos_predictor import EparchosPredictor
 from ml.predictor import AbstractPredictor, Prediction
@@ -42,12 +42,38 @@ def test_predict_with_image_returns_mock_values(client):
 def test_predict_response_shape(client):
     response = upload(client, "test.png", b"fake png bytes", "image/png")
     first = response.json()["predictions"][0]
-    assert set(first) == {"text", "probabilities", "box", "line", "gloss"}
+    assert set(first) == {
+        "text",
+        "probabilities",
+        "box",
+        "line",
+        "gloss",
+        "line_translation",
+    }
     assert set(first["box"]) == {"x", "y", "w", "h"}
     # JSON object keys are always strings
     assert first["probabilities"] == {"2": 1.0}
     assert first["line"] == 0
     assert first["gloss"] is None
+    assert first["line_translation"] is None
+
+
+def test_each_word_carries_its_lines_translation():
+    word = Prediction(
+        text="καὶ",
+        probabilities={"καὶ": 0.9},
+        box=(1, 2, 3, 4),
+        line_translation="And so it is.",
+    )
+
+    assert PredictionItem.of(word).line_translation == "And so it is."
+
+
+def test_a_result_saved_before_line_translations_still_reads():
+    box = {"x": 1, "y": 2, "w": 3, "h": 4}
+    saved = {"text": "καὶ", "probabilities": {"καὶ": 0.9}, "box": box}
+
+    assert PredictionItem.model_validate(saved).line_translation is None
 
 
 def test_predict_returns_the_line_and_gloss_of_each_word(client):

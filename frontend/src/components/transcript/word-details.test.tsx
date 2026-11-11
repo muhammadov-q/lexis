@@ -58,6 +58,17 @@ describe('WordDetails', () => {
     expect(screen.queryByRole('img', { name: /close-up/i })).not.toBeInTheDocument()
   })
 
+  it('says a word is not confirmed when its reading has no confidence', () => {
+    const unconfirmed = words.map((word) => ({ ...word, probabilities: {} }))
+    renderWithProviders(
+      <WordDetails words={unconfirmed} selection={makeSelection({ selected: 1 })} />
+    )
+
+    expect(entry('Confidence')).toHaveTextContent(
+      'Not confirmed. kraken read this word differently, so check it on the page.'
+    )
+  })
+
   it('says so when a word has no translation', () => {
     renderDetails(2)
 

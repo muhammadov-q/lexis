@@ -13,6 +13,7 @@ export function makeRecognition(overrides: Partial<Recognition> = {}): Recogniti
         box: { x: 10, y: 20, w: 30, h: 40 },
         line: 0,
         gloss: { lemma: 'φύσις', translation: 'nature', definition: 'noun: nature' },
+        line_translation: null,
       },
       {
         text: 'ἐστί,',
@@ -20,6 +21,7 @@ export function makeRecognition(overrides: Partial<Recognition> = {}): Recogniti
         box: { x: 50, y: 20, w: 30, h: 40 },
         line: 0,
         gloss: { lemma: 'εἰμί', translation: 'is', definition: 'verb: to be' },
+        line_translation: null,
       },
       {
         text: '?',
@@ -27,6 +29,7 @@ export function makeRecognition(overrides: Partial<Recognition> = {}): Recogniti
         box: { x: 10, y: 70, w: 30, h: 40 },
         line: 1,
         gloss: null,
+        line_translation: null,
       },
     ],
     ...overrides,

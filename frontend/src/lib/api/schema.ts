@@ -319,6 +319,8 @@ export interface components {
              */
             line: number;
             gloss: components["schemas"]["GlossResponse"] | null;
+            /** Line Translation */
+            line_translation: string | null;
         };
         /** RecognitionResponse */
         RecognitionResponse: {

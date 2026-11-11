@@ -14,6 +14,7 @@ class Prediction:
     box: Box
     line: int = 0
     gloss: Gloss | None = None
+    line_translation: str | None = None
 
 
 class AbstractPredictor(ABC):

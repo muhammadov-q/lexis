@@ -17,6 +17,7 @@ export interface BoxPercent {
 
 export interface Line {
   number: number
+  translation: string | null
   words: { word: Word; index: number }[]
 }
 
@@ -28,7 +29,11 @@ export function groupLines(words: Word[]): Line[] {
   const lines = new Map<number, Line>()
 
   words.forEach((word, index) => {
-    const line = lines.get(word.line) ?? { number: word.line + 1, words: [] }
+    const line = lines.get(word.line) ?? {
+      number: word.line + 1,
+      translation: word.line_translation || null,
+      words: [],
+    }
     line.words.push({ word, index })
     lines.set(word.line, line)
   })
@@ -42,8 +47,8 @@ export function positionOf(words: Word[], index: number): { line: number; word: 
   return { line: line + 1, word: before + 1 }
 }
 
-export function confidenceOf(word: Word): number {
-  return word.probabilities[word.text] ?? 0
+export function confidenceOf(word: Word): number | null {
+  return word.probabilities[word.text] ?? null
 }
 
 export function hasBox(box: WordBox): boolean {

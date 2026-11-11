@@ -39,6 +39,7 @@ export function WordDetails({ words, selection, image }: WordDetailsProps) {
 
   const position = positionOf(words, selected)
   const { gloss } = word
+  const confidence = confidenceOf(word)
 
   return (
     <section aria-label="Selected word" className="space-y-5">
@@ -85,17 +86,22 @@ export function WordDetails({ words, selection, image }: WordDetailsProps) {
           </Entry>
           <Entry term="Definition">{gloss.definition}</Entry>
           <Entry term="Confidence">
-            <span className="font-mono text-sm tabular-nums">
-              {formatPercent(confidenceOf(word))}
-            </span>
+            {confidence === null ? (
+              <span className="text-sm">
+                Not confirmed. kraken read this word differently, so check it on the page.
+              </span>
+            ) : (
+              <span className="font-mono text-sm tabular-nums">{formatPercent(confidence)}</span>
+            )}
           </Entry>
         </dl>
       ) : (
         <div className="space-y-1 rounded-xl bg-muted px-5 py-4">
           <p className="font-medium">No translation yet</p>
           <p className="text-sm text-muted-foreground">
-            The model read this word with {formatPercent(confidenceOf(word))} confidence but has no
-            translation for it.
+            {confidence === null
+              ? 'The model has no translation for this word.'
+              : `The model read this word with ${formatPercent(confidence)} confidence but has no translation for it.`}
           </p>
         </div>
       )}
