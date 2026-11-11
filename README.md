@@ -1,10 +1,16 @@
-# Lexis — Ancient Greek Text Assistant
+# Lexis - Ancient Greek Text Assistant
 
 Lexis (Greek λέξις, "word") is the project name; the web app shows it as Λέξις.
 
 A tool that helps students, researchers, and anyone interested in Ancient Greek **read, understand, and learn from Ancient Greek texts**.
 
 Upload a page image and explore recognized words and their translations.
+
+## How it works
+
+![Lexis architecture: line detection, line recognition, word boxes, and with the claude-code model, reading, translation and alignment](docs/architecture/lexis-architecture.png)
+
+kraken finds the lines on the page, a PP-OCRv6-S model fine-tuned on Eparchos reads them, and every word gets a box and a confidence. With the `claude-code` model, Claude Opus 5.5 also reads and translates each line, and its words are matched with kraken's. The bottom strip follows one line of Eparchos page 6791 (1) from the [Eparchos dataset](https://zenodo.org/records/4095301) (CC BY 4.0). Details are in the [model cards](docs/models/README.md).
 
 ## Features
 
