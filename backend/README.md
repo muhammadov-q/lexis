@@ -94,7 +94,7 @@ curl -fL -o src/ml/models/ppocrv6_small.safetensors \
 
 `ML_PREDICTOR` sets the default model, and a request can pick another one:
 
-- `GET /models` lists the models this install can run, and the default. Each has a name and a description written for the people reading pages, and `demo` is true for the models that return a prepared answer whatever you upload. A model that needs weights or the `ml` extra is only listed once they are there.
+- `GET /models` lists the models this install can run, and the default. Each has a name in plain words with the engine in brackets, such as `Greek handwriting (kraken)`, and a description written for the people reading pages, and `demo` is true for the models that return a prepared answer whatever you upload. A model that needs weights or the `ml` extra is only listed once they are there.
 - `POST /predict` and `POST /recognitions` take an optional form field `model` next to `image`. Without it they use the default. A model that isn't on the list gets a 422.
 
 ```bash
@@ -114,7 +114,7 @@ The default model loads when the API starts, the others on their first page, whi
 - Claude Code gets no tools. The page goes inside the request, so writing on a page can't make it open a file or run anything.
 - `RUN_CLAUDE_CODE=1 uv run pytest` also runs the tests that call Claude Code.
 
-To add a model, add its predictor to `PREDICTORS` in `src/ml/factory.py`. Give it a `display_name` and a `description` that a reader understands: what it does, what you get back and how long it takes. Set `demo = True` if it ignores the uploaded page, and add an `is_available` if it needs files.
+To add a model, add its predictor to `PREDICTORS` in `src/ml/factory.py`. Give it a `display_name` in plain words with the engine in brackets, and a `description` that a reader understands: what it does, what you get back and how long it takes. Set `demo = True` if it ignores the uploaded page, and add an `is_available` if it needs files.
 
 ## Run the tests
 

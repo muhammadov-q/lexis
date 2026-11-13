@@ -94,12 +94,13 @@ def test_every_registered_predictor_describes_itself(name):
 
 
 @pytest.mark.parametrize("name", sorted(PREDICTORS))
-def test_names_are_short_and_say_nothing_technical(name):
+def test_names_say_what_it_does_first_and_the_engine_in_brackets(name):
     display_name = PREDICTORS[name].display_name
+    plain = display_name.split(" (")[0].lower()
 
-    assert len(display_name) <= 40
+    assert len(display_name) <= 56
     for word in ("kraken", "mock", "dummy", "k-nn", "opus", "ocr", "eparchos"):
-        assert word not in display_name.lower()
+        assert word not in plain
 
 
 @pytest.mark.parametrize("name", sorted(PREDICTORS))
