@@ -36,7 +36,7 @@ describe('ModelPicker', () => {
     expect(screen.queryByRole('combobox')).not.toBeInTheDocument()
   })
 
-  it("shows the backend's default model and what it does before anything is chosen", async () => {
+  it("shows the backend's default model before anything is chosen", async () => {
     setup(vi.fn().mockResolvedValue(Response.json(makeModelList())))
 
     const select = await picker()
@@ -47,24 +47,47 @@ describe('ModelPicker', () => {
     expect(screen.getByRole('status', { name: 'Selected model' })).toHaveTextContent('kraken')
   })
 
-  it('lists each model with what it does, and selects the one picked', async () => {
+  it('lists the models by name only, and selects the one picked', async () => {
     const { user } = setup(vi.fn().mockResolvedValue(Response.json(makeModelList())))
 
     await user.click(await picker())
     const options = screen.getAllByRole('option')
-    expect(options).toHaveLength(3)
+    expect(options.map((option) => option.textContent)).toEqual([
+      'Greek handwriting',
+      'Untrained reader, for comparison',
+      'Test output',
+    ])
     expect(options[0]).toHaveAttribute('aria-selected', 'true')
-    expect(options[1]).toHaveTextContent('Untrained reader, for comparison')
-    expect(options[1]).toHaveTextContent('The same reader before it learned these manuscripts.')
 
-    await user.click(screen.getByRole('option', { name: /Untrained reader, for comparison/ }))
+    await user.click(screen.getByRole('option', { name: 'Untrained reader, for comparison' }))
 
-    const select = await picker()
-    expect(select).toHaveTextContent('Untrained reader, for comparison')
-    expect(select).toHaveAccessibleDescription(
-      'The same reader before it learned these manuscripts.'
-    )
+    expect(await picker()).toHaveTextContent('Untrained reader, for comparison')
     expect(screen.getByRole('status', { name: 'Selected model' })).toHaveTextContent('kraken-base')
+  })
+
+  it('explains the chosen model behind the info button', async () => {
+    const { user } = setup(vi.fn().mockResolvedValue(Response.json(makeModelList())))
+
+    await user.click(await screen.findByRole('button', { name: 'About Greek handwriting' }))
+
+    const details = await screen.findByRole('dialog')
+    expect(details).toHaveTextContent('Greek handwriting')
+    expect(details).toHaveTextContent(
+      'Reads the page in about 10 seconds and puts a box around every word.'
+    )
+    expect(details).not.toHaveTextContent('Demo')
+  })
+
+  it('says when the chosen model is a demo', async () => {
+    const { user } = setup(vi.fn().mockResolvedValue(Response.json(makeModelList())))
+
+    await user.click(await picker())
+    await user.click(screen.getByRole('option', { name: 'Test output' }))
+    await user.click(screen.getByRole('button', { name: 'About Test output' }))
+
+    const details = await screen.findByRole('dialog')
+    expect(details).toHaveTextContent('Always returns the same six digits, whatever you upload.')
+    expect(details).toHaveTextContent("Demo: it doesn't read your page.")
   })
 
   it('keeps the demos apart from the models that read your page', async () => {

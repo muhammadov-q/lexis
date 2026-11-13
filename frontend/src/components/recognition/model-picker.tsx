@@ -1,8 +1,10 @@
 'use client'
 
+import { InfoIcon } from 'lucide-react'
 import { useId } from 'react'
 import { Button } from '@/components/ui/button'
 import { Label } from '@/components/ui/label'
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
 import {
   Select,
   SelectContent,
@@ -37,12 +39,12 @@ export function ModelPicker({
     <div className="space-y-2">
       <Label htmlFor={id}>Model</Label>
       {query.data ? (
-        <>
+        <div className="flex items-center gap-2">
           <Select value={selected} onValueChange={choice.choose} disabled={disabled}>
             <SelectTrigger
               id={id}
               aria-describedby={current ? descriptionId : undefined}
-              className="w-full"
+              className="w-full min-w-0 flex-1"
             >
               <SelectValue>{current?.name}</SelectValue>
             </SelectTrigger>
@@ -53,11 +55,27 @@ export function ModelPicker({
             </SelectContent>
           </Select>
           {current && (
-            <p id={descriptionId} className="text-sm text-muted-foreground">
-              {current.description}
-            </p>
+            <>
+              <span id={descriptionId} className="sr-only">
+                {current.description}
+              </span>
+              <Popover>
+                <PopoverTrigger asChild>
+                  <Button variant="ghost" size="icon" aria-label={`About ${current.name}`}>
+                    <InfoIcon />
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent align="end" className="w-80 gap-1.5">
+                  <p className="font-medium">{current.name}</p>
+                  <p className="text-muted-foreground">{current.description}</p>
+                  {current.demo && (
+                    <p className="text-muted-foreground">Demo: it doesn&apos;t read your page.</p>
+                  )}
+                </PopoverContent>
+              </Popover>
+            </>
           )}
-        </>
+        </div>
       ) : query.isPending ? (
         <Skeleton aria-hidden className="h-11 w-full rounded-xl" />
       ) : (
@@ -81,10 +99,7 @@ function ModelGroup({ label, models }: { label: string; models: Model[] }) {
       <SelectLabel>{label}</SelectLabel>
       {models.map((model) => (
         <SelectItem key={model.id} value={model.id}>
-          <span className="flex flex-col gap-0.5">
-            <span className="font-medium">{model.name}</span>
-            <span className="text-xs text-muted-foreground">{model.description}</span>
-          </span>
+          {model.name}
         </SelectItem>
       ))}
     </SelectGroup>

@@ -91,8 +91,8 @@ photo with the phone camera and sends it to the backend. The page on the compute
 ## Choose a model
 
 The Model dropdown lists the models the backend can run (`GET /models`) and starts on the
-backend's default. It shows the names and descriptions the backend sends, puts the demo models
-in their own group, and shows the chosen model's description under the dropdown. The chosen
+backend's default. It lists the models by the names the backend sends and puts the demo models
+in their own group. The info button next to it shows what the chosen model does. The chosen
 model goes with the page in the `model` form field. If the list can't load, the page is read
 with the backend's default.
 
