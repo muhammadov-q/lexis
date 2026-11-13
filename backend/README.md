@@ -94,7 +94,7 @@ curl -fL -o src/ml/models/ppocrv6_small.safetensors \
 
 `ML_PREDICTOR` sets the default model, and a request can pick another one:
 
-- `GET /models` lists the models this install can run, and the default. Each has a name in plain words with the engine in brackets, such as `Greek handwriting (kraken)`, and a description written for the people reading pages, and `demo` is true for the models that return a prepared answer whatever you upload. A model that needs weights or the `ml` extra is only listed once they are there.
+- `GET /models` lists the models this install can run, and the default. Each has a name in plain words with the engine in brackets, such as `Greek handwriting (kraken)`, and a description written for the people reading pages. `demo` is true for the models that return a prepared answer whatever you upload. A model that needs weights or the `ml` extra is only listed once they are there.
 - `POST /predict` and `POST /recognitions` take an optional form field `model` next to `image`. Without it they use the default. A model that isn't on the list gets a 422.
 
 ```bash

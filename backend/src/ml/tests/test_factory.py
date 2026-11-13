@@ -104,7 +104,7 @@ def test_names_say_what_it_does_first_and_the_engine_in_brackets(name):
 
 
 @pytest.mark.parametrize("name", sorted(PREDICTORS))
-def test_descriptions_fit_under_the_dropdown(name):
+def test_descriptions_are_short(name):
     assert len(PREDICTORS[name].description) <= 200
 
 
