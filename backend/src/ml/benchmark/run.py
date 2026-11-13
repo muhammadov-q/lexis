@@ -55,7 +55,6 @@ def run(
     names: Sequence[str],
     true_lines: bool = False,
 ) -> dict[str, PageCounts]:
-    """Score every named page of an Eparchos folder (image/ and xml/)."""
     pages = {}
     for number, name in enumerate(names, 1):
         truth = load_page(data / "xml" / f"{name}.xml")

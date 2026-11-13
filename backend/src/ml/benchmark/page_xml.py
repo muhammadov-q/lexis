@@ -45,7 +45,7 @@ def bounding_box(polygon: list[Point]) -> Box:
 
 
 def load_page(path: Path) -> TruthPage:
-    """Read the lines and words of a PAGE XML file. Lines without words are left out."""
+    """Lines without words are left out."""
     root = ET.parse(path).getroot()
     ns = {"p": root.tag.split("}")[0].strip("{")}
     lines: list[TruthLine] = []

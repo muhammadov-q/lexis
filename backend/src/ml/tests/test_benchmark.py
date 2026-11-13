@@ -43,8 +43,6 @@ PAGE_XML = """<?xml version="1.0" encoding="UTF-8"?>
 
 
 class Reader(AbstractPredictor):
-    """Reads every page as the given words."""
-
     def __init__(self, words: list[Prediction]) -> None:
         super().__init__()
         self.words = words
