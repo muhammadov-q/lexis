@@ -5,13 +5,16 @@ import unicodedata
 from collections.abc import Sequence
 from importlib.util import find_spec
 from pathlib import Path
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
 import cv2
 import numpy as np
 from numpy.typing import NDArray
 
 from ml.predictor import AbstractPredictor, Box, Prediction
+
+if TYPE_CHECKING:
+    from PIL.Image import Image
 
 MODEL_PATH = Path(__file__).resolve().parent / "models" / "kraken_eparchos.safetensors"
 BASE_MODEL_PATH = MODEL_PATH.with_name("ppocrv6_small.safetensors")
@@ -77,6 +80,25 @@ def bounds(polygon: Polygon, width: int, height: int) -> tuple[int, int, int, in
     return max(min(xs), 0), max(min(ys), 0), min(max(xs), width), min(max(ys), height)
 
 
+def open_page(image: bytes) -> "Image":
+    from PIL import Image, ImageOps
+
+    try:
+        return ImageOps.exif_transpose(Image.open(io.BytesIO(image)))
+    except OSError as e:  # not an image, or a truncated one
+        raise ValueError(
+            "Impossible to decode image: invalid or unsupported format."
+        ) from e
+
+
+def straight_baseline(polygon: Polygon) -> list[tuple[int, int]]:
+    """Eparchos has no baselines: training used one at 75% of the line height."""
+    xs = [p[0] for p in polygon]
+    ys = [p[1] for p in polygon]
+    y = int(min(ys) + 0.75 * (max(ys) - min(ys)))
+    return [(int(min(xs)), y), (int(max(xs)), y)]
+
+
 class KrakenPredictor(AbstractPredictor):
     display_name = "Kraken, fine-tuned on Eparchos"
     description = (
@@ -112,30 +134,48 @@ class KrakenPredictor(AbstractPredictor):
         return self.model_name
 
     def predict(self, image: bytes) -> list[Prediction]:
-        from kraken.configs import (
-            RecognitionInferenceConfig,
-            SegmentationInferenceConfig,
-        )
-        from PIL import Image, ImageOps
+        from kraken.configs import SegmentationInferenceConfig
 
-        try:
-            page = ImageOps.exif_transpose(Image.open(io.BytesIO(image)))
-        except OSError as e:  # not an image, or a truncated one
-            raise ValueError(
-                "Impossible to decode image: invalid or unsupported format."
-            ) from e
-        gray = np.asarray(page.convert("L"), dtype=np.uint8)
+        page = open_page(image)
         with self.lock:
             segmentation = self.segmenter.predict(
                 page, SegmentationInferenceConfig(accelerator="cpu")
             )
-            records = list(
-                self.recognizer.predict(
-                    page,
-                    segmentation,
-                    RecognitionInferenceConfig(accelerator="cpu", num_line_workers=0),
+            return self._read(page, segmentation)
+
+    def predict_lines(self, image: bytes, lines: Sequence[Polygon]) -> list[Prediction]:
+        """Read the given lines instead of finding them, to judge the reading alone."""
+        from kraken.containers import BaselineLine, Segmentation
+
+        page = open_page(image)
+        segmentation = Segmentation(
+            type="baselines",
+            imagename="page",
+            text_direction="horizontal-lr",
+            script_detection=False,
+            lines=[
+                BaselineLine(
+                    id=str(number),
+                    baseline=straight_baseline(polygon),
+                    boundary=[(int(x), int(y)) for x, y in polygon],
                 )
+                for number, polygon in enumerate(lines)
+            ],
+        )
+        with self.lock:
+            return self._read(page, segmentation)
+
+    def _read(self, page: "Image", segmentation: Any) -> list[Prediction]:
+        from kraken.configs import RecognitionInferenceConfig
+
+        gray = np.asarray(page.convert("L"), dtype=np.uint8)
+        records = list(
+            self.recognizer.predict(
+                page,
+                segmentation,
+                RecognitionInferenceConfig(accelerator="cpu", num_line_workers=0),
             )
+        )
         words: list[Prediction] = []
         line = 0
         for record in records:
