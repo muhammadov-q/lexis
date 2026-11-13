@@ -5,18 +5,21 @@ export function makeModelList(overrides: Partial<ModelList> = {}): ModelList {
     models: [
       {
         id: 'kraken',
-        name: 'Kraken, fine-tuned on Eparchos',
-        description: 'Reads 16th-century Greek handwriting.',
+        name: 'Greek handwriting',
+        description: 'Reads the page in about 10 seconds and puts a box around every word.',
+        demo: false,
       },
       {
         id: 'kraken-base',
-        name: 'Kraken, not fine-tuned',
-        description: 'The general PP-OCRv6 model, before we fine-tuned it.',
+        name: 'Untrained reader, for comparison',
+        description: 'The same reader before it learned these manuscripts.',
+        demo: false,
       },
       {
         id: 'dummy',
-        name: 'Mock digits',
-        description: 'Ignores the page and returns the same six digits. For testing.',
+        name: 'Test output',
+        description: 'Always returns the same six digits, whatever you upload.',
+        demo: true,
       },
     ],
     default_model: 'kraken',

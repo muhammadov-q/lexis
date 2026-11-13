@@ -22,6 +22,7 @@ class AbstractPredictor(ABC):
 
     display_name: ClassVar[str] = ""
     description: ClassVar[str] = ""
+    demo: ClassVar[bool] = False
 
     @classmethod
     def is_available(cls) -> bool:
@@ -40,8 +41,12 @@ class AbstractPredictor(ABC):
 class DummyPredictor(AbstractPredictor):
     """Placeholder: ignores the image and always returns the dummy digits."""
 
-    display_name = "Mock digits"
-    description = "Ignores the page and returns the same six digits. For testing."
+    display_name = "Test output"
+    description = (
+        "Always returns the same six digits, whatever you upload. Only for testing "
+        "the app."
+    )
+    demo = True
 
     def __init__(self) -> None:
         super().__init__()

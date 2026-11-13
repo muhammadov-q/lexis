@@ -21,8 +21,8 @@ class DigitClassifier(Protocol):
 
 
 class KnnPredictor(AbstractPredictor):
-    display_name = "Handwritten digits (k-NN)"
-    description = "Finds and reads handwritten digits. Not made for manuscripts."
+    display_name = "Handwritten digits"
+    description = "Reads handwritten numbers only, not manuscript text."
 
     @classmethod
     def is_available(cls) -> bool:

@@ -1,4 +1,4 @@
-import { screen } from '@testing-library/react'
+import { screen, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { afterEach, describe, expect, it, vi } from 'vitest'
 import { useModelChoice } from '@/hooks/use-models'
@@ -36,10 +36,14 @@ describe('ModelPicker', () => {
     expect(screen.queryByRole('combobox')).not.toBeInTheDocument()
   })
 
-  it("shows the backend's default model before anything is chosen", async () => {
+  it("shows the backend's default model and what it does before anything is chosen", async () => {
     setup(vi.fn().mockResolvedValue(Response.json(makeModelList())))
 
-    expect(await picker()).toHaveTextContent('Kraken, fine-tuned on Eparchos')
+    const select = await picker()
+    expect(select).toHaveTextContent('Greek handwriting')
+    expect(select).toHaveAccessibleDescription(
+      'Reads the page in about 10 seconds and puts a box around every word.'
+    )
     expect(screen.getByRole('status', { name: 'Selected model' })).toHaveTextContent('kraken')
   })
 
@@ -50,13 +54,46 @@ describe('ModelPicker', () => {
     const options = screen.getAllByRole('option')
     expect(options).toHaveLength(3)
     expect(options[0]).toHaveAttribute('aria-selected', 'true')
-    expect(options[1]).toHaveTextContent('Kraken, not fine-tuned')
-    expect(options[1]).toHaveTextContent('The general PP-OCRv6 model, before we fine-tuned it.')
+    expect(options[1]).toHaveTextContent('Untrained reader, for comparison')
+    expect(options[1]).toHaveTextContent('The same reader before it learned these manuscripts.')
 
-    await user.click(screen.getByRole('option', { name: /Kraken, not fine-tuned/ }))
+    await user.click(screen.getByRole('option', { name: /Untrained reader, for comparison/ }))
 
-    expect(await picker()).toHaveTextContent('Kraken, not fine-tuned')
+    const select = await picker()
+    expect(select).toHaveTextContent('Untrained reader, for comparison')
+    expect(select).toHaveAccessibleDescription(
+      'The same reader before it learned these manuscripts.'
+    )
     expect(screen.getByRole('status', { name: 'Selected model' })).toHaveTextContent('kraken-base')
+  })
+
+  it('keeps the demos apart from the models that read your page', async () => {
+    const { user } = setup(vi.fn().mockResolvedValue(Response.json(makeModelList())))
+
+    await user.click(await picker())
+
+    const readers = screen.getByRole('group', { name: 'Read your page' })
+    const demos = screen.getByRole('group', { name: 'Demos' })
+    expect(
+      within(readers)
+        .getAllByRole('option')
+        .map((o) => o.textContent)
+    ).toEqual([
+      expect.stringContaining('Greek handwriting'),
+      expect.stringContaining('Untrained reader, for comparison'),
+    ])
+    expect(within(demos).getByRole('option')).toHaveTextContent('Test output')
+  })
+
+  it('shows no demo group when the backend has no demos', async () => {
+    const list = makeModelList()
+    const readersOnly = makeModelList({ models: list.models.filter((model) => !model.demo) })
+    const { user } = setup(vi.fn().mockResolvedValue(Response.json(readersOnly)))
+
+    await user.click(await picker())
+
+    expect(screen.getByRole('group', { name: 'Read your page' })).toBeInTheDocument()
+    expect(screen.queryByRole('group', { name: 'Demos' })).not.toBeInTheDocument()
   })
 
   it('can be locked while a page is being read', async () => {
@@ -78,7 +115,7 @@ describe('ModelPicker', () => {
 
     await user.click(screen.getByRole('button', { name: 'Reload' }))
 
-    expect(await picker()).toHaveTextContent('Kraken, fine-tuned on Eparchos')
+    expect(await picker()).toHaveTextContent('Greek handwriting')
     expect(fetch).toHaveBeenCalledTimes(2)
   })
 })
