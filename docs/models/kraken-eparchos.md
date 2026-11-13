@@ -18,7 +18,7 @@ Eparchos has line polygons but no baselines, so each line gets a straight baseli
 
 - Word boxes (`words_in_line`): on the validation pages, the box from the space before a word to the space after it, shrunk to the ink, boxes 88.7% of the words correctly (IoU of at least 0.5). The character positions alone box 63.8%.
 
-The training and evaluation scripts are not in the repo yet (#80).
+The training script is not in the repo yet. The word benchmark is: [[ml/benchmark]].
 
 ## Results
 
@@ -32,6 +32,22 @@ Reading lines, with the line polygons from the ground truth:
 | kraken Eparchos                | 8.1%  | 34.5% |
 
 End to end through `KrakenPredictor`, with kraken finding the lines: 77.0% of the words get a box that overlaps the true one (IoU of at least 0.5), 44.5% are read exactly, 66.6% have the right letters when accents are ignored. A page takes about 8 seconds on a laptop CPU.
+
+The word benchmark ([[ml/benchmark]]) on the same 24 test pages. The range is the 95% interval over pages.
+
+| Test pages                      | kraken finds the lines | True lines           |
+| ------------------------------- | ---------------------- | -------------------- |
+| Word boxes, F1                  | 80.3% (76.0 to 83.8)   | 84.6% (82.0 to 87.0) |
+| Word boxes, precision           | 83.8% (79.4 to 87.3)   | 85.3% (82.5 to 87.8) |
+| Word boxes, recall              | 77.0% (72.5 to 80.8)   | 84.0% (81.4 to 86.3) |
+| Overlap of matched boxes (IoU)  | 76.6% (75.1 to 78.0)   | 79.5% (78.2 to 80.7) |
+| Words merged with a neighbour   | 15.1% (11.5 to 19.5)   | 8.0% (6.5 to 9.5)    |
+| Words split in two or more      | 1.1% (0.6 to 1.7)      | 1.9% (1.3 to 2.6)    |
+| Word boundaries in the text, F1 | 91.1% (88.5 to 93.0)   | 91.7% (90.3 to 92.9) |
+| Right word in the right box     | 44.5% (39.2 to 49.0)   | 63.3% (59.0 to 67.1) |
+| Character error rate            | 12.8% (11.0 to 15.0)   | 7.9% (6.7 to 9.2)    |
+
+About one word in seven is merged with a neighbour and few are split: the model misses spaces far more often than it adds them (#102). With the true lines the right word lands in the right box for 63.3% of the words, against 44.5% with the lines kraken finds, so line finding costs about as much as reading.
 
 For comparison, Tsochatzidis et al. (2021) report 4.16% CER on Eparchos with their own split.
 
