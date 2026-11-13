@@ -99,6 +99,34 @@ def straight_baseline(polygon: Polygon) -> list[tuple[int, int]]:
     return [(int(min(xs)), y), (int(max(xs)), y)]
 
 
+def rectangle(polygon: Polygon, width: int, height: int) -> list[tuple[int, int]]:
+    x0, y0, x1, y1 = bounds(polygon, width, height)
+    return [(x0, y0), (x1, y0), (x1, y1), (x0, y1)]
+
+
+def straight_lines(lines: Sequence[Polygon]) -> Any:
+    """
+    The model was trained on Eparchos lines: rectangles with a straight baseline.
+    Read in the curved shape kraken finds, it gets twice as many letters wrong.
+    """
+    from kraken.containers import BaselineLine, Segmentation
+
+    return Segmentation(
+        type="baselines",
+        imagename="page",
+        text_direction="horizontal-lr",
+        script_detection=False,
+        lines=[
+            BaselineLine(
+                id=str(number),
+                baseline=straight_baseline(polygon),
+                boundary=[(int(x), int(y)) for x, y in polygon],
+            )
+            for number, polygon in enumerate(lines)
+        ],
+    )
+
+
 class KrakenPredictor(AbstractPredictor):
     display_name = "Kraken, fine-tuned on Eparchos"
     description = (
@@ -138,32 +166,20 @@ class KrakenPredictor(AbstractPredictor):
 
         page = open_page(image)
         with self.lock:
-            segmentation = self.segmenter.predict(
+            found = self.segmenter.predict(
                 page, SegmentationInferenceConfig(accelerator="cpu")
             )
-            return self._read(page, segmentation)
+            lines = [
+                rectangle(line.boundary, page.width, page.height)
+                for line in found.lines
+            ]
+            return self._read(page, straight_lines(lines))
 
     def predict_lines(self, image: bytes, lines: Sequence[Polygon]) -> list[Prediction]:
         """Read the given lines instead of finding them, to judge the reading alone."""
-        from kraken.containers import BaselineLine, Segmentation
-
         page = open_page(image)
-        segmentation = Segmentation(
-            type="baselines",
-            imagename="page",
-            text_direction="horizontal-lr",
-            script_detection=False,
-            lines=[
-                BaselineLine(
-                    id=str(number),
-                    baseline=straight_baseline(polygon),
-                    boundary=[(int(x), int(y)) for x, y in polygon],
-                )
-                for number, polygon in enumerate(lines)
-            ],
-        )
         with self.lock:
-            return self._read(page, segmentation)
+            return self._read(page, straight_lines(lines))
 
     def _read(self, page: "Image", segmentation: Any) -> list[Prediction]:
         from kraken.configs import RecognitionInferenceConfig
