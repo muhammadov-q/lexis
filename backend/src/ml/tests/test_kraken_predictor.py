@@ -9,6 +9,7 @@ from ml.kraken_predictor import (
     KrakenPredictor,
     bounds,
     ink_box,
+    rectangle,
     straight_baseline,
     words_in_line,
 )
@@ -84,6 +85,20 @@ def test_ink_box_without_ink_keeps_the_box():
 def test_bounds_are_clipped_to_the_page():
     box = bounds([(-5, 10), (120, 10), (120, 90), (-5, 90)], 100, 80)
     assert box == (0, 10, 100, 80)
+
+
+def test_a_found_line_becomes_the_rectangle_around_it():
+    curved = [(12, 30), (60, 24), (110, 31), (108, 58), (60, 52), (10, 60)]
+    assert rectangle(curved, 300, 100) == [(10, 24), (110, 24), (110, 60), (10, 60)]
+
+
+def test_the_rectangle_stays_on_the_page():
+    assert rectangle([(-5, 10), (120, 10), (120, 90), (-5, 90)], 100, 80) == [
+        (0, 10),
+        (100, 10),
+        (100, 80),
+        (0, 80),
+    ]
 
 
 def test_a_given_line_gets_a_baseline_at_three_quarters_of_its_height():
