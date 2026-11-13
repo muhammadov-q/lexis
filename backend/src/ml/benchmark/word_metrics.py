@@ -101,9 +101,9 @@ def split_words(truth: Sequence[Box], predicted: Sequence[Box]) -> int:
 
 
 def fold(text: str) -> str:
-    """Letters without accents or case, so a missed accent is not a missed boundary."""
+    """Bare letters and digits, so a missed accent or comma is not a missed boundary."""
     decomposed = unicodedata.normalize("NFD", text)
-    bare = "".join(c for c in decomposed if unicodedata.category(c) != "Mn")
+    bare = "".join(c for c in decomposed if unicodedata.category(c)[0] in "LN")
     return bare.lower().replace("ς", "σ")
 
 

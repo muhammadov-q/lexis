@@ -24,10 +24,10 @@ A predicted word matches a true word when their boxes overlap with an IoU of at 
 | Overlap of matched boxes | The mean IoU of the matched pairs: how tight the boxes are. |
 | Words merged with a neighbour | True words that share one predicted box with another true word. The box covers at least half of each. |
 | Words split in two or more | True words that hold two or more predicted boxes. At least half of each box is inside the word. |
-| Word boundaries in the text | Are the spaces in the right places, whatever the boxes say. The letters of both readings are lined up without accents or case, and the word ends are compared on the letters both have. |
+| Word boundaries in the text | Are the spaces in the right places, whatever the boxes say. The letters of both readings are lined up without accents, case or punctuation, and the word ends are compared on the letters both have. |
 | Right word in the right box | True words matched by a box with exactly the same text, accents and punctuation included. |
 | Character error rate | Edits needed to turn the read text of the page into the true text, over the length of the true text (NFC). |
 
-Each number is taken over all the words of the pages together, not as a mean of page scores. The 95% interval comes from drawing the pages again with replacement 1000 times, so it shows how much a number depends on which pages are in the split. Two models differ for real when their intervals don't overlap.
+Each number is taken over all the words of the pages together, not as a mean of page scores. The 95% interval comes from drawing the pages again with replacement 1000 times, so it shows how much a number depends on which pages are in the split. Intervals that don't overlap mean a real difference. Intervals that do overlap don't rule one out when both runs read the same pages.
 
 Eparchos does not always list the words of a line in reading order, so the loader sorts them from left to right.

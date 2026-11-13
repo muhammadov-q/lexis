@@ -80,6 +80,10 @@ def test_a_missed_accent_is_not_a_missed_boundary():
     assert boundary_counts(["τούτων", "καὶ"], ["τουτων", "και"]) == (2, 2, 2)
 
 
+def test_missed_punctuation_is_not_a_missed_boundary():
+    assert boundary_counts(["συγκείμενα,", "εἰ"], ["συγκειμενα", "εἰ"]) == (2, 2, 2)
+
+
 def test_a_boundary_after_a_letter_only_one_side_read_is_left_out():
     assert boundary_counts(["αβγ", "δ"], ["αβ", "δ"]) == (1, 2, 1)
 

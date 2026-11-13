@@ -43,7 +43,7 @@ The word benchmark ([[ml/benchmark]]) on the same 24 test pages. The range is th
 | Overlap of matched boxes (IoU)  | 76.6% (75.1 to 78.0)   | 79.5% (78.2 to 80.7) |
 | Words merged with a neighbour   | 15.1% (11.5 to 19.5)   | 8.0% (6.5 to 9.5)    |
 | Words split in two or more      | 1.1% (0.6 to 1.7)      | 1.9% (1.3 to 2.6)    |
-| Word boundaries in the text, F1 | 91.1% (88.5 to 93.0)   | 91.7% (90.3 to 92.9) |
+| Word boundaries in the text, F1 | 93.8% (91.7 to 95.5)   | 94.8% (93.7 to 95.9) |
 | Right word in the right box     | 44.5% (39.2 to 49.0)   | 63.3% (59.0 to 67.1) |
 | Character error rate            | 12.8% (11.0 to 15.0)   | 7.9% (6.7 to 9.2)    |
 
