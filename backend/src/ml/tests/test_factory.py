@@ -93,6 +93,26 @@ def test_every_registered_predictor_describes_itself(name):
     assert predictor_class.description
 
 
+@pytest.mark.parametrize("name", sorted(PREDICTORS))
+def test_names_say_what_it_does_first_and_the_engine_in_brackets(name):
+    display_name = PREDICTORS[name].display_name
+    plain = display_name.split(" (")[0].lower()
+
+    assert len(display_name) <= 56
+    for word in ("kraken", "mock", "dummy", "k-nn", "opus", "ocr", "eparchos"):
+        assert word not in plain
+
+
+@pytest.mark.parametrize("name", sorted(PREDICTORS))
+def test_descriptions_are_short(name):
+    assert len(PREDICTORS[name].description) <= 200
+
+
+@pytest.mark.parametrize("name", sorted(PREDICTORS))
+def test_only_the_models_that_ignore_the_page_are_demos(name):
+    assert PREDICTORS[name].demo == (name in {"eparchos", "dummy"})
+
+
 def test_a_predictor_without_requirements_is_available():
     assert DummyPredictor.is_available()
 

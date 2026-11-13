@@ -289,6 +289,8 @@ export interface components {
             name: string;
             /** Description */
             description: string;
+            /** Demo */
+            demo: boolean;
         };
         /** ModelsResponse */
         ModelsResponse: {

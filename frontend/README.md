@@ -91,8 +91,10 @@ photo with the phone camera and sends it to the backend. The page on the compute
 ## Choose a model
 
 The Model dropdown lists the models the backend can run (`GET /models`) and starts on the
-backend's default. The chosen model goes with the page in the `model` form field. If the list
-can't load, the page is read with the backend's default.
+backend's default. It lists the models by the names the backend sends and puts the demo models
+in their own group. The info button next to it shows what the chosen model does. The chosen
+model goes with the page in the `model` form field. If the list can't load, the page is read
+with the backend's default.
 
 Which models are on the list depends on the backend install (see `backend/README.md`). Results
 from `mock` and `eparchos-…` are marked as placeholder output, since those models return the same

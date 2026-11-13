@@ -78,10 +78,11 @@ def bounds(polygon: Polygon, width: int, height: int) -> tuple[int, int, int, in
 
 
 class KrakenPredictor(AbstractPredictor):
-    display_name = "Kraken, fine-tuned on Eparchos"
+    display_name = "Greek handwriting (kraken)"
     description = (
-        "Reads 16th-century Greek handwriting. A page takes several seconds, "
-        "and the first one longer while the model loads."
+        "Reads the page in about 10 seconds and puts a box around every word. "
+        "Trained on 16th-century Greek manuscripts. Most words come without a "
+        "translation."
     )
 
     @classmethod
@@ -154,10 +155,10 @@ class KrakenPredictor(AbstractPredictor):
 
 
 class KrakenBasePredictor(KrakenPredictor):
-    display_name = "Kraken, not fine-tuned"
+    display_name = "Untrained reader, for comparison (kraken base)"
     description = (
-        "The general PP-OCRv6 model, before we fine-tuned it. Use it to compare: "
-        "on Eparchos pages it gets about one letter in three wrong."
+        "The same reader before it learned these manuscripts. About one letter in "
+        "three is wrong. Use it to see what training changed."
     )
 
     @classmethod
