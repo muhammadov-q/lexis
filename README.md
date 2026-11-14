@@ -1,6 +1,6 @@
 # Lexis - Ancient Greek Text Assistant
 
-Lexis (Greek λέξις, "word") is the project name; the web app shows it as Λέξις.
+Lexis (Greek λέξις, "word") is the project name; the web app shows it as Λέξις, with Lexis in the browser tab.
 
 A tool that helps students, researchers, and anyone interested in Ancient Greek **read, understand, and learn from Ancient Greek texts**.
 

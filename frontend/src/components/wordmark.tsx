@@ -1,11 +1,7 @@
-import { cn } from '@/lib/utils'
-
-export const APP_NAME = 'Λέξις'
-
-export function Wordmark({ className }: { className?: string }) {
+export function Wordmark() {
   return (
-    <span lang="el" className={cn('font-greek', className)}>
-      {APP_NAME}
+    <span lang="el" className="font-greek">
+      Λέξις
     </span>
   )
 }
