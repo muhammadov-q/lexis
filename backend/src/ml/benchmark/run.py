@@ -54,8 +54,9 @@ def run(
     data: Path,
     names: Sequence[str],
     true_lines: bool = False,
-) -> dict[str, PageCounts]:
+) -> tuple[dict[str, PageCounts], dict[str, list[Prediction]]]:
     pages = {}
+    words = {}
     for number, name in enumerate(names, 1):
         truth = load_page(data / "xml" / f"{name}.xml")
         image = (data / "image" / f"{name}.png").read_bytes()
@@ -64,8 +65,9 @@ def run(
             [Word(word.text, word.box) for word in truth.words],
             [Word(word.text, word.box) for word in read],
         )
+        words[name] = read
         print(f"{number}/{len(names)} {name}", file=sys.stderr)
-    return pages
+    return pages, words
 
 
 def table(pages: Sequence[PageCounts]) -> str:
@@ -95,7 +97,7 @@ def main(argv: Sequence[str] | None = None) -> None:
     args = parser.parse_args(argv)
 
     predictor = create_predictor(args.model)
-    pages = run(predictor, args.data, page_names(args.split), args.true_lines)
+    pages, words = run(predictor, args.data, page_names(args.split), args.true_lines)
     counts = list(pages.values())
     lines = "true lines" if args.true_lines else "lines found by the model"
     print(f"{predictor.model_version}, {args.split}, {len(counts)} pages, {lines}\n")
@@ -109,5 +111,17 @@ def main(argv: Sequence[str] | None = None) -> None:
             "summary": summarise(counts),
             "intervals": intervals(counts),
             "pages": {name: asdict(page) for name, page in pages.items()},
+            "words": {
+                name: [
+                    {
+                        "text": word.text,
+                        "box": word.box,
+                        "line": word.line,
+                        "line_translation": word.line_translation,
+                    }
+                    for word in read
+                ]
+                for name, read in words.items()
+            },
         }
         args.out.write_text(json.dumps(result, indent=2), encoding="utf-8")

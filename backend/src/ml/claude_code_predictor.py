@@ -76,7 +76,7 @@ def run_claude(command: list[str], message: str) -> str:
     return done.stdout
 
 
-def claude_command() -> list[str]:
+def claude_command(schema: dict[str, Any] = SCHEMA) -> list[str]:
     return [
         "claude",
         "-p",
@@ -94,7 +94,7 @@ def claude_command() -> list[str]:
         "stream-json",
         "--verbose",
         "--json-schema",
-        json.dumps(SCHEMA),
+        json.dumps(schema),
     ]
 
 
@@ -130,16 +130,21 @@ def page_prompt(size: tuple[int, int], boxes: Sequence[LineBox]) -> str:
     )
 
 
-def parse_answer(output: str) -> dict[int, tuple[list[dict[str, str]], str]]:
+def structured_output(output: str, key: str) -> Any:
     try:
         events = [json.loads(line) for line in output.splitlines() if line.strip()]
     except json.JSONDecodeError as e:
         raise RuntimeError("Claude Code did not answer in JSON") from e
     results = [e for e in events if e.get("type") == "result"]
     result = results[-1] if results else {}
-    lines = (result.get("structured_output") or {}).get("lines")
-    if result.get("is_error") or lines is None:
+    value = (result.get("structured_output") or {}).get(key)
+    if result.get("is_error") or value is None:
         raise RuntimeError(f"Claude Code failed: {str(result.get('result'))[:300]}")
+    return value
+
+
+def parse_answer(output: str) -> dict[int, tuple[list[dict[str, str]], str]]:
+    lines = structured_output(output, "lines")
     return {line["line"]: (line["words"], line["translation"]) for line in lines}
 
 

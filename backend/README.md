@@ -127,6 +127,8 @@ uv run python -m ml.benchmark --data /path/to/eparchos --model kraken --split va
 
 Use `--split test` only for the final numbers of a model, and `--true-lines` to give a kraken model the true lines. What each number means is in `docs/ml/benchmark.md`.
 
+`--out results.json` also saves the words and line translations. `uv run python -m ml.benchmark.judge --results results.json --data /path/to/eparchos` then lets Claude judge the line translations of a `claude-code` run against the true text. It uses your Claude Code plan.
+
 ## Run the tests
 
 ### pytest (no server needed)
