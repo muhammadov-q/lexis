@@ -1,7 +1,6 @@
 import type { Metadata } from 'next'
 import { JetBrains_Mono, Noto_Serif, Schibsted_Grotesk } from 'next/font/google'
 import { Providers } from '@/components/providers'
-import { APP_NAME } from '@/components/wordmark'
 import './globals.css'
 import 'react-image-crop/dist/ReactCrop.css'
 
@@ -10,7 +9,7 @@ const jetbrainsMono = JetBrains_Mono({ variable: '--font-jetbrains-mono', subset
 const greek = Noto_Serif({ variable: '--font-noto-serif', subsets: ['greek', 'greek-ext'] })
 
 export const metadata: Metadata = {
-  title: { default: APP_NAME, template: `%s · ${APP_NAME}` },
+  title: { default: 'Lexis', template: '%s · Lexis' },
   description: 'Recognize, analyze and understand historical manuscripts.',
 }
 
