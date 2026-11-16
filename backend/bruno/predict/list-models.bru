@@ -20,10 +20,15 @@ tests {
   const { models, default_model } = res.getBody();
   const ids = models.map((m) => m.id);
 
-  test("each model has an id, a name and a description", function () {
+  test("each model has an id, a name, a description and says if it is a demo", function () {
     for (const m of models) {
-      expect(m).to.have.all.keys("id", "name", "description");
+      expect(m).to.have.all.keys("id", "name", "description", "demo");
     }
+  });
+
+  test("the models that ignore the page are marked as demos", function () {
+    const demos = models.filter((m) => m.demo).map((m) => m.id);
+    expect(demos).to.include.members(["eparchos", "dummy"]);
   });
 
   test("the default is one of the choices", function () {

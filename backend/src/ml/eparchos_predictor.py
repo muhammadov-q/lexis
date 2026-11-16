@@ -54,11 +54,12 @@ class EparchosPredictor(AbstractPredictor):
     page's coordinates (788 x 805 px for 6791).
     """
 
-    display_name = "Eparchos page 6791 (mock)"
+    display_name = "Sample page"
     description = (
-        "Ignores the page and returns the words of Eparchos page 6791, "
-        "with translations. For demos."
+        "Shows a prepared reading of Eparchos page 6791 with translations, whatever "
+        "you upload. Upload that page to try the app."
     )
+    demo = True
 
     def __init__(self, xml_path: Path = XML_PATH) -> None:
         super().__init__()

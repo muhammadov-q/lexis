@@ -78,6 +78,20 @@ def test_the_default_comes_from_the_env_var(monkeypatch):
     assert ModelRegistry().default == "other"
 
 
+def test_the_list_says_which_models_are_demos():
+    class ShowPredictor(ReadyPredictor):
+        demo = True
+
+    with patch.dict(PREDICTORS, {"show": ShowPredictor}):
+        listed = ModelRegistry(default="ready").available()
+
+    assert [(m.id, m.demo) for m in listed] == [
+        ("ready", False),
+        ("other", False),
+        ("show", True),
+    ]
+
+
 def test_a_loaded_model_stays_listed_when_its_files_disappear():
     registry = ModelRegistry(default="missing")
 

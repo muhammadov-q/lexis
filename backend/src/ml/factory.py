@@ -8,8 +8,8 @@ from ml.predictor import AbstractPredictor, DummyPredictor
 
 PREDICTORS: dict[str, type[AbstractPredictor]] = {
     "kraken": KrakenPredictor,
-    "kraken-base": KrakenBasePredictor,
     "claude-code": ClaudeCodePredictor,
+    "kraken-base": KrakenBasePredictor,
     "knn": KnnPredictor,
     "eparchos": EparchosPredictor,
     "dummy": DummyPredictor,

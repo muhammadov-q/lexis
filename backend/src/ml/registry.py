@@ -15,6 +15,7 @@ class ModelInfo:
     id: str
     name: str
     description: str
+    demo: bool = False
 
 
 class ModelRegistry:
@@ -34,6 +35,7 @@ class ModelRegistry:
                 id=model_id,
                 name=predictor_class.display_name,
                 description=predictor_class.description,
+                demo=predictor_class.demo,
             )
             for model_id, predictor_class in PREDICTORS.items()
             if self._can_serve(model_id)

@@ -230,11 +230,10 @@ def read_line(
 
 
 class ClaudeCodePredictor(AbstractPredictor):
-    display_name = "Claude Opus 5.5, through Claude Code"
+    display_name = "Greek handwriting with translation (kraken + Opus 5.5)"
     description = (
-        "kraken finds the lines, then Claude reads and translates them through the "
-        "Claude Code on this computer. A page takes one to two minutes and is sent "
-        "to Anthropic."
+        "Claude reads the words and translates each word and line. Gets more words "
+        "right, but takes one to two minutes and sends the page to Anthropic."
     )
 
     @classmethod

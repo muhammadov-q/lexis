@@ -71,11 +71,13 @@ def test_models_returns_what_can_run_and_the_default(choosing):
                 "id": "eparchos",
                 "name": EparchosPredictor.display_name,
                 "description": EparchosPredictor.description,
+                "demo": True,
             },
             {
                 "id": "dummy",
                 "name": DummyPredictor.display_name,
                 "description": DummyPredictor.description,
+                "demo": True,
             },
         ],
         "default_model": "dummy",

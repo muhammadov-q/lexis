@@ -352,7 +352,7 @@ describe('RecognitionWorkbench', () => {
 
     await user.upload(screen.getByLabelText('Page image'), page())
     expect(await screen.findByRole('combobox', { name: 'Model' })).toHaveTextContent(
-      'Kraken, fine-tuned on Eparchos'
+      'Greek handwriting'
     )
     await user.click(recognizeButton())
     await screen.findByRole('region', { name: 'Model response' })
@@ -363,7 +363,7 @@ describe('RecognitionWorkbench', () => {
     expect(screen.getByRole('img', { name: 'Preview of folio-1r.png' })).toBeInTheDocument()
 
     await user.click(screen.getByRole('combobox', { name: 'Model' }))
-    await user.click(screen.getByRole('option', { name: /Kraken, not fine-tuned/ }))
+    await user.click(screen.getByRole('option', { name: /Untrained reader, for comparison/ }))
     await user.click(recognizeButton())
 
     await screen.findByRole('region', { name: 'Model response' })

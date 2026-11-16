@@ -46,6 +46,7 @@ class ModelResponse(BaseModel):
     id: str
     name: str
     description: str
+    demo: bool
 
     @classmethod
     def of(cls, model: ModelInfo) -> "ModelResponse":
