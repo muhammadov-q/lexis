@@ -17,23 +17,37 @@ None. The prompt is `page_prompt` in the predictor. These choices were made on t
 
 ## Results
 
-The 24 test pages, 3728 words. Both read the uploaded page end to end, with kraken finding the lines. CER is on the text of the whole page, NFC with accents and punctuation, so it is not the line CER in [[models/kraken-eparchos]], which used the true lines.
+The word benchmark ([[ml/benchmark]]) on the 24 test pages. Both read the uploaded page end to end with the lines kraken finds, straightened as in #102. The range is the 95% interval over pages.
 
-| Test pages                                   | kraken Eparchos | Claude Code reader |
-| -------------------------------------------- | --------------- | ------------------ |
-| CER                                          | 12.8%           | 17.2%              |
-| Words read exactly                           | 51.2%           | 67.5%              |
-| Words with a box on the true one (IoU ≥ 0.5) | 77.0%           | 74.7%              |
-| Right word in the right box                  | 44.5%           | 54.5%              |
-| Time per page (median, 3 pages at a time)    | 8 s             | 104 s              |
+| Test pages                      | kraken Eparchos      | Claude Code reader   |
+| ------------------------------- | -------------------- | -------------------- |
+| Word boxes, F1                  | 81.2% (76.4 to 85.4) | 80.5% (75.6 to 84.4) |
+| Words merged with a neighbour   | 8.6% (6.7 to 10.5)   | 5.0% (3.3 to 7.0)    |
+| Words split in two or more      | 1.3% (0.8 to 1.8)    | 1.4% (0.9 to 2.0)    |
+| Word boundaries in the text, F1 | 95.2% (94.0 to 96.3) | 97.2% (96.3 to 98.0) |
+| Right word in the right box     | 60.1% (54.8 to 64.7) | 57.1% (52.1 to 61.6) |
+| Character error rate            | 8.1% (6.9 to 9.3)    | 15.2% (12.2 to 18.3) |
+| Time per page (median)          | about 8 s            | 102 s                |
 
-Claude Code reads a third more words exactly and puts the right word in the right place more often, but it gets more letters wrong overall: it had the lower CER on only 8 of the 24 pages. The validation pages showed the same pattern (71.4% of words exactly against 54.0%, CER 13.3% against 11.3%).
+Claude merges fewer words and puts the spaces in the right places more often, because it knows where Greek words end. It gets almost twice as many letters wrong, because it sometimes writes fluent Greek that isn't on the page. With the straightened lines kraken alone puts the right word in the right box as often (the intervals overlap). Before #102 the reader was ahead: 54.5% against 44.5%, with a CER of 17.2% (an older script that gave Claude the page through its Read tool and asked for no line translations).
 
-A page used $0.27 of Claude Code usage on average. These runs gave Claude Code the page through its Read tool and asked for no line translations. It now gets the same image inside the request, with no tools, and translates each line too. The evaluation script is not in the repo yet (#80). These numbers are from before #102 straightened the lines kraken finds, which the reader builds on: the current kraken numbers are in [[models/kraken-eparchos]], and the reader has not been measured again.
+### Line translations
+
+`python -m ml.benchmark.judge` on the same run: Claude Opus judged each line translation against the true Greek text of that line ([[ml/benchmark]]).
+
+| Test pages, 433 lines | Lines | Share |
+| --------------------- | ----- | ----- |
+| Correct               | 273   | 63.0% |
+| Partly                | 129   | 29.8% |
+| Wrong                 | 31    | 7.2%  |
+
+The share judged correct runs from 22% to 89% per page and follows the reading: 77% on the 12 pages with the lowest CER, 49% on the 12 with the highest. A misread line is translated from the wrong Greek. This is a light check: the judge is the same model that wrote the translations, and nobody who reads Greek has checked its verdicts.
+
+A page used $0.27 of Claude Code usage on average in the earlier runs.
 
 ## Limits
 
 - It sometimes writes fluent Greek that isn't on the page, from a few words to a whole line. That is why its CER is higher although it reads more words exactly. Words marked not confirmed are where kraken read something else, so check those first.
-- The translations and definitions come from Claude and nobody has checked them.
+- Only an LLM has checked the line translations, and nobody has checked the word glosses and definitions. Nobody who reads Greek has checked either.
 - A page takes one to two minutes and is sent to Anthropic. It only runs with the Claude Code login of the person running the backend.
 - Measured on clean scans of two codices only.
