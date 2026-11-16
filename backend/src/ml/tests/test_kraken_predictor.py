@@ -9,6 +9,7 @@ from ml.kraken_predictor import (
     KrakenPredictor,
     bounds,
     ink_box,
+    straight_baseline,
     words_in_line,
 )
 from ml.predictor import Prediction
@@ -85,6 +86,11 @@ def test_bounds_are_clipped_to_the_page():
     assert box == (0, 10, 100, 80)
 
 
+def test_a_given_line_gets_a_baseline_at_three_quarters_of_its_height():
+    polygon = [(10, 20), (110, 22), (110, 60), (10, 58)]
+    assert straight_baseline(polygon) == [(10, 50), (110, 50)]
+
+
 def test_missing_model_says_where_it_looked(tmp_path):
     with pytest.raises(FileNotFoundError, match="nope.safetensors"):
         KrakenPredictor(tmp_path / "nope.safetensors")
@@ -153,3 +159,11 @@ def test_broken_images_raise_value_error(digit_image):
     for broken in (b"not an image", digit_image[: len(digit_image) // 2]):
         with pytest.raises(ValueError, match="decode"):
             predictor.predict(broken)
+
+
+@needs_model
+def test_reads_the_lines_it_is_given(digit_image):
+    line = [(20, 20), (180, 20), (180, 180), (20, 180)]
+    words = KrakenPredictor().predict_lines(digit_image, [line])
+    assert all(isinstance(w, Prediction) for w in words)
+    assert {w.line for w in words} <= {0}

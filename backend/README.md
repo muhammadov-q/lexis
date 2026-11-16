@@ -116,6 +116,17 @@ The default model loads when the API starts, the others on their first page, whi
 
 To add a model, add its predictor to `PREDICTORS` in `src/ml/factory.py`. Give it a `display_name`, a `description` and, if it needs files, an `is_available`.
 
+## Measure a model
+
+`ml.benchmark` scores a model on the Eparchos validation or test pages: word boxes, merged and split words, word boundaries, and character error rate, each with a 95% interval. It needs the unpacked [Eparchos dataset](https://zenodo.org/records/4095301) (`image/` and `xml/`), which is not in git.
+
+```bash
+cd backend
+uv run python -m ml.benchmark --data /path/to/eparchos --model kraken --split val
+```
+
+Use `--split test` only for the final numbers of a model, and `--true-lines` to give a kraken model the true lines. What each number means is in `docs/ml/benchmark.md`.
+
 ## Run the tests
 
 ### pytest (no server needed)
