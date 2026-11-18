@@ -98,14 +98,15 @@ def test_lines_without_words_and_words_without_text_are_left_out(data):
 
 
 def test_reading_the_truth_scores_full_marks(data, truth_words):
-    pages = benchmark.run(Reader(truth_words), data, ["page 1"])
+    pages, words = benchmark.run(Reader(truth_words), data, ["page 1"])
     page = pages["page 1"]
+    assert words["page 1"] == truth_words
     assert page.truth_words == page.matched == page.exact == 3
     assert page.char_errors == 0
 
 
 def test_reading_nothing_finds_no_words(data):
-    page = benchmark.run(Reader([]), data, ["page 1"])["page 1"]
+    page = benchmark.run(Reader([]), data, ["page 1"])[0]["page 1"]
     assert (page.truth_words, page.predicted_words, page.matched) == (3, 0, 0)
 
 
@@ -115,7 +116,7 @@ def test_only_kraken_can_read_the_true_lines(data, truth_words):
 
 
 def test_the_table_names_every_metric(data, truth_words):
-    pages = benchmark.run(Reader(truth_words), data, ["page 1"])
+    pages, _ = benchmark.run(Reader(truth_words), data, ["page 1"])
     table = benchmark.table(list(pages.values()))
     for label in benchmark.LABELS.values():
         assert label in table
@@ -146,6 +147,12 @@ def test_the_command_prints_and_saves_the_results(
     assert result["model_version"] == "reader-1"
     assert result["summary"]["box_f1"] == 1.0
     assert result["pages"]["page 1"]["truth_words"] == 3
+    assert result["words"]["page 1"][0] == {
+        "text": "καὶ",
+        "box": [10, 12, 30, 16],
+        "line": 0,
+        "line_translation": None,
+    }
 
 
 def test_training_pages_cannot_be_scored(data):

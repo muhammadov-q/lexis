@@ -12,7 +12,7 @@ uv run python -m ml.benchmark --data /path/to/eparchos --model kraken --split va
 - `--data` is the unpacked [Eparchos](https://zenodo.org/records/4095301) folder with `image/` and `xml/`. It is not in git.
 - `--split val` (12 pages) is for trying a change. `--split test` (24 pages) is only for the final numbers of a model. Training pages can't be scored.
 - `--true-lines` gives the model the true lines instead of letting it find them. That shows the word step on its own. Only the kraken models can do this.
-- `--out results.json` saves the numbers, with the counts of every page.
+- `--out results.json` saves the numbers, with the counts of every page and the words and line translations the model read.
 
 ## What it measures
 
@@ -31,3 +31,14 @@ A predicted word matches a true word when their boxes overlap with an IoU of at 
 Each number is taken over all the words of the pages together, not as a mean of page scores. The 95% interval comes from drawing the pages again with replacement 1000 times, so it shows how much a number depends on which pages are in the split. Intervals that don't overlap mean a real difference. Intervals that do overlap don't rule one out when both runs read the same pages.
 
 Eparchos does not always list the words of a line in reading order, so the loader sorts them from left to right.
+
+## Check the translations
+
+```bash
+cd backend
+uv run python -m ml.benchmark.judge --results results.json --data /path/to/eparchos
+```
+
+`ml.benchmark.judge` takes the saved results of a model that translates lines (`claude-code`) and lets Claude Opus, through Claude Code, judge every line translation against the true Greek text of that line: correct, partly (the main sense is right but something is missing, added or mistaken) or wrong. A read line is paired with the true line it overlaps most. Lines without a translation or without a true line are left out.
+
+This is a light check, not a benchmark. The judge is the same model that wrote the translations, so it can share their mistakes, and nobody who reads Greek has checked its verdicts. The translation is judged against the true text, so a line the reader misread counts against the translation too.
