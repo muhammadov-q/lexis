@@ -1,12 +1,12 @@
 package org.example.project.common.presentation.helpers
 
-import org.example.project.common.presentation.models.WordPredictionModel
-import kotlin.math.roundToInt
+import org.example.project.common.presentation.models.Crop
 import org.example.project.common.presentation.models.PredictionBoxModel
+import org.example.project.common.presentation.models.WordPosition
+import org.example.project.common.presentation.models.WordPredictionModel
 import kotlin.math.max
 import kotlin.math.min
-
-data class WordPosition(val line: Int, val word: Int)
+import kotlin.math.roundToInt
 
 fun positionOf(words: List<WordPredictionModel>, index: Int): WordPosition {
     val line = words[index].line
@@ -30,8 +30,6 @@ fun lineCenters(words: List<WordPredictionModel>): Map<Int, Double> =
         }
 
 const val LOUPE_ASPECT = 3f
-
-data class Crop(val x: Double, val y: Double, val w: Double, val h: Double)
 
 fun loupeCrop(box: PredictionBoxModel, imageWidth: Int, imageHeight: Int): Crop {
     val margin = box.h * 0.6

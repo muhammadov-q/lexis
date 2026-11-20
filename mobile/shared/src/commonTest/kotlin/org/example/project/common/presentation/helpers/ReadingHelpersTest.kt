@@ -1,6 +1,7 @@
 package org.example.project.common.presentation.helpers
 
 import org.example.project.common.presentation.models.PredictionBoxModel
+import org.example.project.common.presentation.models.WordPosition
 import org.example.project.common.presentation.models.PredictionGlossModel
 import org.example.project.common.presentation.models.WordPredictionModel
 import kotlin.test.Test

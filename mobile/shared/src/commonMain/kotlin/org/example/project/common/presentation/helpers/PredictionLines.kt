@@ -1,14 +1,10 @@
 package org.example.project.common.presentation.helpers
 
+import org.example.project.common.presentation.models.PredictionLine
 import org.example.project.common.presentation.models.WordPredictionModel
 
-data class PredictionLine(
-    val number: Int,
-    val words: List<IndexedValue<WordPredictionModel>>,
-    val translation: String?,
-)
-
 fun groupPredictionLines(words: List<WordPredictionModel>): List<PredictionLine> {
+    val lines = linkedMapOf<Int, PredictionLine>()
     words.forEachIndexed { index, word ->
         val line = lines[word.line] ?: PredictionLine(
             number = word.line,
