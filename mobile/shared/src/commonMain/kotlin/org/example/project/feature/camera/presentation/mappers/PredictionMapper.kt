@@ -4,15 +4,16 @@ import org.example.project.feature.camera.domain.model.Prediction
 import org.example.project.feature.camera.domain.model.PredictionBox
 import org.example.project.feature.camera.domain.model.PredictionGloss
 import org.example.project.feature.camera.domain.model.WordPrediction
-import org.example.project.feature.camera.presentation.models.PredictionBoxModel
-import org.example.project.feature.camera.presentation.models.PredictionGlossModel
-import org.example.project.feature.camera.presentation.models.PredictionModel
-import org.example.project.feature.camera.presentation.models.WordPredictionModel
+import org.example.project.common.presentation.models.PredictionBoxModel
+import org.example.project.common.presentation.models.PredictionGlossModel
+import org.example.project.common.presentation.models.PredictionModel
+import org.example.project.common.presentation.models.WordPredictionModel
 
 fun mapPredictionToUiModel(prediction: Prediction): PredictionModel =
     PredictionModel(
         predictions = prediction.predictions.map(::mapWordPredictionToUiModel),
         modelVersion = prediction.modelVersion,
+        savedId = prediction.savedId,
     )
 
 private fun mapWordPredictionToUiModel(
@@ -24,6 +25,7 @@ private fun mapWordPredictionToUiModel(
         box = mapPredictionBoxToUiModel(prediction.box),
         line = prediction.line,
         gloss = mapPredictionGlossToUiModel(prediction.gloss),
+        lineTranslation = prediction.lineTranslation,
     )
 
 private fun mapPredictionBoxToUiModel(box: PredictionBox): PredictionBoxModel =
@@ -40,4 +42,3 @@ private fun mapPredictionGlossToUiModel(gloss: PredictionGloss): PredictionGloss
         translation = gloss.translation,
         definition = gloss.definition,
     )
-

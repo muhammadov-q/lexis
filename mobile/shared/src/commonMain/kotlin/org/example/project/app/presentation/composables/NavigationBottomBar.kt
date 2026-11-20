@@ -10,7 +10,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import org.example.project.common.presentation.ui.theme.ScriptLensColors
+import org.example.project.common.presentation.ui.theme.LexisColors
 import org.example.project.core.navigation.Screen
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
@@ -22,7 +22,7 @@ fun NavigationBottomBar(
     destinations: List<Screen>,
 ) {
     NavigationBar(
-        containerColor = ScriptLensColors.Surface,
+        containerColor = LexisColors.Surface,
     ) {
         destinations.forEach { screen ->
             NavigationBarItem(
@@ -33,18 +33,18 @@ fun NavigationBottomBar(
                         modifier = Modifier.size(24.dp),
                         painter = painterResource(screen.icon),
                         contentDescription = "",
-                        tint = if (currentRoute == screen.route) ScriptLensColors.Text else ScriptLensColors.Subtext
+                        tint = if (currentRoute == screen.route) LexisColors.Text else LexisColors.Subtext
                     )
                 },
                 label = {
                     Text(
                         text = stringResource(screen.title),
-                        color = ScriptLensColors.Subtext
+                        color = LexisColors.Subtext
                     )
                 },
                 colors = NavigationBarItemDefaults.colors(
-                    indicatorColor = ScriptLensColors.Surface,
-                    selectedIconColor = ScriptLensColors.Surface,
+                    indicatorColor = LexisColors.Surface,
+                    selectedIconColor = LexisColors.Surface,
                 )
             )
         }

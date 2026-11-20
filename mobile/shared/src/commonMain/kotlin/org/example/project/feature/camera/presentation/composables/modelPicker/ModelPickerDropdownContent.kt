@@ -26,11 +26,11 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import org.example.project.common.presentation.ui.theme.ScriptLensColors
+import org.example.project.common.presentation.ui.theme.LexisColors
 import org.example.project.feature.camera.domain.model.OcrModel
 import org.jetbrains.compose.resources.stringResource
-import scriptlens.shared.generated.resources.Res
-import scriptlens.shared.generated.resources.available_models
+import lexis.shared.generated.resources.Res
+import lexis.shared.generated.resources.available_models
 
 @Composable
 internal fun ModelPickerDropdownContent(
@@ -66,7 +66,7 @@ internal fun ModelPickerDropdownContent(
                     .clip(RoundedCornerShape(12.dp))
                     .background(
                         if (isSelected) {
-                            ScriptLensColors.Accent.copy(alpha = 0.15f)
+                            LexisColors.Accent.copy(alpha = 0.15f)
                         } else {
                             MaterialTheme.colorScheme.surface
                         }
@@ -89,7 +89,7 @@ internal fun ModelPickerDropdownContent(
                         .size(8.dp)
                         .background(
                             color = if (isSelected) {
-                                ScriptLensColors.Accent
+                                LexisColors.Accent
                             } else {
                                 MaterialTheme.colorScheme.outlineVariant
                             },
@@ -122,7 +122,7 @@ internal fun ModelPickerDropdownContent(
                 if (isSelected) {
                     Text(
                         text = "✓",
-                        color = ScriptLensColors.Accent,
+                        color = LexisColors.Accent,
                         fontWeight = FontWeight.Bold,
                         style = MaterialTheme.typography.titleMedium
                     )

@@ -22,8 +22,8 @@ import org.example.project.app.navigation.MainNavigation
 import org.example.project.app.presentation.composables.AppTopBar
 import org.example.project.app.presentation.composables.NavigationBottomBar
 import org.example.project.common.presentation.ui.helpers.asString
-import org.example.project.common.presentation.ui.theme.ScriptLensColors
-import org.example.project.common.presentation.ui.theme.ScriptLensTheme
+import org.example.project.common.presentation.ui.theme.LexisColors
+import org.example.project.common.presentation.ui.theme.LexisTheme
 import org.example.project.core.navigation.AppRoutes
 import org.example.project.core.navigation.Screen
 import org.example.project.core.navigation.navigateAuth
@@ -103,7 +103,7 @@ private fun AppScaffold(
     content: @Composable (PaddingValues) -> Unit,
 ) {
     Scaffold(
-        containerColor = ScriptLensColors.Background,
+        containerColor = LexisColors.Background,
         snackbarHost = { SnackbarHost(snackbarHostState) },
         topBar = {
             if (currentRoute !in AppRoutes.AUTH_ROUTES && (!state.isSessionChecking || canNavigateBack)) {
@@ -134,7 +134,7 @@ private fun AppScaffold(
 @Preview(showBackground = true)
 @Composable
 private fun AppContentPreview() {
-    ScriptLensTheme {
+    LexisTheme {
         AppScaffold(
             state = AppContract(isAuthenticated = false, isSessionChecking = false),
             currentRoute = Screen.CameraView.route,

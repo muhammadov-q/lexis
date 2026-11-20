@@ -9,20 +9,20 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import org.example.project.common.presentation.ui.theme.ScriptLensSpacing
+import org.example.project.common.presentation.ui.theme.LexisSpacing
 import org.jetbrains.compose.resources.stringResource
-import scriptlens.shared.generated.resources.Res
-import scriptlens.shared.generated.resources.history_error_title
-import scriptlens.shared.generated.resources.history_guest_message
-import scriptlens.shared.generated.resources.history_retry
-import scriptlens.shared.generated.resources.history_sign_in
+import lexis.shared.generated.resources.Res
+import lexis.shared.generated.resources.history_error_title
+import lexis.shared.generated.resources.history_guest_message
+import lexis.shared.generated.resources.history_retry
+import lexis.shared.generated.resources.history_sign_in
 
 @Composable
 internal fun HistoryErrorCard(message: String, onRetry: () -> Unit) {
     Card {
         Column(
-            modifier = Modifier.padding(ScriptLensSpacing.padding_16),
-            verticalArrangement = Arrangement.spacedBy(ScriptLensSpacing.padding_12),
+            modifier = Modifier.padding(LexisSpacing.padding_16),
+            verticalArrangement = Arrangement.spacedBy(LexisSpacing.padding_12),
         ) {
             Text(
                 text = stringResource(Res.string.history_error_title),
@@ -44,8 +44,8 @@ internal fun HistoryErrorCard(message: String, onRetry: () -> Unit) {
 internal fun UnauthorizedHistoryCard(onSignInRequested: () -> Unit) {
     Card {
         Column(
-            modifier = Modifier.padding(ScriptLensSpacing.padding_16),
-            verticalArrangement = Arrangement.spacedBy(ScriptLensSpacing.padding_12),
+            modifier = Modifier.padding(LexisSpacing.padding_16),
+            verticalArrangement = Arrangement.spacedBy(LexisSpacing.padding_12),
         ) {
             Text(
                 text = stringResource(Res.string.history_sign_in),

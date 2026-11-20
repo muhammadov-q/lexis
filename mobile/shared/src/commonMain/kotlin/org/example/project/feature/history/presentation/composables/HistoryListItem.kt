@@ -14,16 +14,16 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
-import org.example.project.common.presentation.ui.theme.ScriptLensColors
-import org.example.project.common.presentation.ui.theme.ScriptLensSpacing
-import org.example.project.common.presentation.ui.theme.ScriptLensTheme
+import org.example.project.common.presentation.ui.theme.LexisColors
+import org.example.project.common.presentation.ui.theme.LexisSpacing
+import org.example.project.common.presentation.ui.theme.LexisTheme
 import org.example.project.common.presentation.helpers.HistoryDateTimeFormatter
 import org.example.project.feature.history.domain.model.RecognitionHistoryItem
 import org.jetbrains.compose.resources.stringResource
-import scriptlens.shared.generated.resources.Res
-import scriptlens.shared.generated.resources.history_no_words
-import scriptlens.shared.generated.resources.history_read_on
-import scriptlens.shared.generated.resources.history_untitled_page
+import lexis.shared.generated.resources.Res
+import lexis.shared.generated.resources.history_no_words
+import lexis.shared.generated.resources.history_read_on
+import lexis.shared.generated.resources.history_untitled_page
 
 @Composable
 internal fun HistoryListItem(
@@ -34,20 +34,20 @@ internal fun HistoryListItem(
         modifier = Modifier
             .fillMaxWidth()
             .clickable(onClick = onClick),
-        colors = CardDefaults.cardColors(containerColor = ScriptLensColors.Muted),
+        colors = CardDefaults.cardColors(containerColor = LexisColors.Muted),
     ) {
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(ScriptLensSpacing.padding_12),
+                .padding(LexisSpacing.padding_12),
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically,
         ) {
             Column(
                 modifier = Modifier
                     .weight(1f)
-                    .padding(end = ScriptLensSpacing.padding_12),
-                verticalArrangement = Arrangement.spacedBy(ScriptLensSpacing.padding_4),
+                    .padding(end = LexisSpacing.padding_12),
+                verticalArrangement = Arrangement.spacedBy(LexisSpacing.padding_4),
             ) {
                 Text(
                     text = if (item.filename.isBlank()) {
@@ -84,7 +84,7 @@ internal fun HistoryListItem(
 @Preview(showBackground = true)
 @Composable
 private fun HistoryListItemPreview() {
-    ScriptLensTheme {
+    LexisTheme {
         HistoryListItem(
             item = RecognitionHistoryItem(
                 id = 1,

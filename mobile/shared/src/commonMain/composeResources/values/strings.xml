@@ -5,7 +5,7 @@
     <string name="nav_source">Source</string>
 
     <!-- Authentication -->
-    <string name="auth_branding">Lexis | ScriptLens</string>
+    <string name="auth_branding">Lexis</string>
     <string name="auth_sign_in_title">Sign in</string>
     <string name="auth_sign_in_subtitle">Use the email and password you signed up with.</string>
     <string name="auth_create_title">Create an account</string>
@@ -53,13 +53,12 @@
     <string name="history_untitled_page">Untitled page</string>
     <string name="history_no_words">No words</string>
     <string name="history_detail_read_on">Read on %1$s</string>
-    <string name="history_detail_model_version">Model: %1$s</string>
     <string name="history_detail_image_unavailable">This image cannot be displayed on this device.</string>
 
     <!-- Account -->
     <!-- Camera screen -->
     <string name="camera_title">Read historical manuscripts</string>
-    <string name="camera_subtitle">Photograph a page and ScriptLens recognizes words and helps you read the transcription with translations.</string>
+    <string name="camera_subtitle">Photograph a page and Lexis recognizes words and helps you read the transcription with translations.</string>
     <string name="camera_empty_hint">Lay the page flat in good light JPG, PNG or TIFF</string>
     <string name="model_recognition_title">Recognition model</string>
     <string name="model_select">Select model</string>
@@ -67,7 +66,6 @@
     <string name="available_models">Available models</string>
     <string name="model_default_fallback">Could not load models. Recognition will use the default model.</string>
     <string name="model_reload">Reload</string>
-    <string name="action_read_again">Read with another model</string>
     <string name="captured_photo_description">Uploaded photo with predictions</string>
 
     <!-- Actions -->
@@ -76,16 +74,6 @@
     <string name="action_take_new_photo">Take a new photo</string>
     <string name="action_choose_another_photo">Choose another photo from photos</string>
     <string name="action_retry">Retry</string>
-
-    <!-- Prediction summary -->
-    <string name="prediction_transcription_label">Transcription</string>
-    <string name="prediction_empty_message">No recognizable words were found in this image.</string>
-    <string name="prediction_translation_label">Translation</string>
-    <string name="prediction_select_word_hint">Tap a word in the transcription to view its translation and glossary details.</string>
-    <string name="prediction_recognized_text_label">Recognized text</string>
-    <string name="prediction_lemma_label">Lemma</string>
-    <string name="prediction_definition_label">Definition</string>
-    <string name="prediction_gloss_unavailable">Glossary information unavailable for this word.</string>
 
     <!-- Upload errors -->
     <string name="error_service_offline_title">Recognition service offline</string>
@@ -105,4 +93,46 @@
     <string name="error_gallery_open">Could not open the photo library.</string>
     <string name="error_photo_no_data">The photo contained no image data.</string>
     <string name="error_photo_select">Could not select a photo. Please choose a different image.</string>
+    <string name="transcript_title">Transcript</string>
+    <string name="transcript_count">%1$s on %2$s</string>
+    <string name="transcript_view_original">Original</string>
+    <string name="transcript_view_translation">With translation</string>
+    <string name="transcript_empty">The model found no words on this page.</string>
+    <string name="machine_output">Machine output</string>
+    <string name="word_title">Word</string>
+    <string name="word_pick_title">Pick a word</string>
+    <string name="word_pick_message">Tap a word in the transcript or a box on the page.</string>
+    <string name="word_loupe_description">Close-up of %1$s on the page</string>
+    <string name="word_position">Line %1$d, word %2$d</string>
+    <string name="word_previous">Previous word</string>
+    <string name="word_next">Next word</string>
+    <string name="word_translation">Translation</string>
+    <string name="word_dictionary_form">Dictionary form</string>
+    <string name="word_definition">Definition</string>
+    <string name="word_confidence">Confidence</string>
+    <string name="word_not_confirmed">Not confirmed. kraken read this word differently, so check it on the page.</string>
+    <string name="word_no_translation_title">No translation yet</string>
+    <string name="word_no_translation_message">The model has no translation for this word.</string>
+    <string name="result_no_words_title">No words found</string>
+    <string name="result_no_words_message">Try a closer photo with dark ink on plain paper.</string>
+    <string name="result_read_by">Read by</string>
+    <string name="result_read_in">in %1$s</string>
+    <string name="result_placeholder">Placeholder output. This model returns the same words for every page.</string>
+    <string name="result_saved">Saved to your history.</string>
+    <string name="result_open_it">Open it</string>
+    <string name="result_not_saved">This result is not saved.</string>
+    <string name="result_sign_in">Sign in</string>
+    <string name="result_sign_in_suffix">to save future results to your history.</string>
+    <plurals name="transcript_words">
+        <item quantity="one">%1$d word</item>
+        <item quantity="other">%1$d words</item>
+    </plurals>
+    <plurals name="transcript_lines">
+        <item quantity="one">%1$d line</item>
+        <item quantity="other">%1$d lines</item>
+    </plurals>
+    <string name="reading_page">Reading the page</string>
+    <string name="reading_elapsed">%1$s elapsed</string>
+    <string name="reading_cancel">Cancel</string>
+    <string name="action_read_page">Read the page</string>
 </resources>

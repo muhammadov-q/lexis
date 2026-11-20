@@ -19,6 +19,7 @@ import org.example.project.feature.camera.domain.model.OcrModels
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFalse
+import kotlin.test.assertNull
 import kotlin.test.assertTrue
 
 class PhotoRepositoryImplTest {
@@ -80,6 +81,91 @@ class PhotoRepositoryImplTest {
         assertEquals("", word.gloss.lemma)
         assertEquals(" ", word.gloss.translation)
         assertEquals("", word.gloss.definition)
+    }
+
+    @Test
+    fun uploadPhotoMapsUnconfirmedWordsAndOptionalFieldsInOrder() = runTest {
+        val repository = PhotoRepositoryImpl(
+            apiWithJson(
+                """{"model_version":"reader+kraken","predictions":[
+                    {"text":"λόγος","probabilities":{},"box":{"x":1,"y":2,"w":3,"h":4},"line":2,"gloss":{"lemma":null,"translation":"word"},"line_translation":"A line."},
+                    {"text":"?","probabilities":{"other":0.8},"box":{"x":5,"y":6,"w":7,"h":8}}
+                ]}"""
+            ),
+            config,
+            AuthSessionStore(),
+        )
+
+        val result = repository.uploadPhoto(byteArrayOf(1))
+
+        assertEquals("reader+kraken", result.modelVersion)
+        assertEquals(listOf("λόγος", "?"), result.predictions.map { it.text })
+        val first = result.predictions[0]
+        assertTrue(first.probabilities.isEmpty())
+        assertEquals(2, first.line)
+        assertEquals(3.0, first.box.w)
+        assertEquals("", first.gloss.lemma)
+        assertEquals("word", first.gloss.translation)
+        assertEquals("", first.gloss.definition)
+        assertEquals("A line.", first.lineTranslation)
+        assertEquals(mapOf("other" to 0.8), result.predictions[1].probabilities)
+        assertEquals(0, result.predictions[1].line)
+        assertEquals(null, result.predictions[1].lineTranslation)
+        assertEquals("", result.predictions[1].gloss.translation)
+    }
+
+    @Test
+    fun uploadPhotoMapsEmptyPredictions() = runTest {
+        val repository = PhotoRepositoryImpl(
+            apiWithJson("""{"predictions":[],"model_version":"mock"}"""),
+            config,
+            AuthSessionStore(),
+        )
+
+        assertTrue(repository.uploadPhoto(byteArrayOf(1)).predictions.isEmpty())
+    }
+
+    @Test
+    fun uploadPhotoKeepsTheSavedIdFromRecognitions() = runTest {
+        val authSessionStore = AuthSessionStore().apply {
+            setAuthenticated(User(1, "user@example.com", "John", "Doe"))
+        }
+        val engine = MockEngine {
+            respond(
+                content = """{"id":42,"created_at":"2026-11-20T20:45:00Z","filename":"page.jpg","predictions":[],"model_version":"v1"}""",
+                status = HttpStatusCode.Created,
+                headers = headersOf(HttpHeaders.ContentType, "application/json"),
+            )
+        }
+        val repository = PhotoRepositoryImpl(
+            api = PhotoUploadApi(HttpClient(engine), config),
+            config = config,
+            authSessionStore = authSessionStore,
+        )
+
+        val prediction = repository.uploadPhoto(byteArrayOf(1))
+
+        assertEquals(42L, prediction.savedId)
+    }
+
+    @Test
+    fun uploadPhotoHasNoSavedIdForGuests() = runTest {
+        val engine = MockEngine {
+            respond(
+                content = """{"predictions":[],"model_version":"v1"}""",
+                status = HttpStatusCode.OK,
+                headers = headersOf(HttpHeaders.ContentType, "application/json"),
+            )
+        }
+        val repository = PhotoRepositoryImpl(
+            api = PhotoUploadApi(HttpClient(engine), config),
+            config = config,
+            authSessionStore = AuthSessionStore(),
+        )
+
+        val prediction = repository.uploadPhoto(byteArrayOf(1))
+
+        assertNull(prediction.savedId)
     }
 
     @Test

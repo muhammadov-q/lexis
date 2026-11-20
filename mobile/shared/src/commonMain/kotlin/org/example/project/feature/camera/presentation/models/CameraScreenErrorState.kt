@@ -3,21 +3,21 @@ package org.example.project.feature.camera.presentation.models
 import org.example.project.common.presentation.ui.helpers.UiText
 import org.jetbrains.compose.resources.DrawableResource
 import org.jetbrains.compose.resources.StringResource
-import scriptlens.shared.generated.resources.Res
-import scriptlens.shared.generated.resources.error_image_rejected_message
-import scriptlens.shared.generated.resources.error_image_rejected_title
-import scriptlens.shared.generated.resources.error_image_too_large_message
-import scriptlens.shared.generated.resources.error_image_too_large_title
-import scriptlens.shared.generated.resources.error_photo_unavailable_title
-import scriptlens.shared.generated.resources.error_recognition_failed_message
-import scriptlens.shared.generated.resources.error_recognition_failed_title
-import scriptlens.shared.generated.resources.error_service_offline_message
-import scriptlens.shared.generated.resources.error_service_offline_title
-import scriptlens.shared.generated.resources.error_validation_title
-import scriptlens.shared.generated.resources.error_validation_message
-import scriptlens.shared.generated.resources.ic_image_rejected
-import scriptlens.shared.generated.resources.ic_no_service
-import scriptlens.shared.generated.resources.image_too_large
+import lexis.shared.generated.resources.Res
+import lexis.shared.generated.resources.error_image_rejected_message
+import lexis.shared.generated.resources.error_image_rejected_title
+import lexis.shared.generated.resources.error_image_too_large_message
+import lexis.shared.generated.resources.error_image_too_large_title
+import lexis.shared.generated.resources.error_photo_unavailable_title
+import lexis.shared.generated.resources.error_recognition_failed_message
+import lexis.shared.generated.resources.error_recognition_failed_title
+import lexis.shared.generated.resources.error_service_offline_message
+import lexis.shared.generated.resources.error_service_offline_title
+import lexis.shared.generated.resources.error_validation_title
+import lexis.shared.generated.resources.error_validation_message
+import lexis.shared.generated.resources.ic_image_rejected
+import lexis.shared.generated.resources.ic_no_service
+import lexis.shared.generated.resources.image_too_large
 
 sealed class CameraScreenErrorState(
     val title: StringResource,
