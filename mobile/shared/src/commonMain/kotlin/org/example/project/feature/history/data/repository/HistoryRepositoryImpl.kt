@@ -5,7 +5,7 @@ import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.CancellationException
 import org.example.project.feature.history.data.network.HistoryApi
 import org.example.project.feature.history.data.network.models.RecognitionDto
-import org.example.project.feature.camera.data.network.models.toDomain
+import org.example.project.feature.camera.data.network.models.mapTo
 import org.example.project.feature.camera.domain.model.Prediction
 import org.example.project.feature.history.domain.model.RecognitionDetail
 import org.example.project.feature.history.domain.model.RecognitionHistoryItem
@@ -52,7 +52,7 @@ class HistoryRepositoryImpl(
             filename = filename,
             modelVersion = modelVersion,
             prediction = Prediction(
-                predictions = predictions.map { it.toDomain() },
+                predictions = predictions.map { mapTo(it) },
                 modelVersion = modelVersion,
             ),
             imageBytes = imageBytes,

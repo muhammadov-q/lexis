@@ -25,8 +25,8 @@ import org.example.project.feature.camera.presentation.models.PredictionGlossMod
 import org.example.project.feature.camera.presentation.models.PredictionBoxModel
 import org.example.project.feature.camera.presentation.models.PredictionModel
 import org.example.project.feature.camera.presentation.models.WordPredictionModel
-import org.example.project.feature.camera.presentation.models.groupPredictionLines
-import org.example.project.feature.camera.presentation.models.isConfirmed
+import org.example.project.feature.camera.presentation.helpers.groupPredictionLines
+import org.example.project.feature.camera.presentation.helpers.isConfirmed
 import org.jetbrains.compose.resources.stringResource
 import scriptlens.shared.generated.resources.Res
 import scriptlens.shared.generated.resources.prediction_definition_label

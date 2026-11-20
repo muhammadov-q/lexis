@@ -3,7 +3,7 @@ package org.example.project.feature.camera.data.repository
 import org.example.project.feature.auth.domain.session.AuthSessionStore
 import org.example.project.feature.camera.data.network.PhotoUploadApi
 import org.example.project.feature.camera.data.network.PhotoUploadConfig
-import org.example.project.feature.camera.data.network.models.toDomain
+import org.example.project.feature.camera.data.network.models.mapTo
 import org.example.project.feature.camera.domain.model.ApiException
 import org.example.project.feature.camera.domain.model.Prediction
 import org.example.project.feature.camera.domain.model.OcrModel
@@ -38,6 +38,6 @@ class PhotoRepositoryImpl(
             }
         }
 
-        return response.toDomain()
+        return mapTo(response)
     }
 }

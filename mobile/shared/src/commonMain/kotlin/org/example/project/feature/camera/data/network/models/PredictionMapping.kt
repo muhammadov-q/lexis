@@ -5,19 +5,27 @@ import org.example.project.feature.camera.domain.model.PredictionBox
 import org.example.project.feature.camera.domain.model.PredictionGloss
 import org.example.project.feature.camera.domain.model.WordPrediction
 
-fun PredictionDto.toDomain(): Prediction =
-    Prediction(predictions = predictions.map { it.toDomain() }, modelVersion = modelVersion)
+internal fun mapTo(predictionDto: PredictionDto): Prediction =
+    Prediction(
+        predictions = predictionDto.predictions.map { mapTo(it) },
+        modelVersion = predictionDto.modelVersion,
+    )
 
-fun PredictionItemDto.toDomain(): WordPrediction =
+internal fun mapTo(predictionItemDto: PredictionItemDto): WordPrediction =
     WordPrediction(
-        text = text,
-        probabilities = probabilities,
-        box = PredictionBox(x = box.x, y = box.y, w = box.w, h = box.h),
-        line = line,
-        gloss = PredictionGloss(
-            lemma = gloss?.lemma.orEmpty(),
-            translation = gloss?.translation.orEmpty(),
-            definition = gloss?.definition.orEmpty(),
+        text = predictionItemDto.text,
+        probabilities = predictionItemDto.probabilities,
+        box = PredictionBox(
+            x = predictionItemDto.box.x,
+            y = predictionItemDto.box.y,
+            w = predictionItemDto.box.w,
+            h = predictionItemDto.box.h,
         ),
-        lineTranslation = lineTranslation,
+        line = predictionItemDto.line,
+        gloss = PredictionGloss(
+            lemma = predictionItemDto.gloss?.lemma.orEmpty(),
+            translation = predictionItemDto.gloss?.translation.orEmpty(),
+            definition = predictionItemDto.gloss?.definition.orEmpty(),
+        ),
+        lineTranslation = predictionItemDto.lineTranslation,
     )

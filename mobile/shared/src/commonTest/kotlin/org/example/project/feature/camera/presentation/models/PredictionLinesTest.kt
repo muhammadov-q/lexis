@@ -4,6 +4,8 @@ import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFalse
 import kotlin.test.assertTrue
+import org.example.project.feature.camera.presentation.helpers.groupPredictionLines
+import org.example.project.feature.camera.presentation.helpers.isConfirmed
 
 class PredictionLinesTest {
     private fun word(
