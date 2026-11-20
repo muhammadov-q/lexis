@@ -1,4 +1,5 @@
 src/ml/models
 src/ml/notebooks/data/
+src/ml/notebooks/EparchosData
 models/
 /data/
