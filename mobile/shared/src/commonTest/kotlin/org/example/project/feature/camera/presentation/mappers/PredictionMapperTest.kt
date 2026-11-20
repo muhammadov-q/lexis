@@ -6,6 +6,7 @@ import org.example.project.feature.camera.domain.model.PredictionGloss
 import org.example.project.feature.camera.domain.model.WordPrediction
 import kotlin.test.Test
 import kotlin.test.assertEquals
+import kotlin.test.assertNull
 import kotlin.test.assertTrue
 
 class PredictionMapperTest {
@@ -112,5 +113,14 @@ class PredictionMapperTest {
         assertEquals("", word.gloss.lemma)
         assertEquals(" ", word.gloss.translation)
         assertEquals("", word.gloss.definition)
+    }
+
+    @Test
+    fun mapPredictionToUiModelKeepsTheSavedId() {
+        val saved = mapPredictionToUiModel(Prediction(emptyList(), modelVersion = "v1", savedId = 7))
+        val unsaved = mapPredictionToUiModel(Prediction(emptyList(), modelVersion = "v1"))
+
+        assertEquals(7L, saved.savedId)
+        assertNull(unsaved.savedId)
     }
 }

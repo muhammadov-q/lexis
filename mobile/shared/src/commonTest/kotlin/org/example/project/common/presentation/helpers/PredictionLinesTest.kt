@@ -1,11 +1,12 @@
-package org.example.project.feature.camera.presentation.models
+package org.example.project.common.presentation.helpers
 
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFalse
 import kotlin.test.assertTrue
-import org.example.project.feature.camera.presentation.helpers.groupPredictionLines
-import org.example.project.feature.camera.presentation.helpers.isConfirmed
+import org.example.project.common.presentation.models.PredictionBoxModel
+import org.example.project.common.presentation.models.PredictionGlossModel
+import org.example.project.common.presentation.models.WordPredictionModel
 
 class PredictionLinesTest {
     private fun word(

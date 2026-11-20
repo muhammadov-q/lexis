@@ -1,8 +1,9 @@
-package org.example.project.feature.camera.presentation.models
+package org.example.project.common.presentation.models
 
 data class PredictionModel (
     val predictions: List<WordPredictionModel>,
     val modelVersion: String,
+    val savedId: Long? = null,
 )
 
 data class WordPredictionModel(

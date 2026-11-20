@@ -1,4 +1,4 @@
-package org.example.project.feature.camera.presentation.composables
+package org.example.project.common.presentation.ui.composables.pagescan
 
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.gestures.detectTapGestures
@@ -17,14 +17,16 @@ import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
 import org.example.project.common.presentation.ui.theme.LexisColors
-import org.example.project.feature.camera.presentation.models.PredictionModel
+import org.example.project.common.presentation.models.PredictionModel
+import org.example.project.common.presentation.helpers.overlayRectForImageBox
+import org.example.project.common.presentation.helpers.selectPredictionIndexForTap
 
 @Composable
 fun PredictionOverlay(
     image: ImageBitmap,
     prediction: PredictionModel?,
     selectedPredictionIndex: Int?,
-    onPredictionSelected: (Int) -> Unit,
+    onPredictionSelected: (Int?) -> Unit,
     zoomScale: Float,
     panOffset: Offset,
     modifier: Modifier = Modifier,
@@ -50,11 +52,7 @@ fun PredictionOverlay(
                 }
             },
     ) {
-        val selectedWord = selectedPredictionIndex
-            ?.takeIf { it in predictions.indices }
-            ?.let { predictions[it] }
-
-        selectedWord?.let { word ->
+        predictions.forEachIndexed { index, word ->
             val rect = overlayRectForImageBox(
                 x = word.box.x,
                 y = word.box.y,
@@ -64,13 +62,17 @@ fun PredictionOverlay(
                 containerSize = IntSize(size.width.toInt(), size.height.toInt()),
                 zoomScale = zoomScale,
                 panOffset = panOffset,
-            ) ?: return@let
+            ) ?: return@forEachIndexed
 
+            val isSelected = index == selectedPredictionIndex
+            if (isSelected) {
+                drawRect(color = LexisColors.Accent.copy(alpha = 0.25f), topLeft = rect.topLeft, size = rect.size)
+            }
             drawRect(
-                color = LexisColors.Accent,
+                color = if (isSelected) LexisColors.Accent else LexisColors.Accent.copy(alpha = 0.55f),
                 topLeft = rect.topLeft,
                 size = rect.size,
-                style = Stroke(width = 1.5.dp.toPx()),
+                style = Stroke(width = if (isSelected) 2.dp.toPx() else 1.dp.toPx()),
             )
         }
     }

@@ -8,5 +8,6 @@ data class PredictionDto(
     val predictions: List<PredictionItemDto>,
     @SerialName("model_version")
     val modelVersion: String,
+    val id: Long? = null,
 )
 

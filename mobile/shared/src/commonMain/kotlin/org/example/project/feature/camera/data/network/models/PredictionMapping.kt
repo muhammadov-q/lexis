@@ -9,6 +9,7 @@ internal fun mapTo(predictionDto: PredictionDto): Prediction =
     Prediction(
         predictions = predictionDto.predictions.map { mapTo(it) },
         modelVersion = predictionDto.modelVersion,
+        savedId = predictionDto.id,
     )
 
 internal fun mapTo(predictionItemDto: PredictionItemDto): WordPrediction =

@@ -19,6 +19,7 @@ import org.example.project.feature.camera.domain.model.OcrModels
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFalse
+import kotlin.test.assertNull
 import kotlin.test.assertTrue
 
 class PhotoRepositoryImplTest {
@@ -122,6 +123,49 @@ class PhotoRepositoryImplTest {
         )
 
         assertTrue(repository.uploadPhoto(byteArrayOf(1)).predictions.isEmpty())
+    }
+
+    @Test
+    fun uploadPhotoKeepsTheSavedIdFromRecognitions() = runTest {
+        val authSessionStore = AuthSessionStore().apply {
+            setAuthenticated(User(1, "user@example.com", "John", "Doe"))
+        }
+        val engine = MockEngine {
+            respond(
+                content = """{"id":42,"created_at":"2026-11-20T20:45:00Z","filename":"page.jpg","predictions":[],"model_version":"v1"}""",
+                status = HttpStatusCode.Created,
+                headers = headersOf(HttpHeaders.ContentType, "application/json"),
+            )
+        }
+        val repository = PhotoRepositoryImpl(
+            api = PhotoUploadApi(HttpClient(engine), config),
+            config = config,
+            authSessionStore = authSessionStore,
+        )
+
+        val prediction = repository.uploadPhoto(byteArrayOf(1))
+
+        assertEquals(42L, prediction.savedId)
+    }
+
+    @Test
+    fun uploadPhotoHasNoSavedIdForGuests() = runTest {
+        val engine = MockEngine {
+            respond(
+                content = """{"predictions":[],"model_version":"v1"}""",
+                status = HttpStatusCode.OK,
+                headers = headersOf(HttpHeaders.ContentType, "application/json"),
+            )
+        }
+        val repository = PhotoRepositoryImpl(
+            api = PhotoUploadApi(HttpClient(engine), config),
+            config = config,
+            authSessionStore = AuthSessionStore(),
+        )
+
+        val prediction = repository.uploadPhoto(byteArrayOf(1))
+
+        assertNull(prediction.savedId)
     }
 
     @Test

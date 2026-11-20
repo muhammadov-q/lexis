@@ -6,6 +6,7 @@ object LexisColors {
     // Brand
     val Accent = Color(0xFFE6FF66)
     val OnAccent = Color(0xFF50582A)
+    val Success = Color(0xFF8BC34A)
 
     // Surfaces
     val Background = Color(0xFFF4F4F4)

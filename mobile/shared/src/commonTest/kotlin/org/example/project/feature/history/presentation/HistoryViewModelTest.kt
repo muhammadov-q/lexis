@@ -124,7 +124,7 @@ class HistoryViewModelTest {
 
         assertEquals(detail, viewModel.state.value.selectedDetail)
         assertEquals(8L, repository.lastDetailId)
-        assertEquals(0, viewModel.state.value.selectedPredictionIndex)
+        assertNull(viewModel.state.value.selectedPredictionIndex)
         assertFalse(viewModel.state.value.isLoading)
         assertNull(viewModel.state.value.error)
     }
@@ -232,6 +232,32 @@ class HistoryViewModelTest {
         viewModel.load(3)
         advanceUntilIdle()
         viewModel.selectPrediction(1)
+
+        assertEquals(1, viewModel.state.value.selectedPredictionIndex)
+    }
+
+    @Test
+    fun selectPredictionWithNullClearsTheSelection() = runHistoryTest {
+        val detail = RecognitionDetail(3, "2026-01-03", "detail.jpg", "v1", samplePrediction(), byteArrayOf(7))
+        val viewModel = createDetailViewModel(FakeHistoryRepository(detail = detail))
+
+        viewModel.load(3)
+        advanceUntilIdle()
+        viewModel.selectPrediction(1)
+        viewModel.selectPrediction(null)
+
+        assertNull(viewModel.state.value.selectedPredictionIndex)
+    }
+
+    @Test
+    fun selectPredictionIgnoresAnIndexOutsideThePage() = runHistoryTest {
+        val detail = RecognitionDetail(3, "2026-01-03", "detail.jpg", "v1", samplePrediction(), byteArrayOf(7))
+        val viewModel = createDetailViewModel(FakeHistoryRepository(detail = detail))
+
+        viewModel.load(3)
+        advanceUntilIdle()
+        viewModel.selectPrediction(1)
+        viewModel.selectPrediction(99)
 
         assertEquals(1, viewModel.state.value.selectedPredictionIndex)
     }

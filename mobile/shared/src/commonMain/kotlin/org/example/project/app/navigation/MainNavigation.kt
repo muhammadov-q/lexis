@@ -38,7 +38,12 @@ internal fun MainNavigation(
     ) {
         composable(Screen.CameraView.route) {
             val cameraViewModel: CameraViewModel = koinViewModel()
-            CameraScreen(cameraViewModel)
+            CameraScreen(
+                viewModel = cameraViewModel,
+                isAuthenticated = isAuthenticated,
+                onOpenSaved = navController::navigateHistoryDetail,
+                onSignInRequested = { onEvent(AppEvent.SignInRequested(AuthMode.SignIn)) },
+            )
         }
         composable(Screen.Docs.route) {
             val historyViewModel: HistoryViewModel = koinViewModel()

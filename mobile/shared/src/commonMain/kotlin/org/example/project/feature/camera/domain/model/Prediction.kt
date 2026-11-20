@@ -3,6 +3,7 @@ package org.example.project.feature.camera.domain.model
 data class Prediction(
     val predictions: List<WordPrediction>,
     val modelVersion: String,
+    val savedId: Long? = null,
 )
 
 data class WordPrediction(

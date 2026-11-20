@@ -1,123 +1,111 @@
 package org.example.project.feature.camera.presentation.composables
 
-import androidx.compose.foundation.Image
-import androidx.compose.foundation.gestures.rememberTransformableState
-import androidx.compose.foundation.gestures.transformable
-import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
-import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.graphics.graphicsLayer
-import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.tooling.preview.Preview
 import org.example.project.common.presentation.ui.composables.buttons.LexisButton
 import org.example.project.common.presentation.ui.composables.buttons.LexisButtonStyle
 import org.example.project.common.presentation.ui.theme.LexisSpacing
-import org.example.project.feature.camera.presentation.composables.predictions.PredictionSummary
+import org.example.project.common.presentation.ui.composables.pagescan.PageScan
 import org.example.project.feature.camera.presentation.helpers.decodePhoto
-import org.example.project.feature.camera.presentation.models.PredictionBoxModel
-import org.example.project.feature.camera.presentation.models.PredictionGlossModel
-import org.example.project.feature.camera.presentation.models.PredictionModel
-import org.example.project.feature.camera.presentation.models.WordPredictionModel
+import org.example.project.common.presentation.models.PredictionBoxModel
+import org.example.project.common.presentation.models.PredictionGlossModel
+import org.example.project.common.presentation.models.PredictionModel
+import org.example.project.common.presentation.models.WordPredictionModel
 import org.jetbrains.compose.resources.stringResource
 import lexis.shared.generated.resources.Res
 import lexis.shared.generated.resources.action_choose_another_photo
+import lexis.shared.generated.resources.action_read_page
 import lexis.shared.generated.resources.action_take_new_photo
 import lexis.shared.generated.resources.captured_photo_description
+import org.example.project.common.presentation.ui.composables.transcript.TranscriptCard
+import org.example.project.common.presentation.ui.composables.worddetails.WordDetailsCard
 
 @Composable
 fun CapturedPhotoContent(
     photo: ByteArray?,
     prediction: PredictionModel?,
     selectedPredictionIndex: Int?,
-    onPredictionSelected: (Int) -> Unit,
+    onPredictionSelected: (Int?) -> Unit,
     onTakeNewPhotoClicked: () -> Unit,
     onChooseFromPhotosClicked: () -> Unit,
     modifier: Modifier = Modifier,
+    readDurationMs: Long? = null,
+    isReading: Boolean = false,
+    isAuthenticated: Boolean = false,
+    onReadPageClicked: () -> Unit = {},
+    onOpenSaved: (Long) -> Unit = {},
+    onSignInRequested: () -> Unit = {},
 ) {
-    val imageBitMap = photo?.let { remember(photo) { decodePhoto(photo) } }
-    var zoomScale by remember { mutableStateOf(1f) }
-    var panOffset by remember { mutableStateOf(Offset.Zero) }
-    val transformableState = rememberTransformableState { zoomChange, panChange, _ ->
-        val nextScale = (zoomScale * zoomChange).coerceIn(1f, 4f)
-        zoomScale = nextScale
-        panOffset = if (nextScale <= 1f) Offset.Zero else panOffset + panChange
-    }
+    val image = photo?.let { remember(photo) { decodePhoto(photo) } }
 
-    Column(modifier = modifier, horizontalAlignment = Alignment.CenterHorizontally) {
-        imageBitMap?.let { image ->
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(top = LexisSpacing.padding_16)
-                    .clip(MaterialTheme.shapes.extraLarge)
-                    .aspectRatio(image.width.toFloat() / image.height.toFloat()),
-                contentAlignment = Alignment.Center,
-            ) {
-                Box(
-                    modifier = Modifier
-                        .matchParentSize()
-                        .transformable(state = transformableState, canPan = { zoomScale > 1f })
-                ) {
-                    Image(
-                        bitmap = image,
-                        contentDescription = stringResource(Res.string.captured_photo_description),
-                        contentScale = ContentScale.FillBounds,
-                        modifier = Modifier
-                            .matchParentSize()
-                            .graphicsLayer {
-                                scaleX = zoomScale
-                                scaleY = zoomScale
-                                translationX = panOffset.x
-                                translationY = panOffset.y
-                            },
-                    )
-
-                    PredictionOverlay(
-                        image = image,
-                        prediction = prediction,
-                        selectedPredictionIndex = selectedPredictionIndex,
-                        onPredictionSelected = onPredictionSelected,
-                        zoomScale = zoomScale,
-                        panOffset = panOffset,
-                        modifier = Modifier.matchParentSize(),
-                    )
-                }
-            }
+    Column(
+        modifier = modifier.fillMaxWidth(),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.spacedBy(LexisSpacing.padding_16),
+    ) {
+        image?.let {
+            PageScan(
+                image = it,
+                contentDescription = stringResource(Res.string.captured_photo_description),
+                prediction = prediction,
+                selectedPredictionIndex = selectedPredictionIndex,
+                onPredictionSelected = onPredictionSelected,
+            )
         }
 
-        PredictionSummary(
-            modifier = Modifier.padding(top = LexisSpacing.padding_16),
-            prediction = prediction,
-            selectedPredictionIndex = selectedPredictionIndex,
-            onPredictionSelected = onPredictionSelected,
-        )
+        if (prediction != null) {
+            WordDetailsCard(
+                prediction = prediction,
+                selectedPredictionIndex = selectedPredictionIndex,
+                onPredictionSelected = onPredictionSelected,
+                image = image,
+                durationMs = readDurationMs,
+                footer = {
+                    SavedResultLine(
+                        savedId = prediction.savedId,
+                        isAuthenticated = isAuthenticated,
+                        onOpenSaved = onOpenSaved,
+                        onSignInRequested = onSignInRequested,
+                    )
+                },
+            )
 
-        LexisButton(
-            modifier = Modifier.padding(vertical = LexisSpacing.padding_8),
-            text = stringResource(Res.string.action_take_new_photo),
-            onClick = onTakeNewPhotoClicked,
-            buttonStyle = LexisButtonStyle.Primary
-        )
+            TranscriptCard(
+                words = prediction.predictions,
+                selectedPredictionIndex = selectedPredictionIndex,
+                onPredictionSelected = onPredictionSelected,
+            )
+        } else if (!isReading) {
+            LexisButton(
+                text = stringResource(Res.string.action_read_page),
+                onClick = onReadPageClicked,
+                buttonStyle = LexisButtonStyle.Primary,
+            )
+        }
 
-        LexisButton(
-            modifier = Modifier.padding(bottom = LexisSpacing.padding_4),
-            text = stringResource(Res.string.action_choose_another_photo),
-            onClick = onChooseFromPhotosClicked,
-            buttonStyle = LexisButtonStyle.Secondary
-        )
+        Column(modifier = Modifier.padding(top = LexisSpacing.padding_8)) {
+            LexisButton(
+                modifier = Modifier.padding(bottom = LexisSpacing.padding_8),
+                text = stringResource(Res.string.action_take_new_photo),
+                onClick = onTakeNewPhotoClicked,
+                buttonStyle = LexisButtonStyle.Primary,
+            )
 
+            LexisButton(
+                modifier = Modifier.padding(bottom = LexisSpacing.padding_4),
+                text = stringResource(Res.string.action_choose_another_photo),
+                onClick = onChooseFromPhotosClicked,
+                buttonStyle = LexisButtonStyle.Secondary,
+            )
+        }
     }
 }
 

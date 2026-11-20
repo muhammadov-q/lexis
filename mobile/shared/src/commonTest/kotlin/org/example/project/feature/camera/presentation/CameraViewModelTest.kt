@@ -39,7 +39,7 @@ import kotlin.test.assertTrue
 @OptIn(ExperimentalCoroutinesApi::class)
 class CameraViewModelTest {
     @Test
-    fun discoveryRetryAndReadAgainPreservePhotoAndUseSelectedModel() = runCameraTest {
+    fun discoveryRetryPreservesPhotoAndUsesSelectedModel() = runCameraTest {
         val gate = CompletableDeferred<Unit>()
         var loads = 0
         val uploads = mutableListOf<Pair<ByteArray, String?>>()
@@ -70,8 +70,6 @@ class CameraViewModelTest {
         advanceUntilIdle()
         assertNull(uploads.single().second)
 
-        viewModel.onEvent(CameraEvent.ReadAgain)
-        assertNull(viewModel.state.value.prediction)
         assertContentEquals(photo, viewModel.state.value.photo)
         viewModel.onEvent(CameraEvent.ReloadModels)
         advanceUntilIdle()
@@ -119,7 +117,6 @@ class CameraViewModelTest {
         advanceUntilIdle()
         val error = assertIs<CameraScreenState.Error>(viewModel.state.value.cameraScreenState)
         assertIs<CameraScreenErrorState.ValidationFailed>(error.error)
-        viewModel.onEvent(CameraEvent.ReadAgain)
         viewModel.onEvent(CameraEvent.SelectModel("b"))
         assertEquals("b", viewModel.state.value.selectedModel)
         assertContentEquals(photo, viewModel.state.value.photo)
@@ -191,16 +188,18 @@ class CameraViewModelTest {
     }
 
     @Test
-    fun photoCaptureFailureUpdatesErrorState() = runCameraTest {
-        val viewModel = createViewModel()
+    fun photoCaptureFailureGoesBackToTheStartScreenWithoutAnError() = runCameraTest {
+        val viewModel = createViewModel { samplePrediction() }
+        viewModel.onEvent(CameraEvent.OnPhotoPicked(byteArrayOf(1)))
+        advanceUntilIdle()
 
-        viewModel.onEvent(CameraEvent.OnPhotoCaptureFailed("Camera unavailable"))
+        viewModel.onEvent(CameraEvent.OnPhotoCaptureFailed("No camera app is available on this device."))
 
-        val screenState = viewModel.state.value.cameraScreenState
-        assertIs<CameraScreenState.Error>(screenState)
-        assertIs<CameraScreenErrorState.PhotoUnavailable>(screenState.error)
-        assertEquals(UiText.Plain("Camera unavailable"), screenState.error.message)
-        assertFalse(viewModel.state.value.isLoading)
+        val state = viewModel.state.value
+        assertEquals(CameraScreenState.NoPhotoCaptured, state.cameraScreenState)
+        assertNull(state.photo)
+        assertNull(state.prediction)
+        assertFalse(state.isLoading)
     }
 
     @Test
@@ -451,6 +450,88 @@ class CameraViewModelTest {
         assertFalse(screenState.error.canRetry)
         assertEquals(0, uploads)
         assertFalse(viewModel.state.value.isLoading)
+    }
+
+    @Test
+    fun tappingTheSelectedWordAgainClearsTheSelection() = runCameraTest {
+        val viewModel = createViewModel { samplePrediction() }
+        viewModel.onEvent(CameraEvent.OnPhotoPicked(byteArrayOf(1)))
+        advanceUntilIdle()
+
+        viewModel.onEvent(CameraEvent.SelectPrediction(1))
+        viewModel.onEvent(CameraEvent.SelectPrediction(null))
+
+        assertNull(viewModel.state.value.selectedPredictionIndex)
+    }
+
+    @Test
+    fun readingRecordsTheDurationAndKeepsTheSavedId() = runCameraTest {
+        val gate = CompletableDeferred<Unit>()
+        val viewModel = createViewModel {
+            gate.await()
+            samplePrediction().copy(savedId = 42)
+        }
+        advanceUntilIdle()
+
+        viewModel.onEvent(CameraEvent.OnPhotoPicked(byteArrayOf(1)))
+        runCurrent()
+        gate.complete(Unit)
+        advanceUntilIdle()
+
+        val state = viewModel.state.value
+        assertNotNull(state.readDurationMs)
+        assertEquals(42L, state.prediction?.savedId)
+    }
+
+    @Test
+    fun selectingAWordOutsideThePageKeepsTheCurrentSelection() = runCameraTest {
+        val viewModel = createViewModel { samplePrediction() }
+        viewModel.onEvent(CameraEvent.OnPhotoPicked(byteArrayOf(1)))
+        advanceUntilIdle()
+
+        viewModel.onEvent(CameraEvent.SelectPrediction(1))
+        viewModel.onEvent(CameraEvent.SelectPrediction(99))
+
+        assertEquals(1, viewModel.state.value.selectedPredictionIndex)
+    }
+
+    @Test
+    fun cancellingAReadKeepsThePhotoAndDropsTheResult() = runCameraTest {
+        val viewModel = createViewModel { awaitCancellation() }
+        advanceUntilIdle()
+        val photo = byteArrayOf(9, 9)
+        viewModel.onEvent(CameraEvent.OnPhotoPicked(photo))
+        runCurrent()
+        assertNotNull(viewModel.state.value.readStartedAtMs)
+
+        viewModel.onEvent(CameraEvent.CancelReadRequested)
+        advanceUntilIdle()
+
+        val state = viewModel.state.value
+        assertFalse(state.isLoading)
+        assertNull(state.readStartedAtMs)
+        assertNull(state.prediction)
+        assertContentEquals(photo, state.photo)
+        assertEquals(CameraScreenState.PhotoCaptured, state.cameraScreenState)
+    }
+
+    @Test
+    fun cancelledReadCanBeStartedAgain() = runCameraTest {
+        var uploads = 0
+        val viewModel = createViewModel {
+            uploads++
+            if (uploads == 1) awaitCancellation() else samplePrediction()
+        }
+        advanceUntilIdle()
+
+        viewModel.onEvent(CameraEvent.OnPhotoPicked(byteArrayOf(1)))
+        runCurrent()
+        viewModel.onEvent(CameraEvent.CancelReadRequested)
+        viewModel.onEvent(CameraEvent.RetryUploadRequested)
+        advanceUntilIdle()
+
+        assertEquals(2, uploads)
+        assertNotNull(viewModel.state.value.prediction)
     }
 
     private fun samplePrediction(modelVersion: String = "v1") = Prediction(

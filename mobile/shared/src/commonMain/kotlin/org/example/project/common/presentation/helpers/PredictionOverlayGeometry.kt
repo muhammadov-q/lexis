@@ -1,9 +1,9 @@
-package org.example.project.feature.camera.presentation.composables
+package org.example.project.common.presentation.helpers
 
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.unit.IntSize
-import org.example.project.feature.camera.presentation.models.WordPredictionModel
+import org.example.project.common.presentation.models.WordPredictionModel
 import kotlin.math.max
 import kotlin.math.min
 

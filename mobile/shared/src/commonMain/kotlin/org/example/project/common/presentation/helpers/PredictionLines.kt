@@ -1,6 +1,6 @@
-package org.example.project.feature.camera.presentation.helpers
+package org.example.project.common.presentation.helpers
 
-import org.example.project.feature.camera.presentation.models.WordPredictionModel
+import org.example.project.common.presentation.models.WordPredictionModel
 
 data class PredictionLine(
     val number: Int,

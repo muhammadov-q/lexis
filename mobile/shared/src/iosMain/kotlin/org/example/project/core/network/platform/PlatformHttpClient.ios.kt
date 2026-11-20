@@ -28,4 +28,4 @@ actual fun createHttpClient(
     }
 
 actual fun localBackendBaseUrl(): String =
-    "http://127.0.0.1:8000"
+    "http://192.168.205.84:8000"

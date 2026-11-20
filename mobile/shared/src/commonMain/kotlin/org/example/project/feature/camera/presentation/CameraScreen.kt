@@ -30,6 +30,7 @@ import org.example.project.common.presentation.ui.theme.LexisTypography
 import org.example.project.feature.camera.presentation.composables.CameraPreview
 import org.example.project.feature.camera.presentation.composables.CapturedPhotoContent
 import org.example.project.feature.camera.presentation.composables.EmptyCameraState
+import org.example.project.feature.camera.presentation.composables.ReadingProgressOverlay
 import org.example.project.feature.camera.presentation.composables.error.ErrorState
 import org.example.project.feature.camera.presentation.composables.modelPicker.ModelPicker
 import org.example.project.feature.camera.presentation.models.CameraScreenState
@@ -39,11 +40,19 @@ import lexis.shared.generated.resources.camera_subtitle
 import lexis.shared.generated.resources.camera_title
 
 @Composable
-fun CameraScreen(viewModel: CameraViewModel) {
+fun CameraScreen(
+    viewModel: CameraViewModel,
+    isAuthenticated: Boolean,
+    onOpenSaved: (Long) -> Unit,
+    onSignInRequested: () -> Unit,
+) {
     val state by viewModel.state.collectAsStateWithLifecycle()
 
     CameraScreenContent(
         state = state,
+        isAuthenticated = isAuthenticated,
+        onOpenSaved = onOpenSaved,
+        onSignInRequested = onSignInRequested,
         onTakePhotoClicked = { viewModel.onEvent(CameraEvent.CapturePhotoRequested) },
         onChooseFromPhotosClicked = { viewModel.onEvent(CameraEvent.SelectPhotoRequested) },
         onRetryClicked = { viewModel.onEvent(CameraEvent.RetryUploadRequested) },
@@ -69,7 +78,15 @@ fun CameraScreen(viewModel: CameraViewModel) {
         enter = fadeIn(tween(200)),
         exit = fadeOut(tween(200)),
     ) {
-        OverlayLoadingState()
+        val startedAtMs = state.readStartedAtMs
+        if (startedAtMs != null) {
+            ReadingProgressOverlay(
+                startedAtMs = startedAtMs,
+                onCancel = { viewModel.onEvent(CameraEvent.CancelReadRequested) },
+            )
+        } else {
+            OverlayLoadingState()
+        }
     }
 
 }
@@ -77,13 +94,18 @@ fun CameraScreen(viewModel: CameraViewModel) {
 @Composable
 private fun CameraScreenContent(
     state: CameraContract,
+    isAuthenticated: Boolean,
+    onOpenSaved: (Long) -> Unit,
+    onSignInRequested: () -> Unit,
     onTakePhotoClicked: () -> Unit,
     onChooseFromPhotosClicked: () -> Unit,
     onRetryClicked: () -> Unit,
-    onPredictionSelected: (Int) -> Unit,
+    onPredictionSelected: (Int?) -> Unit,
     onModelSelected: (String) -> Unit,
     onModelsReload: () -> Unit
 ) {
+    val showIntro = state.cameraScreenState !is CameraScreenState.PhotoCaptured
+
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -91,16 +113,20 @@ private fun CameraScreenContent(
             .padding(LexisSpacing.padding_24)
     ) {
 
-        Text(
-            text = stringResource(Res.string.camera_title),
-            style = LexisTypography.Title
-        )
+        AnimatedVisibility(visible = showIntro) {
+            Column {
+                Text(
+                    text = stringResource(Res.string.camera_title),
+                    style = LexisTypography.Title
+                )
 
-        Text(
-            text = stringResource(Res.string.camera_subtitle),
-            style = LexisTypography.Body,
-            color = LexisColors.Subtext
-        )
+                Text(
+                    text = stringResource(Res.string.camera_subtitle),
+                    style = LexisTypography.Body,
+                    color = LexisColors.Subtext
+                )
+            }
+        }
 
 
         AnimatedContent(
@@ -136,7 +162,13 @@ private fun CameraScreenContent(
                                 selectedPredictionIndex = state.selectedPredictionIndex,
                                 onPredictionSelected = onPredictionSelected,
                                 onTakeNewPhotoClicked = onTakePhotoClicked,
-                                onChooseFromPhotosClicked = onChooseFromPhotosClicked
+                                onChooseFromPhotosClicked = onChooseFromPhotosClicked,
+                                readDurationMs = state.readDurationMs,
+                                isAuthenticated = isAuthenticated,
+                                isReading = state.isLoading,
+                                onReadPageClicked = onRetryClicked,
+                                onOpenSaved = onOpenSaved,
+                                onSignInRequested = onSignInRequested,
                             )
 
                         is CameraScreenState.Error ->
@@ -163,6 +195,9 @@ private fun CameraScreenPreview(
     MaterialTheme {
         CameraScreenContent(
             state = state,
+            isAuthenticated = false,
+            onOpenSaved = {},
+            onSignInRequested = {},
             onTakePhotoClicked = {},
             onChooseFromPhotosClicked = {},
             onRetryClicked = {},

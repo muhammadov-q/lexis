@@ -1,13 +1,9 @@
 package org.example.project.feature.historydetail.presentation
 
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.gestures.rememberTransformableState
-import androidx.compose.foundation.gestures.transformable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.heightIn
@@ -22,22 +18,16 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.graphics.graphicsLayer
-import androidx.compose.ui.layout.ContentScale
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import org.example.project.common.presentation.helpers.HistoryDateTimeFormatter
 import org.example.project.common.presentation.ui.helpers.asString
 import org.example.project.common.presentation.ui.theme.LexisColors
 import org.example.project.common.presentation.ui.theme.LexisSpacing
-import org.example.project.feature.camera.presentation.composables.PredictionOverlay
-import org.example.project.feature.camera.presentation.composables.predictions.PredictionSummary
+import org.example.project.common.presentation.ui.composables.pagescan.PageScan
 import org.example.project.feature.camera.presentation.helpers.decodePhoto
 import org.example.project.feature.camera.presentation.mappers.mapPredictionToUiModel
 import org.example.project.feature.history.presentation.composables.GuestHistoryPrompt
@@ -46,9 +36,10 @@ import org.example.project.feature.history.presentation.composables.Unauthorized
 import org.jetbrains.compose.resources.stringResource
 import lexis.shared.generated.resources.Res
 import lexis.shared.generated.resources.history_detail_image_unavailable
-import lexis.shared.generated.resources.history_detail_model_version
 import lexis.shared.generated.resources.history_detail_read_on
 import lexis.shared.generated.resources.history_untitled_page
+import org.example.project.common.presentation.ui.composables.transcript.TranscriptCard
+import org.example.project.common.presentation.ui.composables.worddetails.WordDetailsCard
 
 @Composable
 fun HistoryDetailScreen(
@@ -85,7 +76,7 @@ fun HistoryDetailScreen(
 private fun HistoryDetailContent(
     state: HistoryDetailContract,
     onRetry: () -> Unit,
-    onPredictionSelected: (Int) -> Unit,
+    onPredictionSelected: (Int?) -> Unit,
     onSignInRequested: () -> Unit,
 ) {
     if (state.requiresSignIn) {
@@ -109,14 +100,6 @@ private fun HistoryDetailContent(
     detail ?: return
     val predictionModel = remember(detail.id) { mapPredictionToUiModel(detail.prediction) }
     val imageBitmap = remember(detail.id) { detail.imageBytes?.let(::decodePhoto) }
-
-    var zoomScale by remember { mutableStateOf(1f) }
-    var panOffset by remember { mutableStateOf(Offset.Zero) }
-    val transformableState = rememberTransformableState { zoomChange, panChange, _ ->
-        val nextScale = (zoomScale * zoomChange).coerceIn(1f, 4f)
-        zoomScale = nextScale
-        panOffset = if (nextScale <= 1f) Offset.Zero else panOffset + panChange
-    }
 
     Column(
         modifier = Modifier
@@ -142,11 +125,6 @@ private fun HistoryDetailContent(
             style = MaterialTheme.typography.bodyMedium,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
         )
-        Text(
-            text = stringResource(Res.string.history_detail_model_version, detail.modelVersion),
-            style = MaterialTheme.typography.bodyMedium,
-            color = MaterialTheme.colorScheme.onSurfaceVariant,
-        )
 
         if (imageBitmap == null) {
             Surface(
@@ -165,45 +143,24 @@ private fun HistoryDetailContent(
                 }
             }
         } else {
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .clip(MaterialTheme.shapes.extraLarge)
-                    .aspectRatio(imageBitmap.width.toFloat() / imageBitmap.height.toFloat()),
-            ) {
-                Box(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .transformable(state = transformableState, canPan = { zoomScale > 1f }),
-                ) {
-                    Image(
-                        bitmap = imageBitmap,
-                        contentDescription = detail.filename,
-                        contentScale = ContentScale.FillBounds,
-                        modifier = Modifier
-                            .fillMaxSize()
-                            .graphicsLayer {
-                                scaleX = zoomScale
-                                scaleY = zoomScale
-                                translationX = panOffset.x
-                                translationY = panOffset.y
-                            },
-                    )
-                    PredictionOverlay(
-                        image = imageBitmap,
-                        prediction = predictionModel,
-                        selectedPredictionIndex = state.selectedPredictionIndex,
-                        onPredictionSelected = onPredictionSelected,
-                        zoomScale = zoomScale,
-                        panOffset = panOffset,
-                        modifier = Modifier.fillMaxSize(),
-                    )
-                }
-            }
+            PageScan(
+                image = imageBitmap,
+                contentDescription = detail.filename,
+                prediction = predictionModel,
+                selectedPredictionIndex = state.selectedPredictionIndex,
+                onPredictionSelected = onPredictionSelected,
+            )
         }
 
-        PredictionSummary(
+        WordDetailsCard(
             prediction = predictionModel,
+            selectedPredictionIndex = state.selectedPredictionIndex,
+            onPredictionSelected = onPredictionSelected,
+            image = imageBitmap,
+        )
+
+        TranscriptCard(
+            words = predictionModel.predictions,
             selectedPredictionIndex = state.selectedPredictionIndex,
             onPredictionSelected = onPredictionSelected,
         )

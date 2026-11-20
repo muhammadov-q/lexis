@@ -11,7 +11,6 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
 import org.example.project.common.presentation.ui.helpers.UiText
-import org.example.project.common.presentation.ui.helpers.UiText.Plain
 import org.example.project.core.mvi.setEffect
 import org.example.project.core.mvi.setState
 import org.example.project.feature.camera.domain.model.ApiException
@@ -23,7 +22,10 @@ import org.example.project.feature.camera.presentation.models.CameraScreenErrorS
 import org.example.project.feature.camera.presentation.models.CameraScreenState
 import lexis.shared.generated.resources.Res
 import lexis.shared.generated.resources.error_photo_no_data
+import kotlin.time.Clock
+import kotlin.time.ExperimentalTime
 
+@OptIn(ExperimentalTime::class)
 class CameraViewModel(
     private val uploadPhoto: UploadPhotoUseCase,
     private val getModels: GetModelsUseCase,
@@ -55,6 +57,8 @@ class CameraViewModel(
             is CameraEvent.RetryUploadRequested -> retryUpload()
 
             is CameraEvent.SelectPrediction -> onPredictionSelected(event.index)
+
+            is CameraEvent.CancelReadRequested -> cancelRead()
 
             is CameraEvent.OnImagePickerProcessingStarted -> setLoading(true)
             is CameraEvent.SelectModel -> onSelectModel(event.id)
@@ -105,20 +109,22 @@ class CameraViewModel(
         }
     }
 
-    private fun onPredictionSelected(index: Int) {
+    private fun onPredictionSelected(index: Int?) {
         val predictions = _state.value.prediction?.predictions ?: return
-        if (index !in predictions.indices) return
+        if (index != null && index !in predictions.indices) return
         _state.setState { it.copy(selectedPredictionIndex = index) }
     }
 
     private fun onPhotoCaptureFailed(message: String) {
+        println("$TAG: photo capture failed: $message")
         _state.setState {
             it.copy(
+                cameraScreenState = CameraScreenState.NoPhotoCaptured,
                 isLoading = false,
-                cameraScreenState =
-                    CameraScreenState.Error(PhotoUnavailable(Plain(message)))
+                photo = null,
+                prediction = null,
+                selectedPredictionIndex = null,
             )
-
         }
     }
 
@@ -164,10 +170,24 @@ class CameraViewModel(
         }
     }
 
+    private fun cancelRead() {
+        latestUploadRequestId++
+        uploadJob?.cancel()
+        _state.setState {
+            it.copy(
+                isLoading = false,
+                readStartedAtMs = null,
+                prediction = null,
+                selectedPredictionIndex = null,
+            )
+        }
+    }
+
     private fun upload(photo: ByteArray) {
         uploadJob?.cancel()
         val uploadRequestId = ++latestUploadRequestId
-        setLoading(true)
+        val startedAtMs = Clock.System.now().toEpochMilliseconds()
+        _state.setState { it.copy(isLoading = true, readStartedAtMs = startedAtMs) }
         uploadJob = viewModelScope.launch {
             try {
                 val prediction = uploadPhoto(photo, _state.value.selectedModel)
@@ -178,6 +198,8 @@ class CameraViewModel(
                         prediction = predictionModel,
                         selectedPredictionIndex = null,
                         isLoading = false,
+                        readStartedAtMs = null,
+                        readDurationMs = Clock.System.now().toEpochMilliseconds() - startedAtMs,
                         cameraScreenState = CameraScreenState.PhotoCaptured,
                     )
                 }
@@ -189,6 +211,7 @@ class CameraViewModel(
                 _state.setState {
                     it.copy(
                         isLoading = false,
+                        readStartedAtMs = null,
                         cameraScreenState = CameraScreenState.Error(
                             mapUploadErrorToUiModel(exception)
                         )
