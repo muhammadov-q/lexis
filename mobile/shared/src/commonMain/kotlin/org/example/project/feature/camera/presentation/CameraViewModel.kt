@@ -21,8 +21,8 @@ import org.example.project.feature.camera.presentation.mappers.mapPredictionToUi
 import org.example.project.feature.camera.presentation.mappers.mapUploadErrorToUiModel
 import org.example.project.feature.camera.presentation.models.CameraScreenErrorState.PhotoUnavailable
 import org.example.project.feature.camera.presentation.models.CameraScreenState
-import scriptlens.shared.generated.resources.Res
-import scriptlens.shared.generated.resources.error_photo_no_data
+import lexis.shared.generated.resources.Res
+import lexis.shared.generated.resources.error_photo_no_data
 
 class CameraViewModel(
     private val uploadPhoto: UploadPhotoUseCase,

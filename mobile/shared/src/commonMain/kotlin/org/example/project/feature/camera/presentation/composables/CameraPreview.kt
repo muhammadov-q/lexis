@@ -8,10 +8,10 @@ import kotlinx.coroutines.flow.Flow
 import org.example.project.feature.camera.presentation.CameraEffect
 import org.example.project.feature.camera.presentation.helpers.loadPhotoBytes
 import org.jetbrains.compose.resources.stringResource
-import scriptlens.shared.generated.resources.Res
-import scriptlens.shared.generated.resources.error_camera_open
-import scriptlens.shared.generated.resources.error_gallery_open
-import scriptlens.shared.generated.resources.error_photo_select
+import lexis.shared.generated.resources.Res
+import lexis.shared.generated.resources.error_camera_open
+import lexis.shared.generated.resources.error_gallery_open
+import lexis.shared.generated.resources.error_photo_select
 
 @Composable
 fun CameraPreview(

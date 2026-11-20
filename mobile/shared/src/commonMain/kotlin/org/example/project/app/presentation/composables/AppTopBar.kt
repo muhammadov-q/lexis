@@ -12,16 +12,16 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
-import org.example.project.common.presentation.ui.composables.pill.ScriptLensPill
+import org.example.project.common.presentation.ui.composables.pill.LexisPill
 import org.example.project.common.presentation.ui.helpers.UiText
-import org.example.project.common.presentation.ui.theme.ScriptLensColors
-import org.example.project.common.presentation.ui.theme.ScriptLensSpacing
-import org.example.project.common.presentation.ui.theme.ScriptLensTheme
+import org.example.project.common.presentation.ui.theme.LexisColors
+import org.example.project.common.presentation.ui.theme.LexisSpacing
+import org.example.project.common.presentation.ui.theme.LexisTheme
 import org.jetbrains.compose.resources.stringResource
-import scriptlens.shared.generated.resources.Res
-import scriptlens.shared.generated.resources.auth_action_sign_in
-import scriptlens.shared.generated.resources.auth_action_sign_out
-import scriptlens.shared.generated.resources.navigation_back
+import lexis.shared.generated.resources.Res
+import lexis.shared.generated.resources.auth_action_sign_in
+import lexis.shared.generated.resources.auth_action_sign_out
+import lexis.shared.generated.resources.navigation_back
 
 @Composable
 internal fun AppTopBar(
@@ -37,26 +37,26 @@ internal fun AppTopBar(
         modifier = Modifier
             .fillMaxWidth()
             .statusBarsPadding()
-            .padding(horizontal = ScriptLensSpacing.padding_16),
+            .padding(horizontal = LexisSpacing.padding_16),
         verticalAlignment = Alignment.CenterVertically,
     ) {
         if (canNavigateBack) {
             TextButton(onClick = onBack) {
                 Text(
                     stringResource(Res.string.navigation_back),
-                    color = ScriptLensColors.Subtext
+                    color = LexisColors.Subtext
                 )
             }
         }
         Spacer(Modifier.weight(1f))
         if (showSessionActions && isAuthenticated) {
-            ScriptLensPill(
+            LexisPill(
                 isEnabled = !isSigningOut,
                 onClick = onSignOutRequested,
                 text = UiText.Plain(stringResource(Res.string.auth_action_sign_out))
             )
         } else if (showSessionActions) {
-            ScriptLensPill(
+            LexisPill(
                 onClick = onSignInRequested,
                 text = UiText.Plain(stringResource(Res.string.auth_action_sign_in))
             )
@@ -68,7 +68,7 @@ internal fun AppTopBar(
 @Preview(showBackground = true)
 @Composable
 private fun AppTopBarPreview() {
-    ScriptLensTheme {
+    LexisTheme {
         AppTopBar(
             isAuthenticated = false,
             isSigningOut = false,

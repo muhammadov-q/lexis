@@ -34,8 +34,8 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import org.example.project.common.presentation.helpers.HistoryDateTimeFormatter
 import org.example.project.common.presentation.ui.helpers.asString
-import org.example.project.common.presentation.ui.theme.ScriptLensColors
-import org.example.project.common.presentation.ui.theme.ScriptLensSpacing
+import org.example.project.common.presentation.ui.theme.LexisColors
+import org.example.project.common.presentation.ui.theme.LexisSpacing
 import org.example.project.feature.camera.presentation.composables.PredictionOverlay
 import org.example.project.feature.camera.presentation.composables.predictions.PredictionSummary
 import org.example.project.feature.camera.presentation.helpers.decodePhoto
@@ -44,11 +44,11 @@ import org.example.project.feature.history.presentation.composables.GuestHistory
 import org.example.project.feature.history.presentation.composables.HistoryErrorCard
 import org.example.project.feature.history.presentation.composables.UnauthorizedHistoryCard
 import org.jetbrains.compose.resources.stringResource
-import scriptlens.shared.generated.resources.Res
-import scriptlens.shared.generated.resources.history_detail_image_unavailable
-import scriptlens.shared.generated.resources.history_detail_model_version
-import scriptlens.shared.generated.resources.history_detail_read_on
-import scriptlens.shared.generated.resources.history_untitled_page
+import lexis.shared.generated.resources.Res
+import lexis.shared.generated.resources.history_detail_image_unavailable
+import lexis.shared.generated.resources.history_detail_model_version
+import lexis.shared.generated.resources.history_detail_read_on
+import lexis.shared.generated.resources.history_untitled_page
 
 @Composable
 fun HistoryDetailScreen(
@@ -71,7 +71,7 @@ fun HistoryDetailScreen(
         viewModel.load(id)
     }
 
-    Box(modifier = Modifier.fillMaxSize().background(ScriptLensColors.Background)) {
+    Box(modifier = Modifier.fillMaxSize().background(LexisColors.Background)) {
         HistoryDetailContent(
             state = state,
             onRetry = { viewModel.load(id) },
@@ -122,8 +122,8 @@ private fun HistoryDetailContent(
         modifier = Modifier
             .fillMaxSize()
             .verticalScroll(rememberScrollState())
-            .padding(ScriptLensSpacing.padding_24),
-        verticalArrangement = Arrangement.spacedBy(ScriptLensSpacing.padding_12),
+            .padding(LexisSpacing.padding_24),
+        verticalArrangement = Arrangement.spacedBy(LexisSpacing.padding_12),
     ) {
         Text(
             text = if (detail.filename.isBlank()) {
@@ -152,9 +152,9 @@ private fun HistoryDetailContent(
             Surface(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .heightIn(min = ScriptLensSpacing.padding_56 * 4)
-                    .clip(RoundedCornerShape(ScriptLensSpacing.padding_12)),
-                color = ScriptLensColors.Muted,
+                    .heightIn(min = LexisSpacing.padding_56 * 4)
+                    .clip(RoundedCornerShape(LexisSpacing.padding_12)),
+                color = LexisColors.Muted,
             ) {
                 Box(contentAlignment = Alignment.Center) {
                     Text(

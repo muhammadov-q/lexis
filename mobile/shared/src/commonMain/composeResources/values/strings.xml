@@ -5,7 +5,7 @@
     <string name="nav_source">Source</string>
 
     <!-- Authentication -->
-    <string name="auth_branding">Lexis | ScriptLens</string>
+    <string name="auth_branding">Lexis</string>
     <string name="auth_sign_in_title">Sign in</string>
     <string name="auth_sign_in_subtitle">Use the email and password you signed up with.</string>
     <string name="auth_create_title">Create an account</string>
@@ -59,7 +59,7 @@
     <!-- Account -->
     <!-- Camera screen -->
     <string name="camera_title">Read historical manuscripts</string>
-    <string name="camera_subtitle">Photograph a page and ScriptLens recognizes words and helps you read the transcription with translations.</string>
+    <string name="camera_subtitle">Photograph a page and Lexis recognizes words and helps you read the transcription with translations.</string>
     <string name="camera_empty_hint">Lay the page flat in good light JPG, PNG or TIFF</string>
     <string name="model_recognition_title">Recognition model</string>
     <string name="model_select">Select model</string>

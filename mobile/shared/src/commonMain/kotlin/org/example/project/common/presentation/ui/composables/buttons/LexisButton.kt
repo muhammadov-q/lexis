@@ -10,16 +10,16 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
-import org.example.project.common.presentation.ui.theme.ScriptLensSpacing
-import org.example.project.common.presentation.ui.theme.ScriptLensTypography
+import org.example.project.common.presentation.ui.theme.LexisSpacing
+import org.example.project.common.presentation.ui.theme.LexisTypography
 
 @Composable
-fun ScriptLensButton(
+fun LexisButton(
     text: String,
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
-    buttonStyle: ScriptLensButtonStyle = ScriptLensButtonStyle.Primary,
-    buttonSize: ScriptLensButtonSize = ScriptLensButtonSize.Large
+    buttonStyle: LexisButtonStyle = LexisButtonStyle.Primary,
+    buttonSize: LexisButtonSize = LexisButtonSize.Large
 ) {
 
     Button(
@@ -32,13 +32,13 @@ fun ScriptLensButton(
             containerColor = buttonStyle.containerColor,
             contentColor = buttonStyle.textColor
         ),
-        contentPadding = PaddingValues(horizontal = ScriptLensSpacing.padding_24),
+        contentPadding = PaddingValues(horizontal = LexisSpacing.padding_24),
         border = buttonStyle.borderStroke
 
     ) {
         Text(
             text = text,
-            style = ScriptLensTypography.Label,
+            style = LexisTypography.Label,
             color = buttonStyle.textColor
         )
     }
@@ -47,10 +47,10 @@ fun ScriptLensButton(
 
 @Preview
 @Composable
-private fun ScriptLensButtonPreview() {
-    ScriptLensButton(
+private fun LexisButtonPreview() {
+    LexisButton(
         onClick = {},
         text = "Click Me",
-        buttonStyle = ScriptLensButtonStyle.Primary
+        buttonStyle = LexisButtonStyle.Primary
     )
 }

@@ -16,7 +16,7 @@ import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
-import org.example.project.common.presentation.ui.theme.ScriptLensColors
+import org.example.project.common.presentation.ui.theme.LexisColors
 import org.example.project.feature.camera.presentation.models.PredictionModel
 
 @Composable
@@ -67,7 +67,7 @@ fun PredictionOverlay(
             ) ?: return@let
 
             drawRect(
-                color = ScriptLensColors.Accent,
+                color = LexisColors.Accent,
                 topLeft = rect.topLeft,
                 size = rect.size,
                 style = Stroke(width = 1.5.dp.toPx()),

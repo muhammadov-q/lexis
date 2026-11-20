@@ -7,7 +7,7 @@
 	objects = {
 
 /* Begin PBXFileReference section */
-		58A335B2FDFF4C6B2F8FC917 /* ScriptLens.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = ScriptLens.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		58A335B2FDFF4C6B2F8FC917 /* Lexis.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Lexis.app; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
@@ -59,7 +59,7 @@
 		4F98A1838E6E7525AA1E3680 /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				58A335B2FDFF4C6B2F8FC917 /* ScriptLens.app */,
+				58A335B2FDFF4C6B2F8FC917 /* Lexis.app */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -87,7 +87,7 @@
 			packageProductDependencies = (
 			);
 			productName = iosApp;
-			productReference = 58A335B2FDFF4C6B2F8FC917 /* ScriptLens.app */;
+			productReference = 58A335B2FDFF4C6B2F8FC917 /* Lexis.app */;
 			productType = "com.apple.product-type.application";
 		};
 /* End PBXNativeTarget section */

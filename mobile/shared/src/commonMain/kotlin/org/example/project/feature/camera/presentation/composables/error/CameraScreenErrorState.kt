@@ -18,19 +18,19 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
 import org.example.project.common.presentation.ui.helpers.asString
-import org.example.project.common.presentation.ui.composables.buttons.ScriptLensButton
-import org.example.project.common.presentation.ui.composables.buttons.ScriptLensButtonSize
-import org.example.project.common.presentation.ui.composables.buttons.ScriptLensButtonStyle
-import org.example.project.common.presentation.ui.theme.ScriptLensColors
-import org.example.project.common.presentation.ui.theme.ScriptLensSpacing
-import org.example.project.common.presentation.ui.theme.ScriptLensTypography
+import org.example.project.common.presentation.ui.composables.buttons.LexisButton
+import org.example.project.common.presentation.ui.composables.buttons.LexisButtonSize
+import org.example.project.common.presentation.ui.composables.buttons.LexisButtonStyle
+import org.example.project.common.presentation.ui.theme.LexisColors
+import org.example.project.common.presentation.ui.theme.LexisSpacing
+import org.example.project.common.presentation.ui.theme.LexisTypography
 import org.example.project.feature.camera.presentation.models.CameraScreenErrorState
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
-import scriptlens.shared.generated.resources.Res
-import scriptlens.shared.generated.resources.action_choose_another_photo
-import scriptlens.shared.generated.resources.action_retry
-import scriptlens.shared.generated.resources.action_take_new_photo
+import lexis.shared.generated.resources.Res
+import lexis.shared.generated.resources.action_choose_another_photo
+import lexis.shared.generated.resources.action_retry
+import lexis.shared.generated.resources.action_take_new_photo
 
 @Composable
 fun ErrorState(
@@ -44,9 +44,9 @@ fun ErrorState(
         modifier = modifier
             .fillMaxWidth()
             .clip(MaterialTheme.shapes.extraLarge)
-            .background(ScriptLensColors.Surface)
-            .padding(ScriptLensSpacing.padding_24),
-        verticalArrangement = Arrangement.spacedBy(ScriptLensSpacing.padding_8),
+            .background(LexisColors.Surface)
+            .padding(LexisSpacing.padding_24),
+        verticalArrangement = Arrangement.spacedBy(LexisSpacing.padding_8),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Icon(
@@ -56,42 +56,42 @@ fun ErrorState(
         )
 
         Text(
-            modifier = Modifier.padding(bottom = ScriptLensSpacing.padding_8),
+            modifier = Modifier.padding(bottom = LexisSpacing.padding_8),
             text = stringResource(errorState.title),
-            style = ScriptLensTypography.Heading,
-            color = ScriptLensColors.Text,
+            style = LexisTypography.Heading,
+            color = LexisColors.Text,
             textAlign = TextAlign.Center
         )
 
         Text(
             text = errorState.message.asString(),
-            style = ScriptLensTypography.Body,
-            color = ScriptLensColors.Subtext,
+            style = LexisTypography.Body,
+            color = LexisColors.Subtext,
             textAlign = TextAlign.Center
         )
 
         if (errorState.canRetry) {
-            ScriptLensButton(
-                modifier = Modifier.padding(top = ScriptLensSpacing.padding_24),
-                buttonStyle = ScriptLensButtonStyle.Primary,
+            LexisButton(
+                modifier = Modifier.padding(top = LexisSpacing.padding_24),
+                buttonStyle = LexisButtonStyle.Primary,
                 onClick = onRetryClicked,
                 text = stringResource(Res.string.action_retry),
-                buttonSize = ScriptLensButtonSize.Medium
+                buttonSize = LexisButtonSize.Medium
             )
         }
 
-        ScriptLensButton(
+        LexisButton(
             text = stringResource(Res.string.action_take_new_photo),
             onClick = onTakeNewPhotoClicked,
-            buttonStyle = ScriptLensButtonStyle.Secondary,
-            buttonSize = ScriptLensButtonSize.Medium
+            buttonStyle = LexisButtonStyle.Secondary,
+            buttonSize = LexisButtonSize.Medium
         )
 
-        ScriptLensButton(
+        LexisButton(
             text = stringResource(Res.string.action_choose_another_photo),
             onClick = onChooseFromPhotosClicked,
-            buttonStyle = ScriptLensButtonStyle.Secondary,
-            buttonSize = ScriptLensButtonSize.Medium
+            buttonStyle = LexisButtonStyle.Secondary,
+            buttonSize = LexisButtonSize.Medium
         )
     }
 }

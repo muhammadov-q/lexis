@@ -2,7 +2,7 @@ package org.example.project.common.presentation.ui.theme
 
 import androidx.compose.ui.unit.dp
 
-object ScriptLensSpacing {
+object LexisSpacing {
     val padding_0 = 0.dp
     val padding_4 = 4.dp
     val padding_8 = 8.dp

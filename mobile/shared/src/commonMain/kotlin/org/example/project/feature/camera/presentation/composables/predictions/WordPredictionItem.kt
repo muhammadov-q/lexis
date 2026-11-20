@@ -11,12 +11,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import org.example.project.common.presentation.ui.theme.ScriptLensSpacing
+import org.example.project.common.presentation.ui.theme.LexisSpacing
 import org.example.project.feature.camera.presentation.models.PredictionGlossModel
 import org.example.project.feature.camera.presentation.models.PredictionBoxModel
 import org.example.project.feature.camera.presentation.models.WordPredictionModel
-import org.example.project.common.presentation.ui.theme.ScriptLensColors
-import org.example.project.common.presentation.ui.theme.ScriptLensTypography
+import org.example.project.common.presentation.ui.theme.LexisColors
+import org.example.project.common.presentation.ui.theme.LexisTypography
 
 @Composable
 fun WordPredictionItem(
@@ -26,19 +26,19 @@ fun WordPredictionItem(
     Column(
         modifier = modifier
             .clip(MaterialTheme.shapes.medium)
-            .background(ScriptLensColors.Background)
-            .padding(ScriptLensSpacing.padding_12)
+            .background(LexisColors.Background)
+            .padding(LexisSpacing.padding_12)
             .size(50.dp),
     ) {
         Text(
             text = digitPrediction.text,
-            style = ScriptLensTypography.Heading,
-            color = ScriptLensColors.Text
+            style = LexisTypography.Heading,
+            color = LexisColors.Text
         )
         Text(
             text = "${(digitPrediction.probabilities[digitPrediction.text] ?: 0.0) * 100}%",
-            style = ScriptLensTypography.Label,
-            color = ScriptLensColors.Border
+            style = LexisTypography.Label,
+            color = LexisColors.Border
         )
     }
 }

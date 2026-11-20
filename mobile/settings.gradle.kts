@@ -1,4 +1,4 @@
-rootProject.name = "ScriptLens"
+rootProject.name = "Lexis"
 
 pluginManagement {
     repositories {

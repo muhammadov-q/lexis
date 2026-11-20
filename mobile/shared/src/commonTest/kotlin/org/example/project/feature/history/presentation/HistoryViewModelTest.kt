@@ -30,10 +30,10 @@ import kotlin.test.assertEquals
 import kotlin.test.assertFalse
 import kotlin.test.assertTrue
 import kotlin.test.assertNull
-import scriptlens.shared.generated.resources.Res
-import scriptlens.shared.generated.resources.history_error_general
-import scriptlens.shared.generated.resources.history_error_not_found
-import scriptlens.shared.generated.resources.history_error_unauthorized
+import lexis.shared.generated.resources.Res
+import lexis.shared.generated.resources.history_error_general
+import lexis.shared.generated.resources.history_error_not_found
+import lexis.shared.generated.resources.history_error_unauthorized
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class HistoryViewModelTest {

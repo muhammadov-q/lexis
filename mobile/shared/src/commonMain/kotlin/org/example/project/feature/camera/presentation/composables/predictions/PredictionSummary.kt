@@ -19,8 +19,8 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import org.example.project.common.presentation.ui.theme.ScriptLensSpacing
-import org.example.project.common.presentation.ui.theme.ScriptLensTypography
+import org.example.project.common.presentation.ui.theme.LexisSpacing
+import org.example.project.common.presentation.ui.theme.LexisTypography
 import org.example.project.feature.camera.presentation.models.PredictionGlossModel
 import org.example.project.feature.camera.presentation.models.PredictionBoxModel
 import org.example.project.feature.camera.presentation.models.PredictionModel
@@ -28,17 +28,17 @@ import org.example.project.feature.camera.presentation.models.WordPredictionMode
 import org.example.project.feature.camera.presentation.helpers.groupPredictionLines
 import org.example.project.feature.camera.presentation.helpers.isConfirmed
 import org.jetbrains.compose.resources.stringResource
-import scriptlens.shared.generated.resources.Res
-import scriptlens.shared.generated.resources.prediction_definition_label
-import scriptlens.shared.generated.resources.prediction_empty_message
-import scriptlens.shared.generated.resources.prediction_lemma_label
-import scriptlens.shared.generated.resources.prediction_recognized_text_label
-import scriptlens.shared.generated.resources.prediction_select_word_hint
-import scriptlens.shared.generated.resources.prediction_translation_label
-import scriptlens.shared.generated.resources.prediction_transcription_label
-import scriptlens.shared.generated.resources.prediction_gloss_unavailable
-import scriptlens.shared.generated.resources.prediction_unconfirmed
-import org.example.project.common.presentation.ui.theme.ScriptLensColors
+import lexis.shared.generated.resources.Res
+import lexis.shared.generated.resources.prediction_definition_label
+import lexis.shared.generated.resources.prediction_empty_message
+import lexis.shared.generated.resources.prediction_lemma_label
+import lexis.shared.generated.resources.prediction_recognized_text_label
+import lexis.shared.generated.resources.prediction_select_word_hint
+import lexis.shared.generated.resources.prediction_translation_label
+import lexis.shared.generated.resources.prediction_transcription_label
+import lexis.shared.generated.resources.prediction_gloss_unavailable
+import lexis.shared.generated.resources.prediction_unconfirmed
+import org.example.project.common.presentation.ui.theme.LexisColors
 
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
@@ -57,13 +57,13 @@ fun PredictionSummary(
         Column(
             modifier = modifier
                 .fillMaxWidth()
-                .background(ScriptLensColors.Surface)
-                .padding(ScriptLensSpacing.padding_16)
+                .background(LexisColors.Surface)
+                .padding(LexisSpacing.padding_16)
         ) {
             Text(
-                modifier = Modifier.padding(bottom = ScriptLensSpacing.padding_8),
+                modifier = Modifier.padding(bottom = LexisSpacing.padding_8),
                 text = stringResource(Res.string.prediction_transcription_label),
-                color = ScriptLensColors.Subtext
+                color = LexisColors.Subtext
             )
 
             if (prediction.predictions.isEmpty()) {
@@ -71,11 +71,11 @@ fun PredictionSummary(
                     modifier = Modifier
                         .fillMaxWidth()
                         .clip(MaterialTheme.shapes.large)
-                        .background(ScriptLensColors.Muted)
-                        .padding(ScriptLensSpacing.padding_12),
+                        .background(LexisColors.Muted)
+                        .padding(LexisSpacing.padding_12),
                     text = stringResource(Res.string.prediction_empty_message),
-                    color = ScriptLensColors.Subtext,
-                    style = ScriptLensTypography.Body,
+                    color = LexisColors.Subtext,
+                    style = LexisTypography.Body,
                 )
                 return@Column
             }
@@ -84,40 +84,40 @@ fun PredictionSummary(
                 modifier = Modifier
                     .fillMaxWidth()
                     .clip(MaterialTheme.shapes.large)
-                    .background(ScriptLensColors.Background)
-                    .border(1.dp, ScriptLensColors.Border, MaterialTheme.shapes.large)
-                    .padding(ScriptLensSpacing.padding_12),
-                verticalArrangement = Arrangement.spacedBy(ScriptLensSpacing.padding_8),
+                    .background(LexisColors.Background)
+                    .border(1.dp, LexisColors.Border, MaterialTheme.shapes.large)
+                    .padding(LexisSpacing.padding_12),
+                verticalArrangement = Arrangement.spacedBy(LexisSpacing.padding_8),
             ) {
                 groupedWords.forEach { line ->
                     FlowRow(
                         modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.spacedBy(ScriptLensSpacing.padding_4),
-                        verticalArrangement = Arrangement.spacedBy(ScriptLensSpacing.padding_4),
+                        horizontalArrangement = Arrangement.spacedBy(LexisSpacing.padding_4),
+                        verticalArrangement = Arrangement.spacedBy(LexisSpacing.padding_4),
                     ) {
                         line.words.forEach { indexedWord ->
                             val isSelected = indexedWord.index == selectedPredictionIndex
                             Column(
                                 modifier = Modifier
                                     .clip(RoundedCornerShape(8.dp))
-                                    .background(if (isSelected) ScriptLensColors.Accent.copy(alpha = 0.25f) else ScriptLensColors.Surface)
+                                    .background(if (isSelected) LexisColors.Accent.copy(alpha = 0.25f) else LexisColors.Surface)
                                     .selectable(
                                         selected = isSelected,
                                         role = Role.Button,
                                         onClick = { onPredictionSelected(indexedWord.index) },
                                     )
-                                    .padding(horizontal = ScriptLensSpacing.padding_8, vertical = ScriptLensSpacing.padding_4),
+                                    .padding(horizontal = LexisSpacing.padding_8, vertical = LexisSpacing.padding_4),
                             ) {
                                 Text(
                                     text = indexedWord.value.text,
-                                    style = if (isSelected) ScriptLensTypography.Subtitle else ScriptLensTypography.Body,
-                                    color = ScriptLensColors.Text,
+                                    style = if (isSelected) LexisTypography.Subtitle else LexisTypography.Body,
+                                    color = LexisColors.Text,
                                 )
                                 if (line.translation == null && indexedWord.value.gloss.translation.isNotBlank()) {
                                     Text(
                                         text = indexedWord.value.gloss.translation,
-                                        style = ScriptLensTypography.Label,
-                                        color = ScriptLensColors.Subtext,
+                                        style = LexisTypography.Label,
+                                        color = LexisColors.Subtext,
                                     )
                                 }
                             }
@@ -126,8 +126,8 @@ fun PredictionSummary(
                     line.translation?.let { translation ->
                         Text(
                             text = translation,
-                            style = ScriptLensTypography.Body,
-                            color = ScriptLensColors.Subtext,
+                            style = LexisTypography.Body,
+                            color = LexisColors.Subtext,
                         )
                     }
                 }
@@ -136,31 +136,31 @@ fun PredictionSummary(
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(top = ScriptLensSpacing.padding_16)
+                    .padding(top = LexisSpacing.padding_16)
                     .clip(MaterialTheme.shapes.large)
-                    .background(ScriptLensColors.Background)
-                    .border(1.dp, ScriptLensColors.Border, MaterialTheme.shapes.large)
-                    .padding(ScriptLensSpacing.padding_12)
+                    .background(LexisColors.Background)
+                    .border(1.dp, LexisColors.Border, MaterialTheme.shapes.large)
+                    .padding(LexisSpacing.padding_12)
             ) {
                 Text(
                     text = stringResource(Res.string.prediction_translation_label),
-                    style = ScriptLensTypography.Label,
-                    color = ScriptLensColors.Subtext,
+                    style = LexisTypography.Label,
+                    color = LexisColors.Subtext,
                 )
 
                 if (selectedPrediction == null) {
                     Text(
-                        modifier = Modifier.padding(top = ScriptLensSpacing.padding_8),
+                        modifier = Modifier.padding(top = LexisSpacing.padding_8),
                         text = stringResource(Res.string.prediction_select_word_hint),
-                        style = ScriptLensTypography.Body,
-                        color = ScriptLensColors.Subtext,
+                        style = LexisTypography.Body,
+                        color = LexisColors.Subtext,
                     )
                 } else {
                     val unavailableText = stringResource(Res.string.prediction_gloss_unavailable)
                     Text(
                         text = selectedPrediction.gloss.translation.ifBlank { unavailableText },
-                        style = ScriptLensTypography.Heading,
-                        color = ScriptLensColors.Text,
+                        style = LexisTypography.Heading,
+                        color = LexisColors.Text,
                     )
 
                     PredictionDetailRow(
@@ -180,10 +180,10 @@ fun PredictionSummary(
                     )
                     if (!selectedPrediction.isConfirmed()) {
                         Text(
-                            modifier = Modifier.padding(top = ScriptLensSpacing.padding_8),
+                            modifier = Modifier.padding(top = LexisSpacing.padding_8),
                             text = stringResource(Res.string.prediction_unconfirmed),
-                            style = ScriptLensTypography.Body,
-                            color = ScriptLensColors.Subtext,
+                            style = LexisTypography.Body,
+                            color = LexisColors.Subtext,
                         )
                     }
                 }
@@ -195,15 +195,15 @@ fun PredictionSummary(
 @Composable
 private fun PredictionDetailRow(label: String, value: String, unavailableText: String) {
     Text(
-        modifier = Modifier.padding(top = ScriptLensSpacing.padding_8),
+        modifier = Modifier.padding(top = LexisSpacing.padding_8),
         text = label,
-        style = ScriptLensTypography.Label,
-        color = ScriptLensColors.Subtext,
+        style = LexisTypography.Label,
+        color = LexisColors.Subtext,
     )
     Text(
         text = value.ifBlank { unavailableText },
-        style = ScriptLensTypography.Body,
-        color = ScriptLensColors.Text,
+        style = LexisTypography.Body,
+        color = LexisColors.Text,
     )
 }
 

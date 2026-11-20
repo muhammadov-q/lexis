@@ -15,12 +15,12 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import org.example.project.common.presentation.ui.theme.ScriptLensSpacing
+import org.example.project.common.presentation.ui.theme.LexisSpacing
 import org.example.project.feature.camera.domain.model.OcrModel
 import org.example.project.feature.camera.presentation.CameraContract
 import org.jetbrains.compose.resources.stringResource
-import scriptlens.shared.generated.resources.Res
-import scriptlens.shared.generated.resources.model_recognition_title
+import lexis.shared.generated.resources.Res
+import lexis.shared.generated.resources.model_recognition_title
 
 @Composable
 fun ModelPicker(
@@ -31,7 +31,7 @@ fun ModelPicker(
     Column(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(vertical = ScriptLensSpacing.padding_8),
+            .padding(vertical = LexisSpacing.padding_8),
         verticalArrangement = Arrangement.spacedBy(8.dp)
     ) {
         Text(

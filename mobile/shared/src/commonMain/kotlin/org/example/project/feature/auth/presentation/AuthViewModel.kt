@@ -10,9 +10,9 @@ import org.example.project.common.presentation.ui.helpers.UiText
 import org.example.project.core.mvi.setState
 import org.example.project.feature.auth.domain.usecase.SignInUseCase
 import org.example.project.feature.auth.domain.usecase.SignUpUseCase
-import scriptlens.shared.generated.resources.Res
-import scriptlens.shared.generated.resources.auth_error_password_min_length
-import scriptlens.shared.generated.resources.auth_error_validation
+import lexis.shared.generated.resources.Res
+import lexis.shared.generated.resources.auth_error_password_min_length
+import lexis.shared.generated.resources.auth_error_validation
 
 private const val MIN_SIGN_UP_PASSWORD_LENGTH = 8
 

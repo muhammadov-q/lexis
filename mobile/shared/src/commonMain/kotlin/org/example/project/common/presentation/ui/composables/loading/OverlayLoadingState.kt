@@ -12,14 +12,14 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
-import org.example.project.common.presentation.ui.theme.ScriptLensColors
+import org.example.project.common.presentation.ui.theme.LexisColors
 
 @Composable
 fun OverlayLoadingState() {
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .background(ScriptLensColors.Scrim)
+            .background(LexisColors.Scrim)
             .clickable(
                 interactionSource = remember { MutableInteractionSource() },
                 indication = null,
@@ -28,7 +28,7 @@ fun OverlayLoadingState() {
         contentAlignment = Alignment.Center,
     ) {
         CircularProgressIndicator(
-            color = ScriptLensColors.Accent,
+            color = LexisColors.Accent,
         )
     }
 }

@@ -5,7 +5,7 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.sp
 
-object ScriptLensTypography {
+object LexisTypography {
     val Title = TextStyle(fontSize = 32.sp, lineHeight = 40.sp, fontWeight = FontWeight.Bold)
     val Heading = TextStyle(fontSize = 24.sp, lineHeight = 32.sp, fontWeight = FontWeight.SemiBold)
     val Subtitle = TextStyle(fontSize = 16.sp, lineHeight = 24.sp, fontWeight = FontWeight.Medium)
@@ -14,12 +14,12 @@ object ScriptLensTypography {
     val Caption = TextStyle(fontSize = 10.sp, lineHeight = 14.sp, fontWeight = FontWeight.Normal)
 }
 
-internal val ScriptLensMaterialTypography = Typography(
-    headlineLarge = ScriptLensTypography.Title,
-    headlineMedium = ScriptLensTypography.Heading,
-    titleMedium = ScriptLensTypography.Subtitle,
-    bodyLarge = ScriptLensTypography.Body,
-    bodyMedium = ScriptLensTypography.Body,
-    labelLarge = ScriptLensTypography.Label,
-    labelSmall = ScriptLensTypography.Caption,
+internal val LexisMaterialTypography = Typography(
+    headlineLarge = LexisTypography.Title,
+    headlineMedium = LexisTypography.Heading,
+    titleMedium = LexisTypography.Subtitle,
+    bodyLarge = LexisTypography.Body,
+    bodyMedium = LexisTypography.Body,
+    labelLarge = LexisTypography.Label,
+    labelSmall = LexisTypography.Caption,
 )

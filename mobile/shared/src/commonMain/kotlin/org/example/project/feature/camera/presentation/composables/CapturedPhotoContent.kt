@@ -21,9 +21,9 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.tooling.preview.Preview
-import org.example.project.common.presentation.ui.composables.buttons.ScriptLensButton
-import org.example.project.common.presentation.ui.composables.buttons.ScriptLensButtonStyle
-import org.example.project.common.presentation.ui.theme.ScriptLensSpacing
+import org.example.project.common.presentation.ui.composables.buttons.LexisButton
+import org.example.project.common.presentation.ui.composables.buttons.LexisButtonStyle
+import org.example.project.common.presentation.ui.theme.LexisSpacing
 import org.example.project.feature.camera.presentation.composables.predictions.PredictionSummary
 import org.example.project.feature.camera.presentation.helpers.decodePhoto
 import org.example.project.feature.camera.presentation.models.PredictionBoxModel
@@ -31,10 +31,10 @@ import org.example.project.feature.camera.presentation.models.PredictionGlossMod
 import org.example.project.feature.camera.presentation.models.PredictionModel
 import org.example.project.feature.camera.presentation.models.WordPredictionModel
 import org.jetbrains.compose.resources.stringResource
-import scriptlens.shared.generated.resources.Res
-import scriptlens.shared.generated.resources.action_choose_another_photo
-import scriptlens.shared.generated.resources.action_take_new_photo
-import scriptlens.shared.generated.resources.captured_photo_description
+import lexis.shared.generated.resources.Res
+import lexis.shared.generated.resources.action_choose_another_photo
+import lexis.shared.generated.resources.action_take_new_photo
+import lexis.shared.generated.resources.captured_photo_description
 
 @Composable
 fun CapturedPhotoContent(
@@ -60,7 +60,7 @@ fun CapturedPhotoContent(
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(top = ScriptLensSpacing.padding_16)
+                    .padding(top = LexisSpacing.padding_16)
                     .clip(MaterialTheme.shapes.extraLarge)
                     .aspectRatio(image.width.toFloat() / image.height.toFloat()),
                 contentAlignment = Alignment.Center,
@@ -98,24 +98,24 @@ fun CapturedPhotoContent(
         }
 
         PredictionSummary(
-            modifier = Modifier.padding(top = ScriptLensSpacing.padding_16),
+            modifier = Modifier.padding(top = LexisSpacing.padding_16),
             prediction = prediction,
             selectedPredictionIndex = selectedPredictionIndex,
             onPredictionSelected = onPredictionSelected,
         )
 
-        ScriptLensButton(
-            modifier = Modifier.padding(vertical = ScriptLensSpacing.padding_8),
+        LexisButton(
+            modifier = Modifier.padding(vertical = LexisSpacing.padding_8),
             text = stringResource(Res.string.action_take_new_photo),
             onClick = onTakeNewPhotoClicked,
-            buttonStyle = ScriptLensButtonStyle.Primary
+            buttonStyle = LexisButtonStyle.Primary
         )
 
-        ScriptLensButton(
-            modifier = Modifier.padding(bottom = ScriptLensSpacing.padding_4),
+        LexisButton(
+            modifier = Modifier.padding(bottom = LexisSpacing.padding_4),
             text = stringResource(Res.string.action_choose_another_photo),
             onClick = onChooseFromPhotosClicked,
-            buttonStyle = ScriptLensButtonStyle.Secondary
+            buttonStyle = LexisButtonStyle.Secondary
         )
 
     }

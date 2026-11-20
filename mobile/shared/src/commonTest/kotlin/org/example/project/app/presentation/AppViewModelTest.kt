@@ -23,8 +23,8 @@ import org.example.project.feature.auth.domain.usecase.SignUpUseCase
 import org.example.project.feature.auth.presentation.AuthEvent
 import org.example.project.feature.auth.presentation.AuthMode
 import org.example.project.feature.auth.presentation.AuthViewModel
-import scriptlens.shared.generated.resources.Res
-import scriptlens.shared.generated.resources.auth_error_network
+import lexis.shared.generated.resources.Res
+import lexis.shared.generated.resources.auth_error_network
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFalse

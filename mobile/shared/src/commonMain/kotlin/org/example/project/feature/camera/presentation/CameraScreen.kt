@@ -24,9 +24,9 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import org.example.project.common.presentation.ui.composables.loading.OverlayLoadingState
-import org.example.project.common.presentation.ui.theme.ScriptLensColors
-import org.example.project.common.presentation.ui.theme.ScriptLensSpacing
-import org.example.project.common.presentation.ui.theme.ScriptLensTypography
+import org.example.project.common.presentation.ui.theme.LexisColors
+import org.example.project.common.presentation.ui.theme.LexisSpacing
+import org.example.project.common.presentation.ui.theme.LexisTypography
 import org.example.project.feature.camera.presentation.composables.CameraPreview
 import org.example.project.feature.camera.presentation.composables.CapturedPhotoContent
 import org.example.project.feature.camera.presentation.composables.EmptyCameraState
@@ -34,9 +34,9 @@ import org.example.project.feature.camera.presentation.composables.error.ErrorSt
 import org.example.project.feature.camera.presentation.composables.modelPicker.ModelPicker
 import org.example.project.feature.camera.presentation.models.CameraScreenState
 import org.jetbrains.compose.resources.stringResource
-import scriptlens.shared.generated.resources.Res
-import scriptlens.shared.generated.resources.camera_subtitle
-import scriptlens.shared.generated.resources.camera_title
+import lexis.shared.generated.resources.Res
+import lexis.shared.generated.resources.camera_subtitle
+import lexis.shared.generated.resources.camera_title
 
 @Composable
 fun CameraScreen(viewModel: CameraViewModel) {
@@ -87,19 +87,19 @@ private fun CameraScreenContent(
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .background(ScriptLensColors.Background)
-            .padding(ScriptLensSpacing.padding_24)
+            .background(LexisColors.Background)
+            .padding(LexisSpacing.padding_24)
     ) {
 
         Text(
             text = stringResource(Res.string.camera_title),
-            style = ScriptLensTypography.Title
+            style = LexisTypography.Title
         )
 
         Text(
             text = stringResource(Res.string.camera_subtitle),
-            style = ScriptLensTypography.Body,
-            color = ScriptLensColors.Subtext
+            style = LexisTypography.Body,
+            color = LexisColors.Subtext
         )
 
 
@@ -130,7 +130,7 @@ private fun CameraScreenContent(
 
                         is CameraScreenState.PhotoCaptured ->
                             CapturedPhotoContent(
-                                modifier = Modifier.padding(top = ScriptLensSpacing.padding_16),
+                                modifier = Modifier.padding(top = LexisSpacing.padding_16),
                                 photo = state.photo,
                                 prediction = state.prediction,
                                 selectedPredictionIndex = state.selectedPredictionIndex,

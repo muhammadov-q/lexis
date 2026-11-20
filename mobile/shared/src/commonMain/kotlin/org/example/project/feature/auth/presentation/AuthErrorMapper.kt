@@ -2,12 +2,12 @@ package org.example.project.feature.auth.presentation
 
 import org.example.project.common.presentation.ui.helpers.UiText
 import org.example.project.feature.auth.domain.model.AuthApiException
-import scriptlens.shared.generated.resources.Res
-import scriptlens.shared.generated.resources.auth_error_conflict
-import scriptlens.shared.generated.resources.auth_error_network
-import scriptlens.shared.generated.resources.auth_error_unauthorized
-import scriptlens.shared.generated.resources.auth_error_unknown
-import scriptlens.shared.generated.resources.auth_error_validation
+import lexis.shared.generated.resources.Res
+import lexis.shared.generated.resources.auth_error_conflict
+import lexis.shared.generated.resources.auth_error_network
+import lexis.shared.generated.resources.auth_error_unauthorized
+import lexis.shared.generated.resources.auth_error_unknown
+import lexis.shared.generated.resources.auth_error_validation
 
 fun mapAuthError(exception: Throwable): UiText = when (exception) {
     is AuthApiException -> when (exception.status) {

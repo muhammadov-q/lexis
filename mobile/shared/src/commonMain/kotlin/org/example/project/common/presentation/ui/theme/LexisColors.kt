@@ -2,7 +2,7 @@ package org.example.project.common.presentation.ui.theme
 
 import androidx.compose.ui.graphics.Color
 
-object ScriptLensColors {
+object LexisColors {
     // Brand
     val Accent = Color(0xFFE6FF66)
     val OnAccent = Color(0xFF50582A)

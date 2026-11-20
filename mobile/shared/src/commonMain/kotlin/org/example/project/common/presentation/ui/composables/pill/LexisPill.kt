@@ -14,11 +14,11 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import org.example.project.common.presentation.ui.helpers.UiText
 import org.example.project.common.presentation.ui.helpers.asString
-import org.example.project.common.presentation.ui.theme.ScriptLensColors
-import org.example.project.common.presentation.ui.theme.ScriptLensSpacing
+import org.example.project.common.presentation.ui.theme.LexisColors
+import org.example.project.common.presentation.ui.theme.LexisSpacing
 
 @Composable
-fun ScriptLensPill(
+fun LexisPill(
     modifier: Modifier = Modifier,
     isEnabled: Boolean = true,
     onClick: (() -> Unit),
@@ -32,35 +32,35 @@ fun ScriptLensPill(
             }
             .background(
                 if (isEnabled)
-                    ScriptLensColors.Accent
+                    LexisColors.Accent
                 else
-                    ScriptLensColors.Muted
+                    LexisColors.Muted
             )
             .padding(
-                horizontal = ScriptLensSpacing.padding_8,
-                vertical = ScriptLensSpacing.padding_4
+                horizontal = LexisSpacing.padding_8,
+                vertical = LexisSpacing.padding_4
             )
     ) {
         Text(
             text = text.asString(),
             color = if (isEnabled)
-                ScriptLensColors.Subtext
+                LexisColors.Subtext
             else
-                ScriptLensColors.Subtext.copy(alpha = 0.5f)
+                LexisColors.Subtext.copy(alpha = 0.5f)
         )
     }
 }
 
 @Preview
 @Composable
-fun ScriptLensPillPreview() {
+fun LexisPillPreview() {
     Row {
-        ScriptLensPill(
+        LexisPill(
             text = UiText.Plain("Preview"),
             onClick = {},
             isEnabled = false
         )
-        ScriptLensPill(
+        LexisPill(
             text = UiText.Plain("Preview"),
             onClick = {},
             isEnabled = true

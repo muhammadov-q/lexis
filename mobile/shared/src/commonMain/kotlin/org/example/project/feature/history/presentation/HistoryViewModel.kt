@@ -14,10 +14,10 @@ import org.example.project.feature.auth.domain.model.AuthApiException
 import org.example.project.feature.auth.domain.session.AuthSessionStore
 import org.example.project.feature.auth.domain.session.SessionMode
 import org.example.project.feature.history.domain.usecase.GetRecognitionHistoryUseCase
-import scriptlens.shared.generated.resources.Res
-import scriptlens.shared.generated.resources.history_error_general
-import scriptlens.shared.generated.resources.history_error_not_found
-import scriptlens.shared.generated.resources.history_error_unauthorized
+import lexis.shared.generated.resources.Res
+import lexis.shared.generated.resources.history_error_general
+import lexis.shared.generated.resources.history_error_not_found
+import lexis.shared.generated.resources.history_error_unauthorized
 
 class HistoryViewModel(
     private val getRecognitionHistory: GetRecognitionHistoryUseCase,

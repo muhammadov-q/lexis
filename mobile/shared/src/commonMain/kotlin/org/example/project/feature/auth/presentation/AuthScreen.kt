@@ -34,31 +34,31 @@ import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import org.example.project.common.presentation.ui.helpers.asString
-import org.example.project.common.presentation.ui.theme.ScriptLensColors
-import org.example.project.common.presentation.ui.theme.ScriptLensSpacing
-import org.example.project.common.presentation.ui.theme.ScriptLensTheme
+import org.example.project.common.presentation.ui.theme.LexisColors
+import org.example.project.common.presentation.ui.theme.LexisSpacing
+import org.example.project.common.presentation.ui.theme.LexisTheme
 import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.viewmodel.koinViewModel
-import scriptlens.shared.generated.resources.Res
-import scriptlens.shared.generated.resources.auth_action_continue_as_guest
-import scriptlens.shared.generated.resources.auth_action_create_account
-import scriptlens.shared.generated.resources.auth_action_creating_account
-import scriptlens.shared.generated.resources.auth_action_sign_in
-import scriptlens.shared.generated.resources.auth_action_signing_in
-import scriptlens.shared.generated.resources.auth_branding
-import scriptlens.shared.generated.resources.auth_create_subtitle
-import scriptlens.shared.generated.resources.auth_create_title
-import scriptlens.shared.generated.resources.auth_email_label
-import scriptlens.shared.generated.resources.auth_error_password_min_length
-import scriptlens.shared.generated.resources.auth_first_name_label
-import scriptlens.shared.generated.resources.auth_have_account_sign_in
-import scriptlens.shared.generated.resources.auth_last_name_label
-import scriptlens.shared.generated.resources.auth_no_account_create
-import scriptlens.shared.generated.resources.auth_password_hide
-import scriptlens.shared.generated.resources.auth_password_label
-import scriptlens.shared.generated.resources.auth_password_show
-import scriptlens.shared.generated.resources.auth_sign_in_subtitle
-import scriptlens.shared.generated.resources.auth_sign_in_title
+import lexis.shared.generated.resources.Res
+import lexis.shared.generated.resources.auth_action_continue_as_guest
+import lexis.shared.generated.resources.auth_action_create_account
+import lexis.shared.generated.resources.auth_action_creating_account
+import lexis.shared.generated.resources.auth_action_sign_in
+import lexis.shared.generated.resources.auth_action_signing_in
+import lexis.shared.generated.resources.auth_branding
+import lexis.shared.generated.resources.auth_create_subtitle
+import lexis.shared.generated.resources.auth_create_title
+import lexis.shared.generated.resources.auth_email_label
+import lexis.shared.generated.resources.auth_error_password_min_length
+import lexis.shared.generated.resources.auth_first_name_label
+import lexis.shared.generated.resources.auth_have_account_sign_in
+import lexis.shared.generated.resources.auth_last_name_label
+import lexis.shared.generated.resources.auth_no_account_create
+import lexis.shared.generated.resources.auth_password_hide
+import lexis.shared.generated.resources.auth_password_label
+import lexis.shared.generated.resources.auth_password_show
+import lexis.shared.generated.resources.auth_sign_in_subtitle
+import lexis.shared.generated.resources.auth_sign_in_title
 
 @Composable
 fun AuthScreen(
@@ -90,13 +90,13 @@ private fun AuthScreenContent(
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .background(ScriptLensColors.Background)
+            .background(LexisColors.Background)
             .verticalScroll(rememberScrollState())
             .imePadding()
             .navigationBarsPadding()
-            .padding(ScriptLensSpacing.padding_24),
+            .padding(LexisSpacing.padding_24),
         verticalArrangement = Arrangement.spacedBy(
-            ScriptLensSpacing.padding_16,
+            LexisSpacing.padding_16,
             Alignment.CenterVertically
         ),
         horizontalAlignment = Alignment.CenterHorizontally,
@@ -110,13 +110,13 @@ private fun AuthScreenContent(
         Card(
             modifier = Modifier.fillMaxWidth(),
             colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
-            elevation = CardDefaults.cardElevation(defaultElevation = ScriptLensSpacing.padding_4),
+            elevation = CardDefaults.cardElevation(defaultElevation = LexisSpacing.padding_4),
         ) {
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(ScriptLensSpacing.padding_24),
-                verticalArrangement = Arrangement.spacedBy(ScriptLensSpacing.padding_12),
+                    .padding(LexisSpacing.padding_24),
+                verticalArrangement = Arrangement.spacedBy(LexisSpacing.padding_12),
             ) {
                 Text(
                     text = if (isSignIn) {
@@ -163,7 +163,7 @@ private fun AuthScreenContent(
                     singleLine = true,
                     modifier = Modifier.fillMaxWidth(),
                     colors = OutlinedTextFieldDefaults.colors()
-                        .copy(focusedLabelColor = ScriptLensColors.Subtext)
+                        .copy(focusedLabelColor = LexisColors.Subtext)
 
                 )
 
@@ -184,7 +184,7 @@ private fun AuthScreenContent(
                                 } else {
                                     stringResource(Res.string.auth_password_show)
                                 },
-                                color = ScriptLensColors.Subtext
+                                color = LexisColors.Subtext
                             )
                         }
                     },
@@ -215,11 +215,11 @@ private fun AuthScreenContent(
                 ) {
                     if (state.isLoading) {
                         CircularProgressIndicator(
-                            strokeWidth = ScriptLensSpacing.padding_4,
-                            modifier = Modifier.size(ScriptLensSpacing.padding_16),
+                            strokeWidth = LexisSpacing.padding_4,
+                            modifier = Modifier.size(LexisSpacing.padding_16),
                             color = MaterialTheme.colorScheme.onPrimary,
                         )
-                        Spacer(modifier = Modifier.width(ScriptLensSpacing.padding_8))
+                        Spacer(modifier = Modifier.width(LexisSpacing.padding_8))
                     }
                     Text(
                         text = if (state.isLoading) {
@@ -249,7 +249,7 @@ private fun AuthScreenContent(
                         } else {
                             stringResource(Res.string.auth_have_account_sign_in)
                         },
-                        color = ScriptLensColors.Subtext
+                        color = LexisColors.Subtext
                     )
 
                 }
@@ -266,14 +266,14 @@ private fun AuthScreenContent(
             }
         }
 
-        Spacer(modifier = Modifier.height(ScriptLensSpacing.padding_16))
+        Spacer(modifier = Modifier.height(LexisSpacing.padding_16))
     }
 }
 
 @Preview(showBackground = true)
 @Composable
 private fun AuthScreenPreview() {
-    ScriptLensTheme {
+    LexisTheme {
         AuthScreenContent(
             state = AuthContract(),
             onEvent = {},
