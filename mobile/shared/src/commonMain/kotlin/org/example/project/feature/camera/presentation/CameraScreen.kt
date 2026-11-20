@@ -23,8 +23,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import org.example.project.common.presentation.ui.composables.buttons.ScriptLensButton
-import org.example.project.common.presentation.ui.composables.buttons.ScriptLensButtonStyle
 import org.example.project.common.presentation.ui.composables.loading.OverlayLoadingState
 import org.example.project.common.presentation.ui.theme.ScriptLensColors
 import org.example.project.common.presentation.ui.theme.ScriptLensSpacing
@@ -32,12 +30,11 @@ import org.example.project.common.presentation.ui.theme.ScriptLensTypography
 import org.example.project.feature.camera.presentation.composables.CameraPreview
 import org.example.project.feature.camera.presentation.composables.CapturedPhotoContent
 import org.example.project.feature.camera.presentation.composables.EmptyCameraState
-import org.example.project.feature.camera.presentation.composables.modelPicker.ModelPicker
 import org.example.project.feature.camera.presentation.composables.error.ErrorState
+import org.example.project.feature.camera.presentation.composables.modelPicker.ModelPicker
 import org.example.project.feature.camera.presentation.models.CameraScreenState
 import org.jetbrains.compose.resources.stringResource
 import scriptlens.shared.generated.resources.Res
-import scriptlens.shared.generated.resources.action_read_again
 import scriptlens.shared.generated.resources.camera_subtitle
 import scriptlens.shared.generated.resources.camera_title
 
@@ -52,8 +49,7 @@ fun CameraScreen(viewModel: CameraViewModel) {
         onRetryClicked = { viewModel.onEvent(CameraEvent.RetryUploadRequested) },
         onPredictionSelected = { viewModel.onEvent(CameraEvent.SelectPrediction(it)) },
         onModelSelected = { viewModel.onEvent(CameraEvent.SelectModel(it)) },
-        onModelsReload = { viewModel.onEvent(CameraEvent.ReloadModels) },
-        onReadAgain = { viewModel.onEvent(CameraEvent.ReadAgain) }
+        onModelsReload = { viewModel.onEvent(CameraEvent.ReloadModels) }
     )
 
     CameraPreview(
@@ -86,8 +82,7 @@ private fun CameraScreenContent(
     onRetryClicked: () -> Unit,
     onPredictionSelected: (Int) -> Unit,
     onModelSelected: (String) -> Unit,
-    onModelsReload: () -> Unit,
-    onReadAgain: () -> Unit
+    onModelsReload: () -> Unit
 ) {
     Column(
         modifier = Modifier
@@ -152,13 +147,6 @@ private fun CameraScreenContent(
                                     onChooseFromPhotosClicked = onChooseFromPhotosClicked,
                                     onRetryClicked = onRetryClicked,
                                 )
-                                if (state.photo != null) {
-                                    ScriptLensButton(
-                                        text = stringResource(Res.string.action_read_again),
-                                        onClick = onReadAgain,
-                                        buttonStyle = ScriptLensButtonStyle.Secondary,
-                                    )
-                                }
                             }
                     }
                 }
@@ -180,8 +168,7 @@ private fun CameraScreenPreview(
             onRetryClicked = {},
             onPredictionSelected = {},
             onModelSelected = {},
-            onModelsReload = {},
-            onReadAgain = {},
+            onModelsReload = {}
         )
     }
 }

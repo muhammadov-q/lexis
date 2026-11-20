@@ -26,7 +26,6 @@ sealed interface CameraEvent {
     data class SelectPrediction(val index: Int) : CameraEvent
     data class SelectModel(val id: String) : CameraEvent
     data object ReloadModels : CameraEvent
-    data object ReadAgain : CameraEvent
 
     data object OnImagePickerProcessingStarted : CameraEvent
 

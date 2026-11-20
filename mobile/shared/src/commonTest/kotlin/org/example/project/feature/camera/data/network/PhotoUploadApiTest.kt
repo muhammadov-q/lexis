@@ -52,6 +52,33 @@ class PhotoUploadApiTest {
     }
 
     @Test
+    fun parsesCurrentAndOlderPredictionFields() = runTest {
+        val api = api {
+            respond(
+                """{"model_version":"reader+kraken","predictions":[
+                    {"text":"λόγος","probabilities":{},"box":{"x":1,"y":2,"w":3,"h":4},"line":1,"gloss":{"lemma":"λόγος","translation":"word","definition":"A word."},"line_translation":"A translated line."},
+                    {"text":"?","probabilities":{"?":0.4},"box":{"x":5,"y":6,"w":7,"h":8},"line":1,"gloss":null,"line_translation":null},
+                    {"text":"old","probabilities":{"old":1},"box":{"x":0,"y":0,"w":0,"h":0}}
+                ]}""",
+                HttpStatusCode.OK,
+                jsonHeaders,
+            )
+        }
+
+        val result = api.upload(byteArrayOf(1), "/predict")
+
+        assertEquals("reader+kraken", result.modelVersion)
+        assertEquals(listOf("λόγος", "?", "old"), result.predictions.map { it.text })
+        assertTrue(result.predictions[0].probabilities.isEmpty())
+        assertEquals("A translated line.", result.predictions[0].lineTranslation)
+        assertEquals(null, result.predictions[1].gloss)
+        assertEquals(null, result.predictions[1].lineTranslation)
+        assertEquals(0, result.predictions[2].line)
+        assertEquals(null, result.predictions[2].gloss)
+        assertEquals(null, result.predictions[2].lineTranslation)
+    }
+
+    @Test
     fun uploadPostsMultipartImageFieldToPredict() = runTest {
         var method: HttpMethod? = null
         var url: String? = null

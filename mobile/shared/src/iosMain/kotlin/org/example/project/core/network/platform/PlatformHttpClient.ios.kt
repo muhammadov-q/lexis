@@ -18,4 +18,4 @@ actual fun createHttpClient(
         handleUnauthorizedResponses(authSessionStore)
     }
 
-actual fun localBackendBaseUrl(): String = "http://134.21.144.107:8000"
+actual fun localBackendBaseUrl(): String = "http://134.21.144.107l:8000"

@@ -23,6 +23,7 @@ class PredictionMapperTest {
                         translation = "word",
                         definition = "A word or account.",
                     ),
+                    lineTranslation = "The word.",
                 ),
             ),
             modelVersion = "0.1.0",
@@ -42,6 +43,7 @@ class PredictionMapperTest {
         assertEquals("λόγος", item.gloss.lemma)
         assertEquals("word", item.gloss.translation)
         assertEquals("A word or account.", item.gloss.definition)
+        assertEquals("The word.", item.lineTranslation)
     }
 
     @Test
@@ -112,4 +114,3 @@ class PredictionMapperTest {
         assertEquals("", word.gloss.definition)
     }
 }
-

@@ -2,22 +2,21 @@ package org.example.project.feature.camera.presentation.composables.predictions
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
-import androidx.compose.foundation.clickable
+import androidx.compose.foundation.selection.selectable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.heightIn
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import org.example.project.common.presentation.ui.theme.ScriptLensSpacing
@@ -26,6 +25,8 @@ import org.example.project.feature.camera.presentation.models.PredictionGlossMod
 import org.example.project.feature.camera.presentation.models.PredictionBoxModel
 import org.example.project.feature.camera.presentation.models.PredictionModel
 import org.example.project.feature.camera.presentation.models.WordPredictionModel
+import org.example.project.feature.camera.presentation.models.groupPredictionLines
+import org.example.project.feature.camera.presentation.models.isConfirmed
 import org.jetbrains.compose.resources.stringResource
 import scriptlens.shared.generated.resources.Res
 import scriptlens.shared.generated.resources.prediction_definition_label
@@ -36,6 +37,7 @@ import scriptlens.shared.generated.resources.prediction_select_word_hint
 import scriptlens.shared.generated.resources.prediction_translation_label
 import scriptlens.shared.generated.resources.prediction_transcription_label
 import scriptlens.shared.generated.resources.prediction_gloss_unavailable
+import scriptlens.shared.generated.resources.prediction_unconfirmed
 import org.example.project.common.presentation.ui.theme.ScriptLensColors
 
 @OptIn(ExperimentalLayoutApi::class)
@@ -47,10 +49,7 @@ fun PredictionSummary(
     modifier: Modifier = Modifier
 ) {
     prediction?.let {
-        val groupedWords = prediction.predictions.withIndex().groupBy(
-            keySelector = { indexedWord -> indexedWord.value.line },
-            valueTransform = { indexedWord -> indexedWord },
-        )
+        val groupedWords = remember(prediction.predictions) { groupPredictionLines(prediction.predictions) }
         val selectedPrediction = selectedPredictionIndex
             ?.takeIf { index -> index in prediction.predictions.indices }
             ?.let { prediction.predictions[it] }
@@ -81,39 +80,55 @@ fun PredictionSummary(
                 return@Column
             }
 
-            FlowRow(
+            Column(
                 modifier = Modifier
                     .fillMaxWidth()
                     .clip(MaterialTheme.shapes.large)
                     .background(ScriptLensColors.Background)
                     .border(1.dp, ScriptLensColors.Border, MaterialTheme.shapes.large)
-                    .padding(ScriptLensSpacing.padding_12)
-                    .heightIn(min = 220.dp, max = 320.dp)
-                    .verticalScroll(rememberScrollState()),
-                horizontalArrangement = Arrangement.spacedBy(ScriptLensSpacing.padding_4),
+                    .padding(ScriptLensSpacing.padding_12),
                 verticalArrangement = Arrangement.spacedBy(ScriptLensSpacing.padding_8),
-                maxItemsInEachRow = 1,
             ) {
-                groupedWords.entries.forEach { lineEntry ->
+                groupedWords.forEach { line ->
                     FlowRow(
                         modifier = Modifier.fillMaxWidth(),
                         horizontalArrangement = Arrangement.spacedBy(ScriptLensSpacing.padding_4),
                         verticalArrangement = Arrangement.spacedBy(ScriptLensSpacing.padding_4),
-                        maxItemsInEachRow = Int.MAX_VALUE,
                     ) {
-                        lineEntry.value.forEach { indexedWord ->
+                        line.words.forEach { indexedWord ->
                             val isSelected = indexedWord.index == selectedPredictionIndex
-                            Text(
-                                text = indexedWord.value.text,
-                                style = if (isSelected) ScriptLensTypography.Subtitle else ScriptLensTypography.Body,
-                                color = ScriptLensColors.Text,
+                            Column(
                                 modifier = Modifier
                                     .clip(RoundedCornerShape(8.dp))
                                     .background(if (isSelected) ScriptLensColors.Accent.copy(alpha = 0.25f) else ScriptLensColors.Surface)
-                                    .clickable { onPredictionSelected(indexedWord.index) }
+                                    .selectable(
+                                        selected = isSelected,
+                                        role = Role.Button,
+                                        onClick = { onPredictionSelected(indexedWord.index) },
+                                    )
                                     .padding(horizontal = ScriptLensSpacing.padding_8, vertical = ScriptLensSpacing.padding_4),
-                            )
+                            ) {
+                                Text(
+                                    text = indexedWord.value.text,
+                                    style = if (isSelected) ScriptLensTypography.Subtitle else ScriptLensTypography.Body,
+                                    color = ScriptLensColors.Text,
+                                )
+                                if (line.translation == null && indexedWord.value.gloss.translation.isNotBlank()) {
+                                    Text(
+                                        text = indexedWord.value.gloss.translation,
+                                        style = ScriptLensTypography.Label,
+                                        color = ScriptLensColors.Subtext,
+                                    )
+                                }
+                            }
                         }
+                    }
+                    line.translation?.let { translation ->
+                        Text(
+                            text = translation,
+                            style = ScriptLensTypography.Body,
+                            color = ScriptLensColors.Subtext,
+                        )
                     }
                 }
             }
@@ -163,6 +178,14 @@ fun PredictionSummary(
                         value = selectedPrediction.gloss.definition,
                         unavailableText = unavailableText,
                     )
+                    if (!selectedPrediction.isConfirmed()) {
+                        Text(
+                            modifier = Modifier.padding(top = ScriptLensSpacing.padding_8),
+                            text = stringResource(Res.string.prediction_unconfirmed),
+                            style = ScriptLensTypography.Body,
+                            color = ScriptLensColors.Subtext,
+                        )
+                    }
                 }
             }
         }
@@ -274,4 +297,3 @@ private fun PredictionInfoEmptyPreview() {
         )
     }
 }
-

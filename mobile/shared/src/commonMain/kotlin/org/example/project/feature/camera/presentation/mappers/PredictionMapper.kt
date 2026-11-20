@@ -24,6 +24,7 @@ private fun mapWordPredictionToUiModel(
         box = mapPredictionBoxToUiModel(prediction.box),
         line = prediction.line,
         gloss = mapPredictionGlossToUiModel(prediction.gloss),
+        lineTranslation = prediction.lineTranslation,
     )
 
 private fun mapPredictionBoxToUiModel(box: PredictionBox): PredictionBoxModel =
@@ -40,4 +41,3 @@ private fun mapPredictionGlossToUiModel(gloss: PredictionGloss): PredictionGloss
         translation = gloss.translation,
         definition = gloss.definition,
     )
-

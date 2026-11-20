@@ -59,13 +59,6 @@ class CameraViewModel(
             is CameraEvent.OnImagePickerProcessingStarted -> setLoading(true)
             is CameraEvent.SelectModel -> onSelectModel(event.id)
             is CameraEvent.ReloadModels -> loadModels()
-            is CameraEvent.ReadAgain -> _state.setState {
-                it.copy(
-                    prediction = null,
-                    selectedPredictionIndex = null,
-                    cameraScreenState = CameraScreenState.PhotoCaptured
-                )
-            }
         }
     }
 

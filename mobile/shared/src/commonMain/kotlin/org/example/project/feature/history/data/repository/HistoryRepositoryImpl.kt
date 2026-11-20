@@ -5,10 +5,8 @@ import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.CancellationException
 import org.example.project.feature.history.data.network.HistoryApi
 import org.example.project.feature.history.data.network.models.RecognitionDto
+import org.example.project.feature.camera.data.network.models.toDomain
 import org.example.project.feature.camera.domain.model.Prediction
-import org.example.project.feature.camera.domain.model.PredictionBox
-import org.example.project.feature.camera.domain.model.PredictionGloss
-import org.example.project.feature.camera.domain.model.WordPrediction
 import org.example.project.feature.history.domain.model.RecognitionDetail
 import org.example.project.feature.history.domain.model.RecognitionHistoryItem
 import org.example.project.feature.history.domain.repository.HistoryRepository
@@ -54,24 +52,7 @@ class HistoryRepositoryImpl(
             filename = filename,
             modelVersion = modelVersion,
             prediction = Prediction(
-                predictions = predictions.map { item ->
-                    WordPrediction(
-                        text = item.text,
-                        probabilities = item.probabilities,
-                        box = PredictionBox(
-                            x = item.box.x,
-                            y = item.box.y,
-                            w = item.box.w,
-                            h = item.box.h,
-                        ),
-                        line = item.line,
-                        gloss = PredictionGloss(
-                            lemma = item.gloss?.lemma.orEmpty(),
-                            translation = item.gloss?.translation.orEmpty(),
-                            definition = item.gloss?.definition.orEmpty(),
-                        ),
-                    )
-                },
+                predictions = predictions.map { it.toDomain() },
                 modelVersion = modelVersion,
             ),
             imageBytes = imageBytes,

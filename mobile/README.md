@@ -82,7 +82,10 @@ ML_PREDICTOR="eparchos" uv run uvicorn app.main:app --reload --host 0.0.0.0 --po
    to retry; recognition remains available and uses the backend default.
 2. Tap **Take a photo** or **Choose from photos**. The app uploads the image with the
    selected model to `/predict` for guests or `/recognitions` for signed-in users.
-3. View the result. To use a different model, tap **Read with another model**, select a
+3. View the result and tap a word or its box on the page for glossary details. Line
+   translations appear beneath the corresponding line when available; otherwise available
+   word translations appear beneath individual words. Unconfirmed readings are marked in
+   the word details. To use a different model, tap **Read with another model**, select a
    model, and tap **Recognize page**. The image preview and photo are retained.
 
 Results with a `model_version` of `mock` or `eparchos-` followed by one or more characters

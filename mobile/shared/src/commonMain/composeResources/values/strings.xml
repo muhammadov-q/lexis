@@ -67,7 +67,6 @@
     <string name="available_models">Available models</string>
     <string name="model_default_fallback">Could not load models. Recognition will use the default model.</string>
     <string name="model_reload">Reload</string>
-    <string name="action_read_again">Read with another model</string>
     <string name="captured_photo_description">Uploaded photo with predictions</string>
 
     <!-- Actions -->
@@ -86,6 +85,7 @@
     <string name="prediction_lemma_label">Lemma</string>
     <string name="prediction_definition_label">Definition</string>
     <string name="prediction_gloss_unavailable">Glossary information unavailable for this word.</string>
+    <string name="prediction_unconfirmed">Not confirmed by the recognition model. Check this word on the page.</string>
 
     <!-- Upload errors -->
     <string name="error_service_offline_title">Recognition service offline</string>

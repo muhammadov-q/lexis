@@ -11,6 +11,7 @@ data class WordPredictionModel(
     val box: PredictionBoxModel,
     val line: Int,
     val gloss: PredictionGlossModel,
+    val lineTranslation: String? = null,
 )
 
 data class PredictionBoxModel(
@@ -25,4 +26,3 @@ data class PredictionGlossModel(
     val translation: String,
     val definition: String,
 )
-

@@ -169,7 +169,6 @@ private fun HistoryDetailContent(
                 modifier = Modifier
                     .fillMaxWidth()
                     .clip(MaterialTheme.shapes.extraLarge)
-                    .heightIn(min = ScriptLensSpacing.padding_56 * 4)
                     .aspectRatio(imageBitmap.width.toFloat() / imageBitmap.height.toFloat()),
             ) {
                 Box(
