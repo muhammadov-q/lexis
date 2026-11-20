@@ -188,7 +188,7 @@ class CameraViewModelTest {
     }
 
     @Test
-    fun photoCaptureFailureGoesBackToTheStartScreenWithoutAnError() = runCameraTest {
+    fun photoCaptureFailureShowsTheErrorAndKeepsThePhotoAndResult() = runCameraTest {
         val viewModel = createViewModel { samplePrediction() }
         viewModel.onEvent(CameraEvent.OnPhotoPicked(byteArrayOf(1)))
         advanceUntilIdle()
@@ -196,9 +196,12 @@ class CameraViewModelTest {
         viewModel.onEvent(CameraEvent.OnPhotoCaptureFailed("No camera app is available on this device."))
 
         val state = viewModel.state.value
-        assertEquals(CameraScreenState.NoPhotoCaptured, state.cameraScreenState)
-        assertNull(state.photo)
-        assertNull(state.prediction)
+        val screenState = state.cameraScreenState
+        assertIs<CameraScreenState.Error>(screenState)
+        assertIs<CameraScreenErrorState.PhotoUnavailable>(screenState.error)
+        assertEquals(UiText.Plain("No camera app is available on this device."), screenState.error.message)
+        assertContentEquals(byteArrayOf(1), state.photo)
+        assertNotNull(state.prediction)
         assertFalse(state.isLoading)
     }
 

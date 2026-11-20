@@ -24,20 +24,32 @@ class PredictionLinesTest {
     )
 
     @Test
-    fun groupsLinesInIncomingOrderAndKeepsSelectionIndices() {
+    fun mergesWordsOfTheSameLineAndKeepsSelectionIndices() {
+        val lines = groupPredictionLines(
+            listOf(
+                word("one", 0, "A line."),
+                word("two", 0, "Ignored, not the first word."),
+                word("three", 1, "Another line."),
+                word("four", 0),
+            ),
+        )
+
+        assertEquals(listOf(0, 1), lines.map { it.number })
+        assertEquals(listOf("A line.", "Another line."), lines.map { it.translation })
+        assertEquals(listOf(0, 1, 3, 2), lines.flatMap { it.words }.map { it.index })
+        assertEquals(listOf("one", "two", "four", "three"), lines.flatMap { it.words }.map { it.value.text })
+    }
+
+    @Test
+    fun takesTheTranslationFromTheFirstWordOnly() {
         val lines = groupPredictionLines(
             listOf(
                 word("one", 0),
                 word("two", 0, "A line."),
-                word("three", 1, "Another line."),
-                word("four", 0, "A later line."),
             ),
         )
 
-        assertEquals(listOf(0, 1, 0), lines.map { it.number })
-        assertEquals(listOf("A line.", "Another line.", "A later line."), lines.map { it.translation })
-        assertEquals(listOf(0, 1, 2, 3), lines.flatMap { it.words }.map { it.index })
-        assertEquals(listOf("one", "two", "three", "four"), lines.flatMap { it.words }.map { it.value.text })
+        assertEquals(listOf(null), lines.map { it.translation })
         assertTrue(groupPredictionLines(emptyList()).isEmpty())
     }
 

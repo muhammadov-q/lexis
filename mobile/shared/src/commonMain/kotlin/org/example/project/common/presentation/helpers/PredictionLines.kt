@@ -9,23 +9,15 @@ data class PredictionLine(
 )
 
 fun groupPredictionLines(words: List<WordPredictionModel>): List<PredictionLine> {
-    val lines = mutableListOf<PredictionLine>()
-    var index = 0
-    while (index < words.size) {
-        val number = words[index].line
-        val lineWords = mutableListOf<IndexedValue<WordPredictionModel>>()
-        var translation: String? = null
-        while (index < words.size && words[index].line == number) {
-            val word = words[index]
-            lineWords.add(IndexedValue(index, word))
-            if (translation == null) {
-                translation = word.lineTranslation?.takeIf { it.isNotBlank() }
-            }
-            index++
-        }
-        lines.add(PredictionLine(number, lineWords, translation))
+    words.forEachIndexed { index, word ->
+        val line = lines[word.line] ?: PredictionLine(
+            number = word.line,
+            words = emptyList(),
+            translation = word.lineTranslation?.takeIf { it.isNotBlank() },
+        )
+        lines[word.line] = line.copy(words = line.words + IndexedValue(index, word))
     }
-    return lines
+    return lines.values.toList()
 }
 
 fun WordPredictionModel.isConfirmed(): Boolean = probabilities.containsKey(text)

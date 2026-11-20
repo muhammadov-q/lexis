@@ -119,11 +119,8 @@ class CameraViewModel(
         println("$TAG: photo capture failed: $message")
         _state.setState {
             it.copy(
-                cameraScreenState = CameraScreenState.NoPhotoCaptured,
                 isLoading = false,
-                photo = null,
-                prediction = null,
-                selectedPredictionIndex = null,
+                cameraScreenState = CameraScreenState.Error(PhotoUnavailable(UiText.Plain(message))),
             )
         }
     }
