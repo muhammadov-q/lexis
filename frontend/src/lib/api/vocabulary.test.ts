@@ -38,12 +38,16 @@ describe('vocabulary API', () => {
   it('adds a word by its place on a saved page', async () => {
     const fetch = stubFetch(Response.json(makeVocabularyWord(), { status: 201 }))
 
-    await addToVocabulary({ recognition_id: 7, word_index: 3 })
+    await addToVocabulary({ recognition_id: 7, word_index: 3, note: 'is' })
 
     const [url, init] = call(fetch)
     expect(url).toBe('/api/vocabulary')
     expect(init.method).toBe('POST')
-    expect(JSON.parse(init.body as string)).toEqual({ recognition_id: 7, word_index: 3 })
+    expect(JSON.parse(init.body as string)).toEqual({
+      recognition_id: 7,
+      word_index: 3,
+      note: 'is',
+    })
   })
 
   it('saves a note and removes a word', async () => {
@@ -63,7 +67,9 @@ describe('vocabulary API', () => {
       Response.json({ detail: 'This word is already in your vocabulary.' }, { status: 409 })
     )
 
-    await expect(addToVocabulary({ recognition_id: 7, word_index: 0 })).rejects.toMatchObject({
+    await expect(
+      addToVocabulary({ recognition_id: 7, word_index: 0, note: '' })
+    ).rejects.toMatchObject({
       status: 409,
       message: 'This word is already in your vocabulary.',
     })

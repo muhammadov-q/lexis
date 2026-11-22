@@ -8,9 +8,7 @@ export default function VocabularyPage() {
     <>
       <div className="mb-10">
         <h1 className="text-3xl font-semibold tracking-tight lg:text-4xl">Vocabulary</h1>
-        <p className="mt-3 text-lg text-muted-foreground">
-          Words you saved from your pages, newest first.
-        </p>
+        <p className="mt-3 text-lg text-muted-foreground">Words you saved, newest first.</p>
       </div>
 
       <VocabularyList />

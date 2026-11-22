@@ -63,11 +63,11 @@ describe('vocabulary hooks', () => {
     const { result } = renderWithClient(() => ({
       list: useVocabulary(),
       word: useVocabularyWord(2),
-      update: useUpdateNote(2),
+      update: useUpdateNote(),
     }))
     await waitFor(() => expect(result.current.word.data?.note).toBe(''))
 
-    await act(() => result.current.update.mutateAsync('and'))
+    await act(() => result.current.update.mutateAsync({ id: 2, note: 'and' }))
 
     await waitFor(() => expect(result.current.word.data?.note).toBe('and'))
     expect(result.current.list.data?.find((word) => word.id === 2)?.note).toBe('and')

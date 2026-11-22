@@ -5,7 +5,7 @@ const PAGE_PNG = Buffer.from(
   'base64'
 )
 
-test('adds a word from a read page to the vocabulary, notes it and removes it', async ({
+test('notes a word in the word panel, finds it in the vocabulary and removes it', async ({
   page,
 }) => {
   await page.goto('/dashboard')
@@ -27,26 +27,31 @@ test('adds a word from a read page to the vocabulary, notes it and removes it', 
   const text = (await firstWord.textContent()) ?? ''
   await firstWord.click()
   const word = page.getByRole('region', { name: 'Selected word' })
-  await word.getByRole('button', { name: 'Add to vocabulary' }).click()
-  await word.getByRole('link', { name: 'Open it' }).click()
+  await word.getByLabel('Note').fill('First word of the sample page')
+  await word.getByRole('button', { name: 'Save word' }).click()
+  await expect(word.getByText('Saved')).toBeVisible()
+  await word.getByRole('link', { name: 'In vocabulary' }).click()
 
   await expect(page.getByRole('heading', { level: 1, name: text })).toBeVisible()
-  await page.getByLabel('Your note').fill('First word of the sample page')
+  await expect(page.getByLabel('Note')).toHaveValue('First word of the sample page')
+  await page.getByLabel('Note').fill('First word of the page')
   await page.getByRole('button', { name: 'Save note' }).click()
-  await expect(page.getByText('Note saved')).toBeVisible()
+  await expect(page.getByText('Saved')).toBeVisible()
   await page.reload()
-  await expect(page.getByLabel('Your note')).toHaveValue('First word of the sample page')
+  await expect(page.getByLabel('Note')).toHaveValue('First word of the page')
 
-  await page.getByRole('link', { name: 'Show on the page' }).click()
+  await page.getByRole('link', { name: /, line 1$/ }).click()
   await expect(page).toHaveURL(/\/dashboard\/history\/\d+\?word=0$/)
-  await expect(page.getByRole('region', { name: 'Selected word' })).toContainText(text)
+  await expect(page.getByRole('region', { name: 'Selected word' }).getByLabel('Note')).toHaveValue(
+    'First word of the page'
+  )
 
   await page
     .getByRole('navigation', { name: 'Dashboard navigation' })
     .getByRole('link', { name: 'Vocabulary' })
     .click()
   await page.getByRole('list', { name: 'Saved words' }).getByRole('link', { name: text }).click()
-  await page.getByRole('button', { name: 'Remove from vocabulary' }).click()
+  await page.getByRole('button', { name: 'Remove word' }).click()
   await page.getByRole('button', { name: 'Remove', exact: true }).click()
 
   await expect(page).toHaveURL('/dashboard/vocabulary')

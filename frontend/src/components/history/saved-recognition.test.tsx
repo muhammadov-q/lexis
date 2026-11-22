@@ -68,7 +68,7 @@ describe('SavedRecognition', () => {
     const word = await screen.findByRole('region', { name: 'Selected word' })
     expect(word).toHaveTextContent('Line 1, word 2')
     expect(word).toHaveTextContent('ἐστί,')
-    expect(await within(word).findByRole('button', { name: 'Add to vocabulary' })).toBeVisible()
+    expect(await within(word).findByRole('button', { name: 'Save word' })).toBeVisible()
   })
 
   it('says so, once, when the result is not in your history', async () => {

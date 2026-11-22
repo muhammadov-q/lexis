@@ -21,7 +21,7 @@ describe('WordDetails', () => {
     renderDetails(null)
 
     expect(screen.getByText('Pick a word')).toBeInTheDocument()
-    expect(screen.getByText(/to start with the first word/)).toBeInTheDocument()
+    expect(screen.getByText('On the page or in the transcript.')).toBeInTheDocument()
     expect(screen.queryByRole('region', { name: 'Selected word' })).not.toBeInTheDocument()
   })
 
@@ -64,18 +64,16 @@ describe('WordDetails', () => {
       <WordDetails words={unconfirmed} selection={makeSelection({ selected: 1 })} />
     )
 
-    expect(entry('Confidence')).toHaveTextContent(
-      'Not confirmed. kraken read this word differently, so check it on the page.'
-    )
+    expect(entry('Confidence')).toHaveTextContent('Not confirmed by kraken')
   })
 
   it('says so when a word has no translation', () => {
     renderDetails(2)
 
     expect(screen.getByText('Line 2, word 1')).toBeInTheDocument()
-    expect(screen.getByText('No translation yet')).toBeInTheDocument()
-    expect(screen.getByText(/40% confidence/)).toBeInTheDocument()
-    expect(screen.queryByText('Translation')).not.toBeInTheDocument()
+    expect(entry('Translation')).toHaveTextContent('None')
+    expect(entry('Confidence')).toHaveTextContent('40%')
+    expect(screen.queryByText('Dictionary form')).not.toBeInTheDocument()
   })
 
   it('steps to the previous and next word', async () => {

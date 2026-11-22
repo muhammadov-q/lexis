@@ -46,7 +46,7 @@ describe('VocabularyList', () => {
     renderWithProviders(<VocabularyList />)
 
     expect(await screen.findByText('No words yet')).toBeInTheDocument()
-    expect(screen.getByRole('link', { name: 'Open your history' })).toHaveAttribute(
+    expect(screen.getByRole('link', { name: 'Open history' })).toHaveAttribute(
       'href',
       '/dashboard/history'
     )

@@ -35,18 +35,26 @@ export function useAddToVocabulary() {
 
   return useMutation({
     mutationFn: addToVocabulary,
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: VOCABULARY_KEY, exact: true }),
+    onSuccess: (word) => {
+      queryClient.setQueryData(wordKey(word.id), word)
+      queryClient.setQueryData<VocabularyWord[]>(
+        VOCABULARY_KEY,
+        (words) => words && [word, ...words]
+      )
+    },
   })
 }
 
-export function useUpdateNote(id: number) {
+export function useUpdateNote() {
   const queryClient = useQueryClient()
 
   return useMutation({
-    mutationFn: (note: string) => updateVocabularyNote(id, note),
+    mutationFn: ({ id, note }: { id: number; note: string }) => updateVocabularyNote(id, note),
     onSuccess: (word) => {
-      queryClient.setQueryData(wordKey(id), word)
-      return queryClient.invalidateQueries({ queryKey: VOCABULARY_KEY, exact: true })
+      queryClient.setQueryData(wordKey(word.id), word)
+      queryClient.setQueryData<VocabularyWord[]>(VOCABULARY_KEY, (words) =>
+        words?.map((entry) => (entry.id === word.id ? word : entry))
+      )
     },
   })
 }

@@ -16,14 +16,11 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog'
-import { Label } from '@/components/ui/label'
 import { Skeleton } from '@/components/ui/skeleton'
-import { Textarea } from '@/components/ui/textarea'
-import { useRemoveFromVocabulary, useUpdateNote, useVocabularyWord } from '@/hooks/use-vocabulary'
+import { useRemoveFromVocabulary, useVocabularyWord } from '@/hooks/use-vocabulary'
 import type { VocabularyWord } from '@/lib/api/vocabulary'
 import { formatDateTime } from '@/lib/format'
-
-const MAX_NOTE_LENGTH = 2000
+import { NoteForm } from './note-form'
 
 export function VocabularyWordView({ id }: { id: number }) {
   const query = useVocabularyWord(id)
@@ -85,73 +82,29 @@ function WordEntry({ word }: { word: VocabularyWord }) {
             <dd>{gloss.definition}</dd>
           </dl>
         ) : (
-          <div className="space-y-1 rounded-xl bg-muted px-5 py-4">
-            <p className="font-medium">No translation</p>
-            <p className="text-sm text-muted-foreground">
-              The model that read this page gave no translation for this word.
-            </p>
-          </div>
+          <p className="rounded-xl bg-muted px-5 py-4 font-medium">No translation</p>
         )}
 
-        <div className="flex flex-wrap items-center justify-between gap-x-6 gap-y-2 text-sm">
-          <p className="min-w-0 truncate text-muted-foreground">
-            From {source.filename || 'Untitled page'}, line {source.line + 1}
-          </p>
-          <Link
-            href={`/dashboard/history/${source.recognition_id}?word=${source.word_index}`}
-            className="inline-flex items-center gap-1 font-medium underline underline-offset-4"
-          >
-            Show on the page
-            <ArrowRightIcon className="size-4" aria-hidden="true" />
-          </Link>
-        </div>
+        <Link
+          href={`/dashboard/history/${source.recognition_id}?word=${source.word_index}`}
+          className="inline-flex max-w-full items-center gap-1 text-sm text-muted-foreground underline-offset-4 hover:text-foreground hover:underline"
+        >
+          <span className="truncate">
+            {source.filename || 'Untitled page'}, line {source.line + 1}
+          </span>
+          <ArrowRightIcon className="size-4 shrink-0" aria-hidden="true" />
+        </Link>
       </Card>
 
       <Card className="space-y-8">
-        <NoteEditor word={word} />
+        <NoteForm id="vocabulary-note" entry={word} />
         <RemoveWord word={word} />
       </Card>
     </div>
   )
 }
 
-function NoteEditor({ word }: { word: VocabularyWord }) {
-  const [draft, setDraft] = useState(word.note)
-  const update = useUpdateNote(word.id)
-  const changed = draft.trim() !== word.note
-
-  return (
-    <form
-      className="space-y-3"
-      onSubmit={(event) => {
-        event.preventDefault()
-        update.mutate(draft)
-      }}
-    >
-      <Label htmlFor="vocabulary-note">Your note</Label>
-      <Textarea
-        id="vocabulary-note"
-        value={draft}
-        maxLength={MAX_NOTE_LENGTH}
-        placeholder="What helps you remember this word?"
-        onChange={(event) => setDraft(event.target.value)}
-      />
-      <div className="flex flex-wrap items-center gap-4">
-        <Button type="submit" disabled={!changed || update.isPending}>
-          {update.isPending ? 'Saving…' : 'Save note'}
-        </Button>
-        <p aria-live="polite" className="text-sm text-muted-foreground">
-          {update.isSuccess && !changed ? 'Note saved' : ''}
-        </p>
-      </div>
-      {update.isError && (
-        <p role="alert" className="text-sm text-foreground">
-          {update.error.message}
-        </p>
-      )}
-    </form>
-  )
-}
+const NO_DESCRIPTION = { 'aria-describedby': undefined }
 
 function RemoveWord({ word }: { word: VocabularyWord }) {
   const [open, setOpen] = useState(false)
@@ -161,7 +114,7 @@ function RemoveWord({ word }: { word: VocabularyWord }) {
   function confirm() {
     remove.mutate(undefined, {
       onSuccess: () => {
-        toast.success(`Removed ${word.word} from your vocabulary`)
+        toast.success(`Removed ${word.word}`)
         router.replace('/dashboard/vocabulary')
       },
     })
@@ -171,20 +124,16 @@ function RemoveWord({ word }: { word: VocabularyWord }) {
     <>
       <Button variant="ghost" className="-ml-3" onClick={() => setOpen(true)}>
         <Trash2Icon aria-hidden="true" />
-        Remove from vocabulary
+        Remove word
       </Button>
 
       <Dialog open={open} onOpenChange={setOpen}>
-        <DialogContent showCloseButton={false}>
+        <DialogContent showCloseButton={false} {...(word.note ? {} : NO_DESCRIPTION)}>
           <DialogHeader>
             <DialogTitle>
               Remove <span className="font-greek">{word.word}</span>?
             </DialogTitle>
-            <DialogDescription>
-              {word.note
-                ? 'Your note on this word is deleted too.'
-                : 'You can add it again from its page.'}
-            </DialogDescription>
+            {word.note && <DialogDescription>Your note is deleted too.</DialogDescription>}
           </DialogHeader>
           {remove.isError && (
             <p role="alert" className="text-sm text-foreground">
@@ -218,11 +167,11 @@ function WordSkeleton() {
       </Card>
       <Card className="space-y-8">
         <div className="space-y-3">
-          <Skeleton className="h-4 w-20" />
-          <Skeleton className="h-28 w-full rounded-xl" />
+          <Skeleton className="h-4 w-10" />
+          <Skeleton className="h-20 w-full rounded-xl" />
           <Skeleton className="h-10 w-28 rounded-lg" />
         </div>
-        <Skeleton className="h-10 w-52 rounded-lg" />
+        <Skeleton className="h-10 w-36 rounded-lg" />
       </Card>
     </div>
   )

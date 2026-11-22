@@ -46,20 +46,16 @@ export function RecognitionResult({
         </div>
       )}
 
-      <div className="space-y-1 text-sm text-muted-foreground">
-        <p>
-          Read by <span className="font-mono text-foreground">{modelVersion}</span>
-          {durationMs !== undefined && (
-            <>
-              {' '}
-              in <Annotation>{formatDuration(durationMs)}</Annotation>
-            </>
-          )}
-        </p>
-        {isPlaceholder && (
-          <p>Placeholder output. This model returns the same words for every page.</p>
+      <p className="text-sm text-muted-foreground">
+        Read by <span className="font-mono text-foreground">{modelVersion}</span>
+        {isPlaceholder && ' (placeholder)'}
+        {durationMs !== undefined && (
+          <>
+            {' '}
+            in <Annotation>{formatDuration(durationMs)}</Annotation>
+          </>
         )}
-      </div>
+      </p>
     </section>
   )
 }

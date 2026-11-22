@@ -20,9 +20,6 @@ export function VocabularyList() {
     return (
       <Card className="space-y-4">
         <p className="font-medium">Sign in to keep a vocabulary</p>
-        <p className="text-muted-foreground">
-          Words you add from your saved pages are kept with your account.
-        </p>
         <Button asChild>
           <Link href="/sign-in">Sign in</Link>
         </Button>
@@ -42,11 +39,9 @@ export function VocabularyList() {
     return (
       <Card className="space-y-4">
         <p className="font-medium">No words yet</p>
-        <p className="text-muted-foreground">
-          Pick a word on a page you read and add it to your vocabulary.
-        </p>
+        <p className="text-muted-foreground">Save words from the pages you read.</p>
         <Button asChild>
-          <Link href="/dashboard/history">Open your history</Link>
+          <Link href="/dashboard/history">Open history</Link>
         </Button>
       </Card>
     )

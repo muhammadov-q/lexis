@@ -29,7 +29,7 @@ sequenceDiagram
 | `frontend/src/components/recognition/`   | The upload and recognition flow.                                                       |
 | `frontend/src/components/transcript/`    | The transcript, the word boxes on the page and the panel for the picked word.          |
 | `frontend/src/components/history/`       | The results history (`/dashboard/history`) and one saved result.                       |
-| `frontend/src/components/vocabulary/`    | The vocabulary (`/dashboard/vocabulary`), one saved word, and its add button.          |
+| `frontend/src/components/vocabulary/`    | The vocabulary (`/dashboard/vocabulary`), one saved word, and the note on a word.      |
 | `frontend/src/components/phone-capture/` | The QR code dialog on the computer and the camera page on the phone (`/capture/[id]`). |
 | `frontend/src/components/ui/`            | shadcn primitives plus `LoadingOrb` and `Skeleton`.                                    |
 | `frontend/src/components/auth/`          | Sign-in and sign-up forms, the sign-out button and the account card in the sidebar.    |

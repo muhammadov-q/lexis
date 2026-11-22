@@ -46,8 +46,7 @@ describe('VocabularyWordView', () => {
     expect(screen.getByText('Machine output')).toBeInTheDocument()
     expect(screen.getByText('nature')).toBeInTheDocument()
     expect(screen.getByText('noun: nature')).toBeInTheDocument()
-    expect(screen.getByText('From folio-1r.png, line 3')).toBeInTheDocument()
-    expect(screen.getByRole('link', { name: 'Show on the page' })).toHaveAttribute(
+    expect(screen.getByRole('link', { name: 'folio-1r.png, line 3' })).toHaveAttribute(
       'href',
       '/dashboard/history/7?word=12'
     )
@@ -68,21 +67,21 @@ describe('VocabularyWordView', () => {
     const fetch = stubBackend(makeVocabularyWord({ id: 4, note: '' }))
     renderWithProviders(<VocabularyWordView id={4} />)
 
-    const note = await screen.findByLabelText('Your note')
+    const note = await screen.findByLabelText('Note')
     const save = screen.getByRole('button', { name: 'Save note' })
     expect(save).toBeDisabled()
 
     await userEvent.type(note, 'as in physics ')
     await userEvent.click(save)
 
-    expect(await screen.findByText('Note saved')).toBeInTheDocument()
+    expect(await screen.findByText('Saved')).toBeInTheDocument()
     expect(save).toBeDisabled()
     const patch = fetch.mock.calls.find(([, init]) => init?.method === 'PATCH')
     expect(patch?.[0]).toBe('/api/vocabulary/4')
     expect(JSON.parse(patch?.[1]?.body as string)).toEqual({ note: 'as in physics ' })
 
     await userEvent.type(note, 'again')
-    expect(screen.queryByText('Note saved')).not.toBeInTheDocument()
+    expect(screen.queryByText('Saved')).not.toBeInTheDocument()
     expect(save).toBeEnabled()
   })
 
@@ -90,9 +89,9 @@ describe('VocabularyWordView', () => {
     const fetch = stubBackend(makeVocabularyWord({ id: 4, note: 'as in physics' }))
     renderWithProviders(<VocabularyWordView id={4} />)
 
-    await userEvent.click(await screen.findByRole('button', { name: 'Remove from vocabulary' }))
+    await userEvent.click(await screen.findByRole('button', { name: 'Remove word' }))
     const dialog = screen.getByRole('dialog', { name: 'Remove Φύσις?' })
-    expect(dialog).toHaveTextContent('Your note on this word is deleted too.')
+    expect(dialog).toHaveTextContent('Your note is deleted too.')
     expect(fetch).not.toHaveBeenCalledWith(
       '/api/vocabulary/4',
       expect.objectContaining({ method: 'DELETE' })

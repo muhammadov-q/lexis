@@ -113,11 +113,10 @@ describe('RecognitionWorkbench', () => {
     await user.upload(screen.getByLabelText('Page image'), page())
     await user.click(recognizeButton())
 
-    expect(await screen.findByText(/This result is not saved\./)).toBeInTheDocument()
+    expect(await screen.findByText(/Not saved\./)).toBeInTheDocument()
 
     expect(screen.getByRole('link', { name: 'Sign in' })).toHaveAttribute('href', '/sign-in')
-    expect(screen.queryByRole('link', { name: 'Open it' })).not.toBeInTheDocument()
-    expect(screen.queryByText(/Saved to your history\./)).not.toBeInTheDocument()
+    expect(screen.queryByRole('link', { name: 'history' })).not.toBeInTheDocument()
 
     const transcript = screen.getByRole('region', { name: 'Transcript' })
     expect(
@@ -128,12 +127,12 @@ describe('RecognitionWorkbench', () => {
 
     await user.click(within(transcript).getByRole('button', { name: '2' }))
     expect(screen.getByRole('region', { name: 'Selected word' })).toBeInTheDocument()
-    expect(screen.queryByRole('button', { name: 'Add to vocabulary' })).not.toBeInTheDocument()
+    expect(screen.queryByRole('textbox', { name: 'Note' })).not.toBeInTheDocument()
 
     expect(fetch.mock.calls.map(([url]) => url)).toEqual(['/api/recognitions', '/api/predict'])
   })
 
-  it('offers to add a picked word to your vocabulary once the result is saved', async () => {
+  it('offers a note on a picked word once the result is saved', async () => {
     const saved = { ...greekResponse, id: 9, created_at: '2026-11-22T12:00:00Z', filename: 'p.png' }
     stubBackend(
       vi.fn(async (url: string) =>
@@ -147,7 +146,8 @@ describe('RecognitionWorkbench', () => {
     const transcript = await screen.findByRole('region', { name: 'Transcript' })
     await user.click(within(transcript).getByRole('button', { name: 'ἐστί,' }))
 
-    expect(await screen.findByRole('button', { name: 'Add to vocabulary' })).toBeVisible()
+    expect(await screen.findByRole('textbox', { name: 'Note' })).toBeVisible()
+    expect(screen.getByRole('button', { name: 'Save word' })).toBeEnabled()
   })
 
   it('introduces the page until a page image is chosen, then makes room for it', async () => {
@@ -188,7 +188,7 @@ describe('RecognitionWorkbench', () => {
       '/api/recognitions',
       expect.objectContaining({ method: 'POST' })
     )
-    expect(screen.getByRole('link', { name: 'Open it' })).toHaveAttribute(
+    expect(screen.getByRole('link', { name: 'history' })).toHaveAttribute(
       'href',
       '/dashboard/history/1'
     )

@@ -52,24 +52,24 @@ export function RecognitionPanel({
         />
         {run.data.savedId !== undefined ? (
           <p className="text-sm text-muted-foreground">
-            Saved to your history.{' '}
+            Saved to{' '}
             <Link
               href={`/dashboard/history/${run.data.savedId}`}
               className="font-medium text-foreground underline underline-offset-4"
             >
-              Open it
+              history
             </Link>
           </p>
         ) : (
           <p className="text-sm text-muted-foreground">
-            This result is not saved.{' '}
+            Not saved.{' '}
             <Link
               href="/sign-in"
               className="font-medium text-foreground underline underline-offset-4"
             >
               Sign in
             </Link>{' '}
-            to save future results to your history.
+            to keep your results.
           </p>
         )}
         <Button variant="outline" className="w-full" onClick={onReadAgain}>
