@@ -23,7 +23,6 @@ import { useRemoveFromVocabulary, useUpdateNote, useVocabularyWord } from '@/hoo
 import type { VocabularyWord } from '@/lib/api/vocabulary'
 import { formatDateTime } from '@/lib/format'
 
-// The backend's limit, so the box stops where the API would refuse
 const MAX_NOTE_LENGTH = 2000
 
 export function VocabularyWordView({ id }: { id: number }) {

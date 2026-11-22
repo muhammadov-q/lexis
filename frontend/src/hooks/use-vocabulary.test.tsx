@@ -43,7 +43,7 @@ function stubBackend() {
 }
 
 describe('vocabulary hooks', () => {
-  it('refreshes the list after a word is removed', async () => {
+  it('drops a removed word from the list without loading it again', async () => {
     stubBackend()
     const { result } = renderWithClient(() => ({
       list: useVocabulary(),
@@ -54,6 +54,8 @@ describe('vocabulary hooks', () => {
     await act(() => result.current.remove.mutateAsync())
 
     await waitFor(() => expect(result.current.list.data?.map((word) => word.id)).toEqual([2]))
+    const lists = vi.mocked(fetch).mock.calls.filter(([url]) => url === '/api/vocabulary')
+    expect(lists).toHaveLength(1)
   })
 
   it('shows a saved note on the word and in the list', async () => {

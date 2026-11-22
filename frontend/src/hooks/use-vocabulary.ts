@@ -7,6 +7,7 @@ import {
   listVocabulary,
   removeFromVocabulary,
   updateVocabularyNote,
+  type VocabularyWord,
 } from '@/lib/api/vocabulary'
 
 export const VOCABULARY_KEY = ['vocabulary'] as const
@@ -55,6 +56,9 @@ export function useRemoveFromVocabulary(id: number) {
 
   return useMutation({
     mutationFn: () => removeFromVocabulary(id),
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: VOCABULARY_KEY, exact: true }),
+    onSuccess: () =>
+      queryClient.setQueryData<VocabularyWord[]>(VOCABULARY_KEY, (words) =>
+        words?.filter((word) => word.id !== id)
+      ),
   })
 }
