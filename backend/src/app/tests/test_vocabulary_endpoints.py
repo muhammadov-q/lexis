@@ -48,10 +48,10 @@ def page(ada):
     return response.json()["id"]
 
 
-def add(client, recognition_id, word_index):
+def add(client, recognition_id, word_index, **fields):
     return client.post(
         "/vocabulary",
-        json={"recognition_id": recognition_id, "word_index": word_index},
+        json={"recognition_id": recognition_id, "word_index": word_index, **fields},
     )
 
 
@@ -90,14 +90,21 @@ def test_a_note_can_be_written_and_changed(ada, page):
     assert ada.get(f"/vocabulary/{word_id}").json()["note"] == "as in physical"
 
 
+def test_a_word_can_be_added_with_a_note(ada, page):
+    response = add(ada, page, 0, note="as in physics")
+
+    assert response.status_code == 201
+    assert response.json()["note"] == "as in physics"
+
+
 def test_a_note_has_a_length_limit(ada, page):
+    too_long = "x" * (MAX_NOTE_LENGTH + 1)
     word_id = add(ada, page, 0).json()["id"]
 
-    response = ada.patch(
-        f"/vocabulary/{word_id}", json={"note": "x" * (MAX_NOTE_LENGTH + 1)}
+    assert add(ada, page, 1, note=too_long).status_code == 422
+    assert (
+        ada.patch(f"/vocabulary/{word_id}", json={"note": too_long}).status_code == 422
     )
-
-    assert response.status_code == 422
     assert ada.get(f"/vocabulary/{word_id}").json()["note"] == ""
 
 

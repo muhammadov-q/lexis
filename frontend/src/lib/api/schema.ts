@@ -258,6 +258,11 @@ export interface components {
              * @description Position of the word in predictions
              */
             word_index: number;
+            /**
+             * Note
+             * @default
+             */
+            note: string;
         };
         /** Body_create_recognition_recognitions_post */
         Body_create_recognition_recognitions_post: {
