@@ -1,0 +1,22 @@
+meta {
+  name: Vocabulary - write a note
+  type: http
+  seq: 6
+}
+
+patch {
+  url: {{baseUrl}}/vocabulary/{{vocabularyWordId}}
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "note": "First word of the page"
+  }
+}
+
+assert {
+  res.status: eq 200
+  res.body.note: eq First word of the page
+}

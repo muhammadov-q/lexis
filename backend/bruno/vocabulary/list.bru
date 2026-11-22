@@ -1,0 +1,18 @@
+meta {
+  name: Vocabulary - list your words
+  type: http
+  seq: 5
+}
+
+get {
+  url: {{baseUrl}}/vocabulary
+  body: none
+  auth: none
+}
+
+assert {
+  res.status: eq 200
+  res.body: isArray
+  res.body.length: eq 1
+  res.body[0].id: eq {{vocabularyWordId}}
+}

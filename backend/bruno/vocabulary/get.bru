@@ -1,0 +1,16 @@
+meta {
+  name: Vocabulary - one word
+  type: http
+  seq: 7
+}
+
+get {
+  url: {{baseUrl}}/vocabulary/{{vocabularyWordId}}
+  body: none
+  auth: none
+}
+
+assert {
+  res.status: eq 200
+  res.body.note: eq First word of the page
+}

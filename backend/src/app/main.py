@@ -24,6 +24,9 @@ from app.recognitions.router import recognition_not_found
 from app.recognitions.router import router as recognitions_router
 from app.recognitions.service import RecognitionNotFound
 from app.uploads import UPLOAD_ERRORS, capped_image
+from app.vocabulary.router import router as vocabulary_router
+from app.vocabulary.router import vocabulary_word_not_found
+from app.vocabulary.service import VocabularyWordNotFound
 from ml import AbstractPredictor, ModelRegistry
 
 
@@ -37,9 +40,11 @@ app = FastAPI(title="Prediction API", version="0.1.0", lifespan=lifespan)
 app.include_router(auth_router)
 app.include_router(capture_router)
 app.include_router(recognitions_router)
+app.include_router(vocabulary_router)
 app.add_exception_handler(CaptureSessionNotFound, capture_session_not_found)
 app.add_exception_handler(NotSignedIn, not_signed_in)
 app.add_exception_handler(RecognitionNotFound, recognition_not_found)
+app.add_exception_handler(VocabularyWordNotFound, vocabulary_word_not_found)
 
 
 class PredictResponse(BaseModel):

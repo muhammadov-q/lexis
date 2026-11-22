@@ -1,0 +1,24 @@
+meta {
+  name: Vocabulary - read a page
+  type: http
+  seq: 2
+}
+
+post {
+  url: {{baseUrl}}/recognitions
+  body: multipartForm
+  auth: none
+}
+
+body:multipart-form {
+  image: @file(fixtures/test.png)
+  model: eparchos
+}
+
+assert {
+  res.status: eq 201
+}
+
+script:post-response {
+  bru.setVar("vocabularyPageId", res.getBody().id);
+}

@@ -174,6 +174,43 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/vocabulary": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List Words */
+        get: operations["list_words_vocabulary_get"];
+        put?: never;
+        /** Add Word */
+        post: operations["add_word_vocabulary_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/vocabulary/{word_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get Word */
+        get: operations["get_word_vocabulary__word_id__get"];
+        put?: never;
+        post?: never;
+        /** Remove Word */
+        delete: operations["remove_word_vocabulary__word_id__delete"];
+        options?: never;
+        head?: never;
+        /** Update Note */
+        patch: operations["update_note_vocabulary__word_id__patch"];
+        trace?: never;
+    };
     "/models": {
         parameters: {
             query?: never;
@@ -212,6 +249,16 @@ export interface paths {
 export type webhooks = Record<string, never>;
 export interface components {
     schemas: {
+        /** AddWordRequest */
+        AddWordRequest: {
+            /** Recognition Id */
+            recognition_id: number;
+            /**
+             * Word Index
+             * @description Position of the word in predictions
+             */
+            word_index: number;
+        };
         /** Body_create_recognition_recognitions_post */
         Body_create_recognition_recognitions_post: {
             /** Image */
@@ -299,6 +346,11 @@ export interface components {
             /** Default Model */
             default_model: string;
         };
+        /** NoteRequest */
+        NoteRequest: {
+            /** Note */
+            note: string;
+        };
         /** PredictResponse */
         PredictResponse: {
             /** Predictions */
@@ -374,6 +426,33 @@ export interface components {
             input?: unknown;
             /** Context */
             ctx?: Record<string, never>;
+        };
+        /** VocabularyWordResponse */
+        VocabularyWordResponse: {
+            /** Id */
+            id: number;
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
+            /** Word */
+            word: string;
+            gloss: components["schemas"]["GlossResponse"] | null;
+            /** Note */
+            note: string;
+            source: components["schemas"]["WordSource"];
+        };
+        /** WordSource */
+        WordSource: {
+            /** Recognition Id */
+            recognition_id: number;
+            /** Filename */
+            filename: string;
+            /** Line */
+            line: number;
+            /** Word Index */
+            word_index: number;
         };
     };
     responses: never;
@@ -901,6 +980,244 @@ export interface operations {
                 };
             };
             /** @description Not one of your results */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    list_words_vocabulary_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["VocabularyWordResponse"][];
+                };
+            };
+            /** @description No session, or it expired */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    add_word_vocabulary_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["AddWordRequest"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["VocabularyWordResponse"];
+                };
+            };
+            /** @description No session, or it expired */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Not one of your results */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Word already saved */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description No word at that position */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    get_word_vocabulary__word_id__get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                word_id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["VocabularyWordResponse"];
+                };
+            };
+            /** @description No session, or it expired */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Not one of your words */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    remove_word_vocabulary__word_id__delete: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                word_id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description No session, or it expired */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Not one of your words */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    update_note_vocabulary__word_id__patch: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                word_id: number;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["NoteRequest"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["VocabularyWordResponse"];
+                };
+            };
+            /** @description No session, or it expired */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Not one of your words */
             404: {
                 headers: {
                     [name: string]: unknown;
