@@ -13,7 +13,8 @@ post {
 body:json {
   {
     "recognition_id": {{vocabularyPageId}},
-    "word_index": 0
+    "word_index": 0,
+    "note": "Opens the page"
   }
 }
 
@@ -22,7 +23,7 @@ assert {
   res.body.id: isNumber
   res.body.word: isString
   res.body.gloss.translation: isString
-  res.body.note: eq ""
+  res.body.note: eq Opens the page
   res.body.source.recognition_id: eq {{vocabularyPageId}}
   res.body.source.word_index: eq 0
 }

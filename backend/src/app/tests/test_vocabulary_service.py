@@ -101,6 +101,12 @@ def test_a_note_is_saved_without_the_spaces_around_it(service, ada, page):
     assert service.get(ada, word.id).note == "nature, as in physics"
 
 
+def test_a_word_can_be_added_with_its_note(service, ada, page):
+    word = service.add(ada, page, 0, note=" as in physics ")
+
+    assert service.get(ada, word.id).note == "as in physics"
+
+
 def test_a_removed_word_is_gone(service, ada, page):
     word = service.add(ada, page, 0)
 

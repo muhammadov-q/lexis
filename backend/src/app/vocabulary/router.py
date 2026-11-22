@@ -39,6 +39,7 @@ Service = Annotated[VocabularyService, Depends(get_vocabulary_service)]
 class AddWordRequest(BaseModel):
     recognition_id: int
     word_index: int = Field(ge=0, description="Position of the word in predictions")
+    note: str = Field("", max_length=MAX_NOTE_LENGTH)
 
 
 class NoteRequest(BaseModel):
@@ -94,7 +95,9 @@ def add_word(
     request: AddWordRequest, user: CurrentUser, service: Service
 ) -> VocabularyWordResponse:
     try:
-        word = service.add(user.id, request.recognition_id, request.word_index)
+        word = service.add(
+            user.id, request.recognition_id, request.word_index, request.note
+        )
     except NotAWord as e:
         raise HTTPException(status_code=422, detail=str(e)) from e
     except WordAlreadySaved as e:

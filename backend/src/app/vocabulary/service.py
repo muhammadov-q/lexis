@@ -42,7 +42,9 @@ class VocabularyService:
         self._recognitions = recognitions
         self._clock = clock
 
-    def add(self, user_id: int, recognition_id: int, word_index: int) -> VocabularyWord:
+    def add(
+        self, user_id: int, recognition_id: int, word_index: int, note: str = ""
+    ) -> VocabularyWord:
         recognition = self._recognitions.get_for_user(user_id, recognition_id)
         if recognition is None:
             raise RecognitionNotFound(recognition_id)
@@ -63,7 +65,7 @@ class VocabularyService:
                 gloss=prediction.get("gloss"),
                 line=prediction.get("line", 0),
                 word_index=word_index,
-                note="",
+                note=note.strip(),
             )
         )
 

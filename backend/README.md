@@ -183,7 +183,7 @@ More in `docs/architecture/database.md`.
 
 ## Vocabulary
 
-`POST /vocabulary` with `recognition_id` and `word_index` saves a word from one of your results, with its gloss and where it came from. `GET /vocabulary` lists your words, newest first; `GET`, `PATCH` (the note) and `DELETE /vocabulary/{id}` work on one. A word is saved once, without the punctuation around it, so a second `ἐστί,` gets a 409. The code is in `src/app/vocabulary/`.
+`POST /vocabulary` with `recognition_id`, `word_index` and an optional `note` saves a word from one of your results, with its gloss and where it came from. `GET /vocabulary` lists your words, newest first; `GET`, `PATCH` (the note) and `DELETE /vocabulary/{id}` work on one. A word is saved once, without the punctuation around it, so a second `ἐστί,` gets a 409. The code is in `src/app/vocabulary/`.
 
 ## Phone capture sessions
 
