@@ -48,6 +48,7 @@ export function RecognitionPanel({
           selection={selection}
           image={image}
           durationMs={run.data.durationMs}
+          savedId={run.data.savedId}
         />
         {run.data.savedId !== undefined ? (
           <p className="text-sm text-muted-foreground">

@@ -56,6 +56,21 @@ describe('SavedRecognition', () => {
     expect(word).toHaveTextContent('nature')
   })
 
+  it('opens with the word from the link picked, ready to add to your vocabulary', async () => {
+    vi.stubGlobal(
+      'fetch',
+      vi.fn(async (url: string) =>
+        url === '/api/vocabulary' ? Response.json([]) : Response.json(makeRecognition({ id: 7 }))
+      )
+    )
+    renderWithProviders(<SavedRecognition id={7} word={1} />)
+
+    const word = await screen.findByRole('region', { name: 'Selected word' })
+    expect(word).toHaveTextContent('Line 1, word 2')
+    expect(word).toHaveTextContent('ἐστί,')
+    expect(await within(word).findByRole('button', { name: 'Add to vocabulary' })).toBeVisible()
+  })
+
   it('says so, once, when the result is not in your history', async () => {
     const fetch = stubFetch(
       Response.json({ detail: 'This result is not in your history.' }, { status: 404 })

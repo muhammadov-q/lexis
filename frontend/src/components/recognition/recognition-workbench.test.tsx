@@ -126,7 +126,28 @@ describe('RecognitionWorkbench', () => {
         .map((b) => b.textContent)
     ).toEqual(['2', '5'])
 
+    await user.click(within(transcript).getByRole('button', { name: '2' }))
+    expect(screen.getByRole('region', { name: 'Selected word' })).toBeInTheDocument()
+    expect(screen.queryByRole('button', { name: 'Add to vocabulary' })).not.toBeInTheDocument()
+
     expect(fetch.mock.calls.map(([url]) => url)).toEqual(['/api/recognitions', '/api/predict'])
+  })
+
+  it('offers to add a picked word to your vocabulary once the result is saved', async () => {
+    const saved = { ...greekResponse, id: 9, created_at: '2026-11-22T12:00:00Z', filename: 'p.png' }
+    stubBackend(
+      vi.fn(async (url: string) =>
+        url === '/api/vocabulary' ? Response.json([]) : Response.json(saved)
+      )
+    )
+    const { user } = setup()
+
+    await user.upload(screen.getByLabelText('Page image'), page())
+    await user.click(recognizeButton())
+    const transcript = await screen.findByRole('region', { name: 'Transcript' })
+    await user.click(within(transcript).getByRole('button', { name: 'ἐστί,' }))
+
+    expect(await screen.findByRole('button', { name: 'Add to vocabulary' })).toBeVisible()
   })
 
   it('introduces the page until a page image is chosen, then makes room for it', async () => {

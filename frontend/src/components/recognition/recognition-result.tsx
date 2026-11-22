@@ -15,6 +15,7 @@ interface RecognitionResultProps {
   selection: WordSelection
   image?: ImageSource
   durationMs?: number
+  savedId?: number
 }
 
 export function RecognitionResult({
@@ -22,6 +23,7 @@ export function RecognitionResult({
   selection,
   image,
   durationMs,
+  savedId,
 }: RecognitionResultProps) {
   const { predictions: words, model_version: modelVersion } = recognition
   const isPlaceholder = PLACEHOLDER_MODEL_VERSION.test(modelVersion)
@@ -34,7 +36,7 @@ export function RecognitionResult({
       </div>
 
       {words.length > 0 ? (
-        <WordDetails words={words} selection={selection} image={image} />
+        <WordDetails words={words} selection={selection} image={image} recognitionId={savedId} />
       ) : (
         <div className="space-y-1 rounded-xl bg-muted px-5 py-4">
           <p className="text-lg font-medium">No words found</p>

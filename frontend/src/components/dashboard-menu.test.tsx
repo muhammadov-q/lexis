@@ -142,3 +142,18 @@ describe('DashboardMenu', () => {
     }
   )
 })
+
+describe('Vocabulary in the menu', () => {
+  it.each(['/dashboard/vocabulary', '/dashboard/vocabulary/4'])(
+    'links to the vocabulary and marks it as the page on %s',
+    (path) => {
+      navigation.pathname = path
+      render(<DashboardMenu />)
+
+      const link = screen.getByRole('link', { name: 'Vocabulary' })
+      expect(link).toHaveAttribute('href', '/dashboard/vocabulary')
+      expect(link).toHaveAttribute('aria-current', 'page')
+      expect(screen.getByRole('link', { name: 'History' })).not.toHaveAttribute('aria-current')
+    }
+  )
+})

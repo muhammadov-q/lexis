@@ -2,7 +2,7 @@
 
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { ArrowUpRight, ChevronLeft, ChevronRight, History, ScanLine } from 'lucide-react'
+import { ArrowUpRight, BookA, ChevronLeft, ChevronRight, History, ScanLine } from 'lucide-react'
 import { useState } from 'react'
 import { AccountCard } from '@/components/auth/account-card'
 import { ThemeToggle } from '@/components/theme-toggle'
@@ -16,6 +16,7 @@ const REPO_URL = 'https://github.com/muhammadov-q/lexis'
 const PAGES = [
   { href: '/dashboard', label: 'Read', icon: ScanLine, exact: true },
   { href: '/dashboard/history', label: 'History', icon: History, exact: false },
+  { href: '/dashboard/vocabulary', label: 'Vocabulary', icon: BookA, exact: false },
 ] as const
 
 const PROJECT_LINKS = [

@@ -3,6 +3,7 @@
 import { ChevronLeftIcon, ChevronRightIcon } from 'lucide-react'
 import { Annotation } from '@/components/ui/annotation'
 import { Button } from '@/components/ui/button'
+import { SaveWord } from '@/components/vocabulary/save-word'
 import type { WordSelection } from '@/hooks/use-word-selection'
 import { formatPercent } from '@/lib/format'
 import type { ImageSource } from '@/lib/image-file'
@@ -13,9 +14,10 @@ interface WordDetailsProps {
   words: Word[]
   selection: WordSelection
   image?: ImageSource
+  recognitionId?: number
 }
 
-export function WordDetails({ words, selection, image }: WordDetailsProps) {
+export function WordDetails({ words, selection, image, recognitionId }: WordDetailsProps) {
   const { selected, select } = selection
   const word = selected === null ? undefined : words[selected]
 
@@ -104,6 +106,15 @@ export function WordDetails({ words, selection, image }: WordDetailsProps) {
               : `The model read this word with ${formatPercent(confidence)} confidence but has no translation for it.`}
           </p>
         </div>
+      )}
+
+      {recognitionId !== undefined && (
+        <SaveWord
+          key={selected}
+          recognitionId={recognitionId}
+          wordIndex={selected}
+          text={word.text}
+        />
       )}
 
       <KeyHint>

@@ -47,6 +47,11 @@ export function positionOf(words: Word[], index: number): { line: number; word: 
   return { line: line + 1, word: before + 1 }
 }
 
+// Same rule as `headword` in backend/src/app/vocabulary/service.py, which decides what is saved
+export function headword(text: string): string {
+  return text.normalize('NFC').replace(/^[\p{P}\s]+|[\p{P}\s]+$/gu, '')
+}
+
 export function confidenceOf(word: Word): number | null {
   return word.probabilities[word.text] ?? null
 }

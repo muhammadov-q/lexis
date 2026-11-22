@@ -4,6 +4,7 @@ import {
   confidenceOf,
   groupLines,
   hasBox,
+  headword,
   lineSpans,
   loupeCrop,
   positionOf,
@@ -137,5 +138,18 @@ describe('loupeCrop', () => {
 
     expect(crop.x).toBe(0)
     expect(crop.y).toBe(0)
+  })
+})
+
+describe('headword', () => {
+  it('drops the punctuation around a word, like the backend does', () => {
+    expect(headword('ἐστί,')).toBe('ἐστί')
+    expect(headword('«λόγος»')).toBe('λόγος')
+    expect(headword(' καὶ· ')).toBe('καὶ')
+    expect(headword('ἐστί'.normalize('NFD'))).toBe('ἐστί')
+  })
+
+  it('is empty for punctuation alone', () => {
+    expect(headword('·')).toBe('')
   })
 })
