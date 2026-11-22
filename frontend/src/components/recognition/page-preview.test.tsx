@@ -38,6 +38,15 @@ function load(image: HTMLElement, width: number, height: number) {
 }
 
 describe('PagePreview', () => {
+  it('fits a small page, like a crop, to the space there is instead of its own pixels', () => {
+    const image = renderPreview()
+
+    load(image, 500, 250)
+
+    expect(image.style.getPropertyValue('--page-ratio')).toBe('2')
+    expect(image).toHaveClass('w-[min(100cqw,70vh*var(--page-ratio))]')
+  })
+
   it('draws a box over each word the model found once the image loads', () => {
     const image = renderPreview({ words, selection: makeSelection() })
 

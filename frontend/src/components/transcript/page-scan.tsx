@@ -20,17 +20,31 @@ export function PageScan({ image, alt, words, selection, onError }: PageScanProp
   const marks = size && words && selection ? { size, words, selection } : null
 
   return (
-    <div className="flex max-w-full items-stretch gap-2">
-      {marks && <LineNumbers {...marks} />}
-      <div className="relative min-w-0">
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img
-          {...imageProps}
-          alt={alt}
-          onError={onError}
-          className="block max-h-[70vh] w-auto max-w-full rounded-md"
-        />
-        {marks && <WordBoxes words={marks.words} image={marks.size} selection={marks.selection} />}
+    <div className="@container w-full">
+      <div className="mx-auto flex w-fit max-w-full items-stretch gap-2">
+        {marks && <LineNumbers {...marks} />}
+        <div className="relative min-w-0">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            {...imageProps}
+            alt={alt}
+            onError={onError}
+            style={
+              size
+                ? ({ '--page-ratio': size.width / size.height } as React.CSSProperties)
+                : undefined
+            }
+            className={cn(
+              'block h-auto max-h-[70vh] max-w-full rounded-md',
+              marks
+                ? 'w-[min(100cqw_-_2rem,70vh*var(--page-ratio))]'
+                : 'w-[min(100cqw,70vh*var(--page-ratio))]'
+            )}
+          />
+          {marks && (
+            <WordBoxes words={marks.words} image={marks.size} selection={marks.selection} />
+          )}
+        </div>
       </div>
     </div>
   )
