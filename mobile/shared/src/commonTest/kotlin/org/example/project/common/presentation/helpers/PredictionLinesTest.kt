@@ -2,7 +2,6 @@ package org.example.project.common.presentation.helpers
 
 import kotlin.test.Test
 import kotlin.test.assertEquals
-import kotlin.test.assertFalse
 import kotlin.test.assertTrue
 import org.example.project.common.presentation.models.PredictionBoxModel
 import org.example.project.common.presentation.models.PredictionGlossModel
@@ -13,10 +12,9 @@ class PredictionLinesTest {
         text: String,
         line: Int,
         translation: String? = null,
-        probabilities: Map<String, Double> = emptyMap(),
     ) = WordPredictionModel(
         text = text,
-        probabilities = probabilities,
+        probabilities = emptyMap(),
         box = PredictionBoxModel(1.0, 2.0, 3.0, 4.0),
         line = line,
         gloss = PredictionGlossModel("", "", ""),
@@ -51,12 +49,5 @@ class PredictionLinesTest {
 
         assertEquals(listOf(null), lines.map { it.translation })
         assertTrue(groupPredictionLines(emptyList()).isEmpty())
-    }
-
-    @Test
-    fun confirmationUsesTheRecognizedTextNotAnotherCandidate() {
-        assertFalse(word("word", 0).isConfirmed())
-        assertFalse(word("word", 0, probabilities = mapOf("other" to 0.9)).isConfirmed())
-        assertTrue(word("word", 0, probabilities = mapOf("word" to 0.0)).isConfirmed())
     }
 }

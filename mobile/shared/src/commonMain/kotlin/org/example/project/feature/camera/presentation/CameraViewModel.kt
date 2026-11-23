@@ -173,7 +173,6 @@ class CameraViewModel(
         _state.setState {
             it.copy(
                 isLoading = false,
-                readStartedAtMs = null,
                 prediction = null,
                 selectedPredictionIndex = null,
             )
@@ -195,7 +194,6 @@ class CameraViewModel(
                         prediction = predictionModel,
                         selectedPredictionIndex = null,
                         isLoading = false,
-                        readStartedAtMs = null,
                         readDurationMs = Clock.System.now().toEpochMilliseconds() - startedAtMs,
                         cameraScreenState = CameraScreenState.PhotoCaptured,
                     )
@@ -208,7 +206,6 @@ class CameraViewModel(
                 _state.setState {
                     it.copy(
                         isLoading = false,
-                        readStartedAtMs = null,
                         cameraScreenState = CameraScreenState.Error(
                             mapUploadErrorToUiModel(exception)
                         )
@@ -221,7 +218,9 @@ class CameraViewModel(
     }
 
     private fun setLoading(isLoading: Boolean) {
-        _state.setState { it.copy(isLoading = isLoading) }
+        _state.setState {
+            if (isLoading) it.copy(isLoading = true, readStartedAtMs = null) else it.copy(isLoading = false)
+        }
     }
 
     private companion object {

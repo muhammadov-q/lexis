@@ -113,6 +113,7 @@
     <string name="word_not_confirmed">Not confirmed. kraken read this word differently, so check it on the page.</string>
     <string name="word_no_translation_title">No translation yet</string>
     <string name="word_no_translation_message">The model has no translation for this word.</string>
+    <string name="word_no_translation_message_with_confidence">The model read this word with %1$s confidence but has no translation for it.</string>
     <string name="result_no_words_title">No words found</string>
     <string name="result_no_words_message">Try a closer photo with dark ink on plain paper.</string>
     <string name="result_read_by">Read by</string>

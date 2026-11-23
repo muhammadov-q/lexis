@@ -14,11 +14,7 @@ actual fun createHttpClient(
     HttpClient(CIO) {
         expectSuccess = false
 
-        install(HttpTimeout) {
-            requestTimeoutMillis = 360_000 // 6 minutes
-            connectTimeoutMillis = 30_000
-            socketTimeoutMillis = 360_000
-        }
+        install(HttpTimeout)
 
         install(HttpCookies) {
             storage = cookieStorage

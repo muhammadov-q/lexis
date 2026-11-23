@@ -499,6 +499,22 @@ class CameraViewModelTest {
     }
 
     @Test
+    fun readStartIsKeptWhileTheOverlayFadesOutAndResetByTheNextSpinner() = runCameraTest {
+        val viewModel = createViewModel { samplePrediction() }
+        advanceUntilIdle()
+        viewModel.onEvent(CameraEvent.OnPhotoPicked(byteArrayOf(1)))
+        advanceUntilIdle()
+
+        assertFalse(viewModel.state.value.isLoading)
+        assertNotNull(viewModel.state.value.readStartedAtMs)
+
+        viewModel.onEvent(CameraEvent.OnImagePickerProcessingStarted)
+
+        assertTrue(viewModel.state.value.isLoading)
+        assertNull(viewModel.state.value.readStartedAtMs)
+    }
+
+    @Test
     fun cancellingAReadKeepsThePhotoAndDropsTheResult() = runCameraTest {
         val viewModel = createViewModel { awaitCancellation() }
         advanceUntilIdle()
@@ -512,7 +528,6 @@ class CameraViewModelTest {
 
         val state = viewModel.state.value
         assertFalse(state.isLoading)
-        assertNull(state.readStartedAtMs)
         assertNull(state.prediction)
         assertContentEquals(photo, state.photo)
         assertEquals(CameraScreenState.PhotoCaptured, state.cameraScreenState)

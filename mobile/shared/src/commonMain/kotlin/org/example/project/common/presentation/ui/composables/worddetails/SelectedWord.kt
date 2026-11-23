@@ -7,9 +7,12 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.tooling.preview.Preview
 import lexis.shared.generated.resources.Res
 import lexis.shared.generated.resources.word_no_translation_message
+import lexis.shared.generated.resources.word_no_translation_message_with_confidence
 import lexis.shared.generated.resources.word_no_translation_title
 import org.example.project.common.presentation.ui.preview.previewTranslatedPrediction
 import org.example.project.common.presentation.ui.theme.LexisSpacing
+import org.example.project.common.presentation.helpers.confidence
+import org.example.project.common.presentation.helpers.formatPercent
 import org.example.project.common.presentation.helpers.hasGloss
 import org.example.project.common.presentation.models.WordPredictionModel
 import org.jetbrains.compose.resources.stringResource
@@ -35,9 +38,17 @@ internal fun SelectedWord(
         if (word.hasGloss()) {
             WordGloss(word = word)
         } else {
+            val confidence = word.confidence()
             MutedNote(
                 title = stringResource(Res.string.word_no_translation_title),
-                message = stringResource(Res.string.word_no_translation_message),
+                message = if (confidence == null) {
+                    stringResource(Res.string.word_no_translation_message)
+                } else {
+                    stringResource(
+                        Res.string.word_no_translation_message_with_confidence,
+                        formatPercent(confidence),
+                    )
+                },
             )
         }
     }

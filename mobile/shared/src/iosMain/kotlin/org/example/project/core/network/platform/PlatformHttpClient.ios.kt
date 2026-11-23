@@ -15,10 +15,8 @@ actual fun createHttpClient(
     HttpClient(Darwin) {
         expectSuccess = false
 
-        install(HttpTimeout) {
-            requestTimeoutMillis = 360_000
-            socketTimeoutMillis = 360_000
-        }
+        // No global values: engine defaults apply. Long calls opt in per request with timeout { }.
+        install(HttpTimeout)
 
         install(HttpCookies) {
             storage = cookieStorage

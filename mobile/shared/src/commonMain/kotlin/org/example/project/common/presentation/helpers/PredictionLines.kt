@@ -15,5 +15,3 @@ fun groupPredictionLines(words: List<WordPredictionModel>): List<PredictionLine>
     }
     return lines.values.toList()
 }
-
-fun WordPredictionModel.isConfirmed(): Boolean = probabilities.containsKey(text)
