@@ -9,8 +9,14 @@ export interface WordSelection {
   hover: (index: number | null) => void
 }
 
-export function useWordSelection(result: object | undefined, count: number): WordSelection {
-  const [selection, setSelection] = useState<{ result: object; index: number } | null>(null)
+export function useWordSelection(
+  result: object | undefined,
+  count: number,
+  initial: number | null = null
+): WordSelection {
+  const [selection, setSelection] = useState<{ result: object; index: number } | null>(() =>
+    result !== undefined && initial !== null && initial < count ? { result, index: initial } : null
+  )
   const [hovered, setHovered] = useState<number | null>(null)
   const selected = selection !== null && selection.result === result ? selection.index : null
 

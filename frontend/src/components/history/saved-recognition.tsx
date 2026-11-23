@@ -14,7 +14,7 @@ import { useWordSelection } from '@/hooks/use-word-selection'
 import { recognitionImageUrl, type Recognition } from '@/lib/api/recognitions'
 import { formatDateTime } from '@/lib/format'
 
-export function SavedRecognition({ id }: { id: number }) {
+export function SavedRecognition({ id, word = null }: { id: number; word?: number | null }) {
   const query = useRecognition(id)
 
   return (
@@ -46,13 +46,13 @@ export function SavedRecognition({ id }: { id: number }) {
         </Card>
       )}
 
-      {query.isSuccess && <SavedReading key={query.data.id} recognition={query.data} />}
+      {query.isSuccess && <SavedReading key={query.data.id} recognition={query.data} word={word} />}
     </>
   )
 }
 
-function SavedReading({ recognition }: { recognition: Recognition }) {
-  const selection = useWordSelection(recognition, recognition.predictions.length)
+function SavedReading({ recognition, word }: { recognition: Recognition; word: number | null }) {
+  const selection = useWordSelection(recognition, recognition.predictions.length, word)
   const [failed, setFailed] = useState(false)
   const image = recognitionImageUrl(recognition.id)
 
@@ -81,6 +81,7 @@ function SavedReading({ recognition }: { recognition: Recognition }) {
           recognition={recognition}
           selection={selection}
           image={failed ? undefined : image}
+          savedId={recognition.id}
         />
       </Card>
     </div>

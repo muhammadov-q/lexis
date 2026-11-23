@@ -3,6 +3,7 @@
 import { ChevronLeftIcon, ChevronRightIcon } from 'lucide-react'
 import { Annotation } from '@/components/ui/annotation'
 import { Button } from '@/components/ui/button'
+import { WordNote } from '@/components/vocabulary/word-note'
 import type { WordSelection } from '@/hooks/use-word-selection'
 import { formatPercent } from '@/lib/format'
 import type { ImageSource } from '@/lib/image-file'
@@ -13,26 +14,20 @@ interface WordDetailsProps {
   words: Word[]
   selection: WordSelection
   image?: ImageSource
+  recognitionId?: number
 }
 
-export function WordDetails({ words, selection, image }: WordDetailsProps) {
+export function WordDetails({ words, selection, image, recognitionId }: WordDetailsProps) {
   const { selected, select } = selection
   const word = selected === null ? undefined : words[selected]
 
   if (selected === null || word === undefined) {
     return (
-      <div className="space-y-4">
-        <div className="grid aspect-[3/1] place-items-center rounded-2xl bg-muted px-6 text-center">
-          <div className="space-y-1">
-            <p className="font-medium">Pick a word</p>
-            <p className="text-sm text-muted-foreground">
-              Click a word in the transcript or a box on the page.
-            </p>
-          </div>
+      <div className="grid aspect-[3/1] place-items-center rounded-2xl bg-muted px-6 text-center">
+        <div className="space-y-1">
+          <p className="font-medium">Pick a word</p>
+          <p className="text-sm text-muted-foreground">On the page or in the transcript.</p>
         </div>
-        <KeyHint>
-          Or press <Kbd>→</Kbd> to start with the first word.
-        </KeyHint>
       </div>
     )
   }
@@ -76,39 +71,39 @@ export function WordDetails({ words, selection, image }: WordDetailsProps) {
         </div>
       </div>
 
-      {gloss ? (
-        <dl className="grid grid-cols-[auto_1fr] items-baseline gap-x-6 gap-y-3 rounded-xl bg-muted px-5 py-4">
+      <dl className="grid grid-cols-[auto_1fr] items-baseline gap-x-6 gap-y-3 rounded-xl bg-muted px-5 py-4">
+        {gloss ? (
+          <>
+            <Entry term="Translation">
+              <span className="text-lg font-medium">{gloss.translation}</span>
+            </Entry>
+            <Entry term="Dictionary form">
+              <span className="font-greek text-lg">{gloss.lemma}</span>
+            </Entry>
+            <Entry term="Definition">{gloss.definition}</Entry>
+          </>
+        ) : (
           <Entry term="Translation">
-            <span className="text-lg font-medium">{gloss.translation}</span>
+            <span className="text-muted-foreground">None</span>
           </Entry>
-          <Entry term="Dictionary form">
-            <span className="font-greek text-lg">{gloss.lemma}</span>
-          </Entry>
-          <Entry term="Definition">{gloss.definition}</Entry>
-          <Entry term="Confidence">
-            {confidence === null ? (
-              <span className="text-sm">
-                Not confirmed. kraken read this word differently, so check it on the page.
-              </span>
-            ) : (
-              <span className="font-mono text-sm tabular-nums">{formatPercent(confidence)}</span>
-            )}
-          </Entry>
-        </dl>
-      ) : (
-        <div className="space-y-1 rounded-xl bg-muted px-5 py-4">
-          <p className="font-medium">No translation yet</p>
-          <p className="text-sm text-muted-foreground">
-            {confidence === null
-              ? 'The model has no translation for this word.'
-              : `The model read this word with ${formatPercent(confidence)} confidence but has no translation for it.`}
-          </p>
-        </div>
-      )}
+        )}
+        <Entry term="Confidence">
+          {confidence === null ? (
+            <span className="text-sm">Not confirmed by kraken</span>
+          ) : (
+            <span className="font-mono text-sm tabular-nums">{formatPercent(confidence)}</span>
+          )}
+        </Entry>
+      </dl>
 
-      <KeyHint>
-        <Kbd>←</Kbd> <Kbd>→</Kbd> move between words, <Kbd>Esc</Kbd> clears
-      </KeyHint>
+      {recognitionId !== undefined && (
+        <WordNote
+          key={selected}
+          recognitionId={recognitionId}
+          wordIndex={selected}
+          text={word.text}
+        />
+      )}
     </section>
   )
 }
@@ -119,17 +114,5 @@ function Entry({ term, children }: { term: string; children: React.ReactNode }) 
       <dt className="text-sm text-muted-foreground">{term}</dt>
       <dd>{children}</dd>
     </>
-  )
-}
-
-function KeyHint({ children }: { children: React.ReactNode }) {
-  return <p className="text-caption text-muted-foreground pointer-coarse:hidden">{children}</p>
-}
-
-function Kbd({ children }: { children: React.ReactNode }) {
-  return (
-    <kbd className="rounded bg-muted px-1.5 py-0.5 font-mono text-caption text-foreground">
-      {children}
-    </kbd>
   )
 }

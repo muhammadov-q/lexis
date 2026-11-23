@@ -15,6 +15,7 @@ interface RecognitionResultProps {
   selection: WordSelection
   image?: ImageSource
   durationMs?: number
+  savedId?: number
 }
 
 export function RecognitionResult({
@@ -22,6 +23,7 @@ export function RecognitionResult({
   selection,
   image,
   durationMs,
+  savedId,
 }: RecognitionResultProps) {
   const { predictions: words, model_version: modelVersion } = recognition
   const isPlaceholder = PLACEHOLDER_MODEL_VERSION.test(modelVersion)
@@ -34,7 +36,7 @@ export function RecognitionResult({
       </div>
 
       {words.length > 0 ? (
-        <WordDetails words={words} selection={selection} image={image} />
+        <WordDetails words={words} selection={selection} image={image} recognitionId={savedId} />
       ) : (
         <div className="space-y-1 rounded-xl bg-muted px-5 py-4">
           <p className="text-lg font-medium">No words found</p>
@@ -44,20 +46,16 @@ export function RecognitionResult({
         </div>
       )}
 
-      <div className="space-y-1 text-sm text-muted-foreground">
-        <p>
-          Read by <span className="font-mono text-foreground">{modelVersion}</span>
-          {durationMs !== undefined && (
-            <>
-              {' '}
-              in <Annotation>{formatDuration(durationMs)}</Annotation>
-            </>
-          )}
-        </p>
-        {isPlaceholder && (
-          <p>Placeholder output. This model returns the same words for every page.</p>
+      <p className="text-sm text-muted-foreground">
+        Read by <span className="font-mono text-foreground">{modelVersion}</span>
+        {isPlaceholder && ' (placeholder)'}
+        {durationMs !== undefined && (
+          <>
+            {' '}
+            in <Annotation>{formatDuration(durationMs)}</Annotation>
+          </>
         )}
-      </div>
+      </p>
     </section>
   )
 }

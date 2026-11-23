@@ -62,7 +62,7 @@ describe('RecognitionResult', () => {
   it.each(['mock', 'eparchos-6791'])('flags the placeholder model %s', (modelVersion) => {
     const { region } = renderResult({ model_version: modelVersion })
 
-    expect(within(region).getByText(/^placeholder output\./i)).toBeInTheDocument()
+    expect(within(region).getByText(/\(placeholder\)/)).toBeInTheDocument()
   })
 
   it.each(['kraken-kraken_eparchos', 'KNN-100126'])(
@@ -70,7 +70,7 @@ describe('RecognitionResult', () => {
     (modelVersion) => {
       const { region } = renderResult({ model_version: modelVersion })
 
-      expect(within(region).queryByText(/placeholder output/i)).not.toBeInTheDocument()
+      expect(within(region).queryByText(/\(placeholder\)/)).not.toBeInTheDocument()
     }
   )
 

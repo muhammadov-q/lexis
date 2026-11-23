@@ -17,6 +17,11 @@ describe('useWordSelection', () => {
     expect(result.current.selected).toBeNull()
   })
 
+  it('can start on a given word, if the result has it', () => {
+    expect(renderHook(() => useWordSelection(first, 3, 2)).result.current.selected).toBe(2)
+    expect(renderHook(() => useWordSelection(first, 3, 3)).result.current.selected).toBeNull()
+  })
+
   it('remembers the picked word and lets go of it', () => {
     const { result } = renderHook(() => useWordSelection(first, 3))
 
