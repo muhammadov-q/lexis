@@ -7,6 +7,7 @@ from app.auth.models import User
 from app.db import create_db_engine, create_session_factory, get_db, migrate
 from app.main import app
 from app.prediction import get_predictor
+from app.recognitions.models import Recognition
 from ml.predictor import DummyPredictor
 
 
@@ -46,5 +47,24 @@ def make_user(db):
         db.add(user)
         db.commit()
         return user.id
+
+    return make
+
+
+@pytest.fixture
+def make_recognition(db):
+    def make(user_id, predictions, filename="1r.png"):
+        recognition = Recognition(
+            user_id=user_id,
+            created_at=datetime.now(UTC),
+            filename=filename,
+            content_type="image/png",
+            image=b"png bytes",
+            model_version="mock",
+            predictions=predictions,
+        )
+        db.add(recognition)
+        db.commit()
+        return recognition.id
 
     return make

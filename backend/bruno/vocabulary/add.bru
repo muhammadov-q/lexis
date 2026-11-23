@@ -1,0 +1,33 @@
+meta {
+  name: Vocabulary - add a word from the page
+  type: http
+  seq: 3
+}
+
+post {
+  url: {{baseUrl}}/vocabulary
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "recognition_id": {{vocabularyPageId}},
+    "word_index": 0,
+    "note": "Opens the page"
+  }
+}
+
+assert {
+  res.status: eq 201
+  res.body.id: isNumber
+  res.body.word: isString
+  res.body.gloss.translation: isString
+  res.body.note: eq Opens the page
+  res.body.source.recognition_id: eq {{vocabularyPageId}}
+  res.body.source.word_index: eq 0
+}
+
+script:post-response {
+  bru.setVar("vocabularyWordId", res.getBody().id);
+}

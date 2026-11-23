@@ -1,0 +1,15 @@
+meta {
+  name: Vocabulary - removed word
+  type: http
+  seq: 9
+}
+
+get {
+  url: {{baseUrl}}/vocabulary/{{vocabularyWordId}}
+  body: none
+  auth: none
+}
+
+assert {
+  res.status: eq 404
+}

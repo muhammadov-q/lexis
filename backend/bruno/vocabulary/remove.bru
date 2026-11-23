@@ -1,0 +1,15 @@
+meta {
+  name: Vocabulary - remove the word
+  type: http
+  seq: 8
+}
+
+delete {
+  url: {{baseUrl}}/vocabulary/{{vocabularyWordId}}
+  body: none
+  auth: none
+}
+
+assert {
+  res.status: eq 204
+}

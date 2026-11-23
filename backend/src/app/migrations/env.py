@@ -6,6 +6,7 @@ from sqlalchemy import Connection
 
 import app.auth.models  # noqa: F401  registers the auth tables on Base.metadata
 import app.recognitions.models  # noqa: F401
+import app.vocabulary.models  # noqa: F401
 from app.db import Base, UtcDateTime, create_db_engine, database_url
 
 

@@ -1,0 +1,22 @@
+meta {
+  name: Vocabulary - the same word again
+  type: http
+  seq: 4
+}
+
+post {
+  url: {{baseUrl}}/vocabulary
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "recognition_id": {{vocabularyPageId}},
+    "word_index": 0
+  }
+}
+
+assert {
+  res.status: eq 409
+}

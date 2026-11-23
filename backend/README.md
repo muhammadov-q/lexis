@@ -181,6 +181,10 @@ More in `docs/architecture/database.md`.
 
 `/recognitions` reads a page like `/predict` and also saves it for the signed-in user, image included. `GET /recognitions` lists your results, newest first; `GET /recognitions/{id}` and `/recognitions/{id}/image` return one. The web app uses these; `/predict` stays open for the mobile app. The code is in `src/app/recognitions/`.
 
+## Vocabulary
+
+`POST /vocabulary` with `recognition_id`, `word_index` and an optional `note` saves a word from one of your results, with its gloss and where it came from. `GET /vocabulary` lists your words, newest first; `GET`, `PATCH` (the note) and `DELETE /vocabulary/{id}` work on one. A word is saved once, without the punctuation around it, so a second `ἐστί,` gets a 409. The code is in `src/app/vocabulary/`.
+
 ## Phone capture sessions
 
 `/capture-sessions` lets a phone send photos to the web app (the "Use your phone" QR code). Sessions
