@@ -6,10 +6,11 @@ import org.example.project.feature.auth.di.authModule
 import org.example.project.feature.camera.di.cameraModule
 import org.example.project.feature.history.di.historyModule
 import org.example.project.feature.historydetail.di.historyDetailModule
+import org.example.project.feature.vocabulary.di.vocabularyModule
 import org.koin.core.module.dsl.viewModelOf
 import org.koin.dsl.module
 
 val appModule = module {
-    includes(coreNetworkModule, authModule, cameraModule, historyModule, historyDetailModule)
+    includes(coreNetworkModule, authModule, cameraModule, historyModule, historyDetailModule, vocabularyModule)
     viewModelOf(::AppViewModel)
 }

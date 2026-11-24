@@ -3,6 +3,7 @@
     <string name="nav_camera">Camera</string>
     <string name="nav_documents">History</string>
     <string name="nav_source">Source</string>
+    <string name="nav_vocabulary">Vocabulary</string>
 
     <!-- Authentication -->
     <string name="auth_branding">Lexis</string>
@@ -136,4 +137,43 @@
     <string name="reading_elapsed">%1$s elapsed</string>
     <string name="reading_cancel">Cancel</string>
     <string name="action_read_page">Read the page</string>
+
+    <!-- Vocabulary -->
+    <string name="vocabulary_header_title">Vocabulary</string>
+    <string name="vocabulary_header_subtitle">Words you saved from your pages, newest first.</string>
+    <string name="vocabulary_guest_title">Your vocabulary</string>
+    <string name="vocabulary_guest_message">Sign in to keep a vocabulary of the words you read, with your own notes.</string>
+    <string name="vocabulary_count_word">%1$d word</string>
+    <string name="vocabulary_count_words">%1$d words</string>
+    <string name="vocabulary_machine_translations">Machine translations</string>
+    <string name="vocabulary_no_translation">No translation</string>
+    <string name="vocabulary_empty_title">No words yet</string>
+    <string name="vocabulary_empty_message">Save words from the pages you read.</string>
+    <string name="vocabulary_open_history">Open history</string>
+    <string name="vocabulary_source">%1$s, line %2$d</string>
+    <string name="vocabulary_added_on">Added on %1$s</string>
+    <string name="vocabulary_meaning">Meaning</string>
+    <string name="vocabulary_note_label">Note</string>
+    <string name="vocabulary_note_placeholder">Add a note</string>
+    <string name="vocabulary_save_word">Save word</string>
+    <string name="vocabulary_save_note">Save note</string>
+    <string name="vocabulary_saving">Saving…</string>
+    <string name="vocabulary_saved">Saved</string>
+    <string name="vocabulary_in_vocabulary">In vocabulary</string>
+    <string name="vocabulary_remove_word">Remove word</string>
+    <string name="vocabulary_remove_title">Remove %1$s?</string>
+    <string name="vocabulary_remove_note_deleted">Your note is deleted too.</string>
+    <string name="vocabulary_remove">Remove</string>
+    <string name="vocabulary_removing">Removing…</string>
+    <string name="vocabulary_cancel">Cancel</string>
+    <string name="vocabulary_error_title">Could not load your vocabulary</string>
+    <string name="vocabulary_error_word_title">Could not open this word</string>
+    <string name="vocabulary_error_load">Could not load your vocabulary. Please try again.</string>
+    <string name="vocabulary_error_load_word">Could not load this word. Please try again.</string>
+    <string name="vocabulary_error_add">Could not add this word.</string>
+    <string name="vocabulary_error_save_note">Could not save your note.</string>
+    <string name="vocabulary_error_remove">Could not remove this word.</string>
+    <string name="vocabulary_error_not_found">This word is not in your vocabulary.</string>
+    <string name="vocabulary_error_unauthorized">Sign in to keep a vocabulary.</string>
+    <string name="vocabulary_error_network">Could not reach the server. Check your network and try again.</string>
 </resources>

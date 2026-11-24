@@ -10,7 +10,7 @@ class NavigationDestinationsTest {
     fun routesStayStableAndInExpectedOrder() {
         val routes = Screen.entries.map { it.route }
 
-        assertEquals(listOf("camera", "docs", "source"), routes)
+        assertEquals(listOf("camera", "docs", "vocabulary", "source"), routes)
     }
 
     @Test
@@ -26,6 +26,18 @@ class NavigationDestinationsTest {
         assertEquals(Screen.Docs.route, AppRoutes.bottomBarRoute(AppRoutes.HISTORY_DETAIL))
         assertEquals(Screen.CameraView.route, AppRoutes.bottomBarRoute(Screen.CameraView.route))
         assertEquals(null, AppRoutes.bottomBarRoute(null))
+    }
+
+    @Test
+    fun historyDetailRouteCanSelectAWord() {
+        assertEquals("docs/42?word=7", AppRoutes.historyDetail(42, wordIndex = 7))
+    }
+
+    @Test
+    fun vocabularyWordRouteContainsIdAndSelectsVocabularyTab() {
+        assertEquals("vocabulary/5", AppRoutes.vocabularyWord(5))
+        assertEquals(Screen.Vocabulary.route, AppRoutes.bottomBarRoute(AppRoutes.VOCABULARY_WORD))
+        assertEquals(true, AppRoutes.showsBackButton(AppRoutes.VOCABULARY_WORD, true))
     }
 
     @Test

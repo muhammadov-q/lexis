@@ -123,7 +123,7 @@ private fun AppScaffold(
                 NavigationBottomBar(
                     onClick = onDestinationSelected,
                     currentRoute = AppRoutes.bottomBarRoute(currentRoute),
-                    destinations = listOf(Screen.CameraView, Screen.Docs, Screen.Source),
+                    destinations = listOf(Screen.CameraView, Screen.Docs, Screen.Vocabulary, Screen.Source),
                 )
             }
         },

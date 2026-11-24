@@ -5,10 +5,12 @@ import lexis.shared.generated.resources.Res
 import lexis.shared.generated.resources.ic_camera
 import lexis.shared.generated.resources.ic_docs
 import lexis.shared.generated.resources.ic_source
+import lexis.shared.generated.resources.ic_vocabulary
 import org.jetbrains.compose.resources.StringResource
 import lexis.shared.generated.resources.nav_camera
 import lexis.shared.generated.resources.nav_documents
 import lexis.shared.generated.resources.nav_source
+import lexis.shared.generated.resources.nav_vocabulary
 
 enum class Screen(
     val route: String,
@@ -17,5 +19,6 @@ enum class Screen(
 ) {
     CameraView("camera", Res.string.nav_camera, Res.drawable.ic_camera),
     Docs("docs", Res.string.nav_documents, Res.drawable.ic_docs),
+    Vocabulary("vocabulary", Res.string.nav_vocabulary, Res.drawable.ic_vocabulary),
     Source("source", Res.string.nav_source, Res.drawable.ic_source),
 }

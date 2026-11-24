@@ -45,6 +45,7 @@ fun CameraScreen(
     isAuthenticated: Boolean,
     onOpenSaved: (Long) -> Unit,
     onSignInRequested: () -> Unit,
+    onOpenVocabularyWord: (Long) -> Unit = {},
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
 
@@ -53,6 +54,7 @@ fun CameraScreen(
         isAuthenticated = isAuthenticated,
         onOpenSaved = onOpenSaved,
         onSignInRequested = onSignInRequested,
+        onOpenVocabularyWord = onOpenVocabularyWord,
         onTakePhotoClicked = { viewModel.onEvent(CameraEvent.CapturePhotoRequested) },
         onChooseFromPhotosClicked = { viewModel.onEvent(CameraEvent.SelectPhotoRequested) },
         onRetryClicked = { viewModel.onEvent(CameraEvent.RetryUploadRequested) },
@@ -97,6 +99,7 @@ private fun CameraScreenContent(
     isAuthenticated: Boolean,
     onOpenSaved: (Long) -> Unit,
     onSignInRequested: () -> Unit,
+    onOpenVocabularyWord: (Long) -> Unit,
     onTakePhotoClicked: () -> Unit,
     onChooseFromPhotosClicked: () -> Unit,
     onRetryClicked: () -> Unit,
@@ -169,6 +172,7 @@ private fun CameraScreenContent(
                                 onReadPageClicked = onRetryClicked,
                                 onOpenSaved = onOpenSaved,
                                 onSignInRequested = onSignInRequested,
+                                onOpenVocabularyWord = onOpenVocabularyWord,
                             )
 
                         is CameraScreenState.Error ->
@@ -198,6 +202,7 @@ private fun CameraScreenPreview(
             isAuthenticated = false,
             onOpenSaved = {},
             onSignInRequested = {},
+            onOpenVocabularyWord = {},
             onTakePhotoClicked = {},
             onChooseFromPhotosClicked = {},
             onRetryClicked = {},
