@@ -55,7 +55,7 @@ fun NavigationBottomBar(
 @Composable
 private fun NavigationBottomBarPreview() {
 
-    val screens = listOf(Screen.CameraView, Screen.Docs, Screen.Source)
+    val screens = listOf(Screen.CameraView, Screen.Docs, Screen.Vocabulary, Screen.Source)
     NavigationBottomBar(
         onClick = {},
         currentRoute = Screen.CameraView.route,

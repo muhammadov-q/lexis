@@ -10,6 +10,7 @@ import lexis.shared.generated.resources.result_no_words_message
 import lexis.shared.generated.resources.result_no_words_title
 import org.example.project.common.presentation.ui.composables.reading.ReadingCard
 import org.example.project.common.presentation.models.PredictionModel
+import org.example.project.common.presentation.models.WordPredictionModel
 import org.jetbrains.compose.resources.stringResource
 import androidx.compose.ui.graphics.ImageBitmap
 import org.example.project.common.presentation.ui.preview.previewPage
@@ -23,6 +24,7 @@ fun WordDetailsCard(
     modifier: Modifier = Modifier,
     durationMs: Long? = null,
     footer: @Composable () -> Unit = {},
+    selectedWordFooter: @Composable (index: Int, word: WordPredictionModel) -> Unit = { _, _ -> },
 ) {
     val words = prediction.predictions
     val selected = selectedPredictionIndex?.takeIf { it in words.indices }
@@ -38,12 +40,15 @@ fun WordDetailsCard(
 
             selected == null -> PickAWordPlaceholder()
 
-            else -> SelectedWord(
-                words = words,
-                index = selected,
-                image = image,
-                onPredictionSelected = onPredictionSelected,
-            )
+            else -> {
+                SelectedWord(
+                    words = words,
+                    index = selected,
+                    image = image,
+                    onPredictionSelected = onPredictionSelected,
+                )
+                selectedWordFooter(selected, words[selected])
+            }
         }
 
         ReadByLine(modelVersion = prediction.modelVersion, durationMs = durationMs)

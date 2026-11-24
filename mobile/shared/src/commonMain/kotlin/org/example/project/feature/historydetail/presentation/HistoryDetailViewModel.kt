@@ -34,7 +34,7 @@ class HistoryDetailViewModel(
         }
     }
 
-    fun load(id: Long) {
+    fun load(id: Long, initialWordIndex: Int? = null) {
         request?.cancel()
         val currentRequestId = ++requestId
         _state.setState {
@@ -54,7 +54,8 @@ class HistoryDetailViewModel(
                     it.copy(
                         isLoading = false,
                         selectedDetail = detail,
-                        selectedPredictionIndex = null,
+                        selectedPredictionIndex = initialWordIndex
+                            ?.takeIf { index -> index in detail.prediction.predictions.indices },
                     )
                 }
             } catch (cancellation: CancellationException) {

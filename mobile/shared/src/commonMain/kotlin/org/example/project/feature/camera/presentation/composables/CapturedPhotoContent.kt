@@ -27,6 +27,7 @@ import lexis.shared.generated.resources.action_take_new_photo
 import lexis.shared.generated.resources.captured_photo_description
 import org.example.project.common.presentation.ui.composables.transcript.TranscriptCard
 import org.example.project.common.presentation.ui.composables.worddetails.WordDetailsCard
+import org.example.project.feature.vocabulary.presentation.note.WordNote
 
 @Composable
 fun CapturedPhotoContent(
@@ -43,6 +44,7 @@ fun CapturedPhotoContent(
     onReadPageClicked: () -> Unit = {},
     onOpenSaved: (Long) -> Unit = {},
     onSignInRequested: () -> Unit = {},
+    onOpenVocabularyWord: (Long) -> Unit = {},
 ) {
     val image = photo?.let { remember(photo) { decodePhoto(photo) } }
 
@@ -75,6 +77,17 @@ fun CapturedPhotoContent(
                         onOpenSaved = onOpenSaved,
                         onSignInRequested = onSignInRequested,
                     )
+                },
+                selectedWordFooter = { index, word ->
+                    val savedId = prediction.savedId
+                    if (isAuthenticated && savedId != null) {
+                        WordNote(
+                            recognitionId = savedId,
+                            wordIndex = index,
+                            text = word.text,
+                            onOpenVocabularyWord = onOpenVocabularyWord,
+                        )
+                    }
                 },
             )
 

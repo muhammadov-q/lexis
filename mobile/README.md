@@ -18,64 +18,57 @@ The code is organized into presentation, domain, and data layers:
 
 ### Prerequisites
 
-- **Android:** Android Studio, Android SDK, and an emulator or connected device.
-- **iOS:** macOS, Xcode, and an iOS simulator or connected device.
+- **Backend:** running on port 8000, as described in the [Backend README](../backend/README.md#run-the-api).
+- **Android:** Android Studio with an emulator.
+- **iOS:** macOS with Xcode and an iOS simulator.
 
-The backend must be running before testing image uploads. See the [Backend README](../backend/README.md) for setup instructions.
+### Backend address
+
+The app reaches the backend through `localBackendBaseUrl()`. Set it for where you run the app:
+
+| Where | File | Address |
+|---|---|---|
+| Android emulator | `shared/src/androidMain/kotlin/org/example/project/core/network/platform/PlatformHttpClient.android.kt` | `http://127.0.0.1:8000` (default, needs `adb reverse` below) |
+| iOS simulator | `shared/src/iosMain/kotlin/org/example/project/core/network/platform/PlatformHttpClient.ios.kt` | `http://127.0.0.1:8000` (default) |
+| Phone | the file for its platform | `http://<computer-LAN-IP>:8000` |
+
+For a phone, the phone and the computer must be on the same Wi-Fi, and the backend must be
+started with `--host 0.0.0.0`.
 
 ### Android
 
-1. Open `shared/src/androidMain/kotlin/org/example/project/core/network/platform/PlatformHttpClient.android.kt`.
-
-2. Configure `localBackendBaseUrl()` for your target:
-
-   | Target | Backend URL |
-      |---|---|
-   | Emulator with ADB reverse | `http://127.0.0.1:8000` |
-   | Standard Android emulator | `http://10.0.2.2:8000` |
-   | Physical device | `http://<computer-LAN-IP>:8000` |
-
-3. For the recommended emulator setup, forward the backend port:
+1. Open the `mobile/` folder in Android Studio and start an emulator from **Device Manager**.
+2. Forward the emulator's port 8000 to the backend on your computer (again after every
+   emulator restart):
 
    ```bash
-   adb reverse tcp:8000 tcp:8000
+   ~/Library/Android/sdk/platform-tools/adb reverse tcp:8000 tcp:8000
    ```
 
-   Run this command again after restarting the emulator.
-
-   For a physical device, connect the phone and computer to the same network. The backend must listen on `0.0.0.0`, and the firewall must allow connections on port `8000`.
-
-4. From the `mobile/` directory, build the debug APK:
-
-   ```bash
-   ./gradlew :androidApp:assembleDebug
-   ```
-
-   Alternatively, build and run the Android app using Android Studio or Gradle.
+3. Run the `androidApp` configuration.
 
 ### iOS
 
-1. Open `shared/src/iosMain/kotlin/org/example/project/core/network/platform/PlatformHttpClient.ios.kt`.
+1. Open `iosApp/iosApp.xcodeproj` in Xcode.
+2. Pick a simulator and run the `iosApp` scheme.
 
-2. Configure `localBackendBaseUrl()`:
+The camera does not work in the simulator; use **Choose from photos** there.
 
-   - **Simulator:** `http://127.0.0.1:8000`
-   - **Physical device:** `http://<computer-LAN-IP>:8000`
+### Tests
 
-3. Open the iOS project in Xcode and run the app on a simulator or connected device.
-
-For a physical device, ensure the backend is reachable over the local network. Camera functionality may be limited in simulators, so a physical device is recommended for testing photo capture.
-
-**Note for physical devices:** The backend must listen on `0.0.0.0` and both devices must be connected to the same Wi-Fi network.
-
-Start the backend using:
+From the `mobile/` directory, run what CI runs (shared tests on Android and iOS, and the
+Android debug build):
 
 ```bash
-ML_PREDICTOR="eparchos" uv run uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
+./check.sh
 ```
 
+`./gradlew :shared:testAndroidHostTest` runs only the shared tests on the JVM, which is quicker.
 
 ## Using the App
+
+You can use the app as a guest, or **Sign in** (top right) to save your results. Signed-in
+users find their pages under **History** and their words under **Vocabulary**.
 
 1. Choose a model from the list; its names and descriptions come from `GET /models`.
    The backend's default is selected initially. If the list cannot be loaded, use **Reload**
@@ -96,6 +89,24 @@ ML_PREDICTOR="eparchos" uv run uvicorn app.main:app --reload --host 0.0.0.0 --po
 Results with a `model_version` of `mock` or `eparchos-` followed by one or more characters
 are placeholders: they return the same words for every page. An invalid image or model
 can cause a validation error; reload the model list or choose another image.
+
+### Vocabulary
+
+Signed-in users can keep a vocabulary of the words they read. It uses the backend's
+`/vocabulary` endpoints, so the words are the same as in the web app.
+
+1. Select a word on a saved page, from **History** or right after reading a page. Under
+   the **Word** card, write a **Note** if you like and tap **Save word**. Words are saved
+   without the punctuation around them, so `ἐστί,` and `ἐστί` are the same entry.
+2. Once a word is saved, the same field edits its note (**Save note**), and **In vocabulary**
+   opens the word.
+3. The **Vocabulary** tab lists your words, newest first, with the page and line they come
+   from and their translation.
+4. Tap a word to see its translation, dictionary form and definition, and to edit its note.
+   The page and line under the meaning open that page with the word selected.
+   **Remove word** deletes the word and its note after you confirm.
+
+Guests see a prompt to sign in instead.
 
 ## Project Structure
 

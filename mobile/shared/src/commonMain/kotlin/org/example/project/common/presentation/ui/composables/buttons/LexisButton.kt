@@ -19,7 +19,8 @@ fun LexisButton(
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
     buttonStyle: LexisButtonStyle = LexisButtonStyle.Primary,
-    buttonSize: LexisButtonSize = LexisButtonSize.Large
+    buttonSize: LexisButtonSize = LexisButtonSize.Large,
+    enabled: Boolean = true,
 ) {
 
     Button(
@@ -27,10 +28,13 @@ fun LexisButton(
             .fillMaxWidth()
             .height(buttonSize.height),
         onClick = onClick,
+        enabled = enabled,
         shape = MaterialTheme.shapes.medium,
         colors = ButtonDefaults.buttonColors(
             containerColor = buttonStyle.containerColor,
-            contentColor = buttonStyle.textColor
+            contentColor = buttonStyle.textColor,
+            disabledContainerColor = buttonStyle.containerColor.copy(alpha = 0.5f),
+            disabledContentColor = buttonStyle.textColor.copy(alpha = 0.5f),
         ),
         contentPadding = PaddingValues(horizontal = LexisSpacing.padding_24),
         border = buttonStyle.borderStroke
