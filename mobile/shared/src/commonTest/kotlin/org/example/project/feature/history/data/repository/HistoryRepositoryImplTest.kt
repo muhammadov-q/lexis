@@ -56,7 +56,8 @@ class HistoryRepositoryImplTest {
                   "filename": "saved.png",
                   "model_version": "eparchos",
                   "predictions": [
-                    {"text":"λόγος","probabilities":{"λόγος":0.95},"box":{"x":10,"y":20,"w":30,"h":40},"line":0,"gloss":{"lemma":"λόγος","translation":"word","definition":"def"}}
+                    {"text":"λόγος","probabilities":{},"box":{"x":10,"y":20,"w":30,"h":40},"line":0,"gloss":{"lemma":"λόγος","translation":"word","definition":"def"},"line_translation":"A word."},
+                    {"text":"?","probabilities":{"?":0.5},"box":{"x":1,"y":2,"w":3,"h":4}}
                   ]
                 }
                 """.trimIndent(),
@@ -69,7 +70,11 @@ class HistoryRepositoryImplTest {
         assertEquals(7, detail.id)
         assertEquals("saved.png", detail.filename)
         assertEquals("eparchos", detail.modelVersion)
-        assertEquals("λόγος", detail.prediction.predictions.single().text)
+        assertEquals(listOf("λόγος", "?"), detail.prediction.predictions.map { it.text })
+        assertEquals(emptyMap(), detail.prediction.predictions[0].probabilities)
+        assertEquals("A word.", detail.prediction.predictions[0].lineTranslation)
+        assertEquals("", detail.prediction.predictions[1].gloss.translation)
+        assertEquals(null, detail.prediction.predictions[1].lineTranslation)
         assertContentEquals(image, detail.imageBytes)
     }
 

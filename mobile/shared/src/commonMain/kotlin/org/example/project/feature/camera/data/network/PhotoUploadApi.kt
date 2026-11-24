@@ -1,6 +1,7 @@
 package org.example.project.feature.camera.data.network
 
 import io.ktor.client.HttpClient
+import io.ktor.client.plugins.timeout
 import io.ktor.client.request.post
 import io.ktor.client.request.get
 import io.ktor.client.request.setBody
@@ -43,7 +44,13 @@ class PhotoUploadApi(
         val status: Int
         val body: String
         try {
-            val response = client.post(endpoint) { setBody(photoBody(photo, model)) }
+            val response = client.post(endpoint) {
+                timeout {
+                    requestTimeoutMillis = UPLOAD_TIMEOUT_MILLIS
+                    socketTimeoutMillis = UPLOAD_TIMEOUT_MILLIS
+                }
+                setBody(photoBody(photo, model))
+            }
             status = response.status.value
             body = response.bodyAsText()
         } catch (cancellation: CancellationException) {
@@ -77,5 +84,6 @@ class PhotoUploadApi(
 
     private companion object {
         const val TAG = "PhotoUploadApi"
+        const val UPLOAD_TIMEOUT_MILLIS = 360_000L // 6 minutes
     }
 }

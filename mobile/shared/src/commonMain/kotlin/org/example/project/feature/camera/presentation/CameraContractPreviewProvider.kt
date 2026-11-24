@@ -3,10 +3,10 @@ package org.example.project.feature.camera.presentation
 import androidx.compose.ui.tooling.preview.PreviewParameterProvider
 import org.example.project.feature.camera.presentation.models.CameraScreenErrorState
 import org.example.project.feature.camera.presentation.models.CameraScreenState
-import org.example.project.feature.camera.presentation.models.PredictionBoxModel
-import org.example.project.feature.camera.presentation.models.PredictionGlossModel
-import org.example.project.feature.camera.presentation.models.PredictionModel
-import org.example.project.feature.camera.presentation.models.WordPredictionModel
+import org.example.project.common.presentation.models.PredictionBoxModel
+import org.example.project.common.presentation.models.PredictionGlossModel
+import org.example.project.common.presentation.models.PredictionModel
+import org.example.project.common.presentation.models.WordPredictionModel
 
 class CameraContractPreviewProvider : PreviewParameterProvider<CameraContract> {
     private val prediction = PredictionModel(

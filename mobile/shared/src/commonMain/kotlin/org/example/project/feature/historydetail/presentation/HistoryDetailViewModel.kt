@@ -54,7 +54,7 @@ class HistoryDetailViewModel(
                     it.copy(
                         isLoading = false,
                         selectedDetail = detail,
-                        selectedPredictionIndex = detail.prediction.predictions.indices.firstOrNull(),
+                        selectedPredictionIndex = null,
                     )
                 }
             } catch (cancellation: CancellationException) {
@@ -79,10 +79,10 @@ class HistoryDetailViewModel(
         request = null
     }
 
-    fun selectPrediction(index: Int) {
+    fun selectPrediction(index: Int?) {
         _state.setState { current ->
             val maxIndex = current.selectedDetail?.prediction?.predictions?.lastIndex ?: -1
-            if (index in 0..maxIndex) current.copy(selectedPredictionIndex = index) else current
+            if (index == null || index in 0..maxIndex) current.copy(selectedPredictionIndex = index) else current
         }
     }
 }

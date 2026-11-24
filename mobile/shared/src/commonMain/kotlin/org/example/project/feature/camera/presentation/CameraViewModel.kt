@@ -11,7 +11,6 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
 import org.example.project.common.presentation.ui.helpers.UiText
-import org.example.project.common.presentation.ui.helpers.UiText.Plain
 import org.example.project.core.mvi.setEffect
 import org.example.project.core.mvi.setState
 import org.example.project.feature.camera.domain.model.ApiException
@@ -21,9 +20,12 @@ import org.example.project.feature.camera.presentation.mappers.mapPredictionToUi
 import org.example.project.feature.camera.presentation.mappers.mapUploadErrorToUiModel
 import org.example.project.feature.camera.presentation.models.CameraScreenErrorState.PhotoUnavailable
 import org.example.project.feature.camera.presentation.models.CameraScreenState
-import scriptlens.shared.generated.resources.Res
-import scriptlens.shared.generated.resources.error_photo_no_data
+import lexis.shared.generated.resources.Res
+import lexis.shared.generated.resources.error_photo_no_data
+import kotlin.time.Clock
+import kotlin.time.ExperimentalTime
 
+@OptIn(ExperimentalTime::class)
 class CameraViewModel(
     private val uploadPhoto: UploadPhotoUseCase,
     private val getModels: GetModelsUseCase,
@@ -56,16 +58,11 @@ class CameraViewModel(
 
             is CameraEvent.SelectPrediction -> onPredictionSelected(event.index)
 
+            is CameraEvent.CancelReadRequested -> cancelRead()
+
             is CameraEvent.OnImagePickerProcessingStarted -> setLoading(true)
             is CameraEvent.SelectModel -> onSelectModel(event.id)
             is CameraEvent.ReloadModels -> loadModels()
-            is CameraEvent.ReadAgain -> _state.setState {
-                it.copy(
-                    prediction = null,
-                    selectedPredictionIndex = null,
-                    cameraScreenState = CameraScreenState.PhotoCaptured
-                )
-            }
         }
     }
 
@@ -112,20 +109,19 @@ class CameraViewModel(
         }
     }
 
-    private fun onPredictionSelected(index: Int) {
+    private fun onPredictionSelected(index: Int?) {
         val predictions = _state.value.prediction?.predictions ?: return
-        if (index !in predictions.indices) return
+        if (index != null && index !in predictions.indices) return
         _state.setState { it.copy(selectedPredictionIndex = index) }
     }
 
     private fun onPhotoCaptureFailed(message: String) {
+        println("$TAG: photo capture failed: $message")
         _state.setState {
             it.copy(
                 isLoading = false,
-                cameraScreenState =
-                    CameraScreenState.Error(PhotoUnavailable(Plain(message)))
+                cameraScreenState = CameraScreenState.Error(PhotoUnavailable(UiText.Plain(message))),
             )
-
         }
     }
 
@@ -171,10 +167,23 @@ class CameraViewModel(
         }
     }
 
+    private fun cancelRead() {
+        latestUploadRequestId++
+        uploadJob?.cancel()
+        _state.setState {
+            it.copy(
+                isLoading = false,
+                prediction = null,
+                selectedPredictionIndex = null,
+            )
+        }
+    }
+
     private fun upload(photo: ByteArray) {
         uploadJob?.cancel()
         val uploadRequestId = ++latestUploadRequestId
-        setLoading(true)
+        val startedAtMs = Clock.System.now().toEpochMilliseconds()
+        _state.setState { it.copy(isLoading = true, readStartedAtMs = startedAtMs) }
         uploadJob = viewModelScope.launch {
             try {
                 val prediction = uploadPhoto(photo, _state.value.selectedModel)
@@ -185,6 +194,7 @@ class CameraViewModel(
                         prediction = predictionModel,
                         selectedPredictionIndex = null,
                         isLoading = false,
+                        readDurationMs = Clock.System.now().toEpochMilliseconds() - startedAtMs,
                         cameraScreenState = CameraScreenState.PhotoCaptured,
                     )
                 }
@@ -208,7 +218,9 @@ class CameraViewModel(
     }
 
     private fun setLoading(isLoading: Boolean) {
-        _state.setState { it.copy(isLoading = isLoading) }
+        _state.setState {
+            if (isLoading) it.copy(isLoading = true, readStartedAtMs = null) else it.copy(isLoading = false)
+        }
     }
 
     private companion object {

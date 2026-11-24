@@ -1,0 +1,53 @@
+package org.example.project.common.presentation.helpers
+
+import kotlin.test.Test
+import kotlin.test.assertEquals
+import kotlin.test.assertTrue
+import org.example.project.common.presentation.models.PredictionBoxModel
+import org.example.project.common.presentation.models.PredictionGlossModel
+import org.example.project.common.presentation.models.WordPredictionModel
+
+class PredictionLinesTest {
+    private fun word(
+        text: String,
+        line: Int,
+        translation: String? = null,
+    ) = WordPredictionModel(
+        text = text,
+        probabilities = emptyMap(),
+        box = PredictionBoxModel(1.0, 2.0, 3.0, 4.0),
+        line = line,
+        gloss = PredictionGlossModel("", "", ""),
+        lineTranslation = translation,
+    )
+
+    @Test
+    fun mergesWordsOfTheSameLineAndKeepsSelectionIndices() {
+        val lines = groupPredictionLines(
+            listOf(
+                word("one", 0, "A line."),
+                word("two", 0, "Ignored, not the first word."),
+                word("three", 1, "Another line."),
+                word("four", 0),
+            ),
+        )
+
+        assertEquals(listOf(0, 1), lines.map { it.number })
+        assertEquals(listOf("A line.", "Another line."), lines.map { it.translation })
+        assertEquals(listOf(0, 1, 3, 2), lines.flatMap { it.words }.map { it.index })
+        assertEquals(listOf("one", "two", "four", "three"), lines.flatMap { it.words }.map { it.value.text })
+    }
+
+    @Test
+    fun takesTheTranslationFromTheFirstWordOnly() {
+        val lines = groupPredictionLines(
+            listOf(
+                word("one", 0),
+                word("two", 0, "A line."),
+            ),
+        )
+
+        assertEquals(listOf(null), lines.map { it.translation })
+        assertTrue(groupPredictionLines(emptyList()).isEmpty())
+    }
+}

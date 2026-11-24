@@ -27,23 +27,23 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import org.example.project.common.presentation.ui.helpers.asString
-import org.example.project.common.presentation.ui.theme.ScriptLensColors
-import org.example.project.common.presentation.ui.theme.ScriptLensSpacing
-import org.example.project.common.presentation.ui.theme.ScriptLensTheme
+import org.example.project.common.presentation.ui.theme.LexisColors
+import org.example.project.common.presentation.ui.theme.LexisSpacing
+import org.example.project.common.presentation.ui.theme.LexisTheme
 import org.example.project.feature.history.domain.model.RecognitionHistoryItem
 import org.example.project.feature.history.presentation.composables.GuestHistoryPrompt
 import org.example.project.feature.history.presentation.composables.HistoryErrorCard
 import org.example.project.feature.history.presentation.composables.HistoryListItem
 import org.example.project.feature.history.presentation.composables.UnauthorizedHistoryCard
 import org.jetbrains.compose.resources.stringResource
-import scriptlens.shared.generated.resources.Res
-import scriptlens.shared.generated.resources.history_action_read_page
-import scriptlens.shared.generated.resources.history_authenticated_placeholder
-import scriptlens.shared.generated.resources.history_count_result
-import scriptlens.shared.generated.resources.history_count_results
-import scriptlens.shared.generated.resources.history_empty_title
-import scriptlens.shared.generated.resources.history_header_subtitle
-import scriptlens.shared.generated.resources.history_header_title
+import lexis.shared.generated.resources.Res
+import lexis.shared.generated.resources.history_action_read_page
+import lexis.shared.generated.resources.history_authenticated_placeholder
+import lexis.shared.generated.resources.history_count_result
+import lexis.shared.generated.resources.history_count_results
+import lexis.shared.generated.resources.history_empty_title
+import lexis.shared.generated.resources.history_header_subtitle
+import lexis.shared.generated.resources.history_header_title
 
 @Composable
 fun HistoryScreen(
@@ -89,10 +89,10 @@ private fun HistoryListScreen(
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .background(ScriptLensColors.Background)
+            .background(LexisColors.Background)
             .imePadding()
-            .padding(ScriptLensSpacing.padding_24),
-        verticalArrangement = Arrangement.spacedBy(ScriptLensSpacing.padding_16),
+            .padding(LexisSpacing.padding_24),
+        verticalArrangement = Arrangement.spacedBy(LexisSpacing.padding_16),
     ) {
         Text(
             text = stringResource(Res.string.history_header_title),
@@ -127,7 +127,7 @@ private fun HistoryListScreen(
                 )
 
                 LazyColumn(
-                    verticalArrangement = Arrangement.spacedBy(ScriptLensSpacing.padding_8),
+                    verticalArrangement = Arrangement.spacedBy(LexisSpacing.padding_8),
                 ) {
                     items(state.items, key = { it.id }) { item ->
                         HistoryListItem(item = item, onClick = { onOpenDetail(item.id) })
@@ -142,8 +142,8 @@ private fun HistoryListScreen(
 private fun HistoryEmptyCard(onReadPageRequested: () -> Unit) {
     Card {
         Column(
-            modifier = Modifier.padding(ScriptLensSpacing.padding_16),
-            verticalArrangement = Arrangement.spacedBy(ScriptLensSpacing.padding_12),
+            modifier = Modifier.padding(LexisSpacing.padding_16),
+            verticalArrangement = Arrangement.spacedBy(LexisSpacing.padding_12),
         ) {
             Text(
                 text = stringResource(Res.string.history_empty_title),
@@ -163,18 +163,18 @@ private fun HistoryEmptyCard(onReadPageRequested: () -> Unit) {
 
 @Composable
 private fun HistorySkeleton() {
-    Column(verticalArrangement = Arrangement.spacedBy(ScriptLensSpacing.padding_8)) {
+    Column(verticalArrangement = Arrangement.spacedBy(LexisSpacing.padding_8)) {
         repeat(3) {
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(ScriptLensSpacing.padding_56 + ScriptLensSpacing.padding_12)
-                    .clip(RoundedCornerShape(ScriptLensSpacing.padding_12))
-                    .background(ScriptLensColors.Muted)
+                    .height(LexisSpacing.padding_56 + LexisSpacing.padding_12)
+                    .clip(RoundedCornerShape(LexisSpacing.padding_12))
+                    .background(LexisColors.Muted)
                     .border(
                         1.dp,
-                        ScriptLensColors.Border,
-                        RoundedCornerShape(ScriptLensSpacing.padding_12)
+                        LexisColors.Border,
+                        RoundedCornerShape(LexisSpacing.padding_12)
                     ),
             )
         }
@@ -184,7 +184,7 @@ private fun HistorySkeleton() {
 @Preview(showBackground = true)
 @Composable
 private fun HistoryScreenPreview() {
-    ScriptLensTheme {
+    LexisTheme {
         HistoryListScreen(
             state = HistoryContract(
                 items = listOf(

@@ -14,9 +14,9 @@ import org.example.project.feature.auth.domain.model.User
 import org.example.project.feature.auth.domain.repository.AuthRepository
 import org.example.project.feature.auth.domain.usecase.SignInUseCase
 import org.example.project.feature.auth.domain.usecase.SignUpUseCase
-import scriptlens.shared.generated.resources.Res
-import scriptlens.shared.generated.resources.auth_error_password_min_length
-import scriptlens.shared.generated.resources.auth_error_validation
+import lexis.shared.generated.resources.Res
+import lexis.shared.generated.resources.auth_error_password_min_length
+import lexis.shared.generated.resources.auth_error_validation
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFalse

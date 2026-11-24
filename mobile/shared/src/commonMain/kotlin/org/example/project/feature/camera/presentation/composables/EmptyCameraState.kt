@@ -15,17 +15,17 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import org.example.project.common.presentation.ui.theme.ScriptLensSpacing
-import org.example.project.common.presentation.ui.composables.buttons.ScriptLensButton
-import org.example.project.common.presentation.ui.composables.buttons.ScriptLensButtonStyle
+import org.example.project.common.presentation.ui.theme.LexisSpacing
+import org.example.project.common.presentation.ui.composables.buttons.LexisButton
+import org.example.project.common.presentation.ui.composables.buttons.LexisButtonStyle
 import org.jetbrains.compose.resources.painterResource
-import scriptlens.shared.generated.resources.Res
-import scriptlens.shared.generated.resources.ic_camera
+import lexis.shared.generated.resources.Res
+import lexis.shared.generated.resources.ic_camera
 import org.jetbrains.compose.resources.stringResource
-import scriptlens.shared.generated.resources.camera_empty_hint
-import scriptlens.shared.generated.resources.action_take_photo
-import scriptlens.shared.generated.resources.action_choose_photo
-import org.example.project.common.presentation.ui.theme.ScriptLensColors
+import lexis.shared.generated.resources.camera_empty_hint
+import lexis.shared.generated.resources.action_take_photo
+import lexis.shared.generated.resources.action_choose_photo
+import org.example.project.common.presentation.ui.theme.LexisColors
 
 
 @Composable
@@ -38,36 +38,36 @@ fun EmptyCameraState(
         modifier = modifier
             .fillMaxWidth()
             .clip(MaterialTheme.shapes.extraLarge)
-            .background(ScriptLensColors.Surface)
-            .padding(ScriptLensSpacing.padding_24),
+            .background(LexisColors.Surface)
+            .padding(LexisSpacing.padding_24),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
 
         Icon(
-            modifier = Modifier.padding(bottom = ScriptLensSpacing.padding_12).size(28.dp),
+            modifier = Modifier.padding(bottom = LexisSpacing.padding_12).size(28.dp),
             painter = painterResource(Res.drawable.ic_camera),
             contentDescription = null,
         )
 
         Text(
-            modifier = Modifier.padding(bottom = ScriptLensSpacing.padding_56),
+            modifier = Modifier.padding(bottom = LexisSpacing.padding_56),
             text = stringResource(Res.string.camera_empty_hint),
-            color = ScriptLensColors.Subtext,
+            color = LexisColors.Subtext,
             textAlign = TextAlign.Center,
         )
 
-        ScriptLensButton(
-            modifier = Modifier.padding(bottom = ScriptLensSpacing.padding_8),
+        LexisButton(
+            modifier = Modifier.padding(bottom = LexisSpacing.padding_8),
             text = stringResource(Res.string.action_take_photo),
             onClick = onTakePhotoClicked,
-            buttonStyle = ScriptLensButtonStyle.Primary
+            buttonStyle = LexisButtonStyle.Primary
         )
 
-        ScriptLensButton(
-            modifier = Modifier.padding(bottom = ScriptLensSpacing.padding_4),
+        LexisButton(
+            modifier = Modifier.padding(bottom = LexisSpacing.padding_4),
             text = stringResource(Res.string.action_choose_photo),
             onClick = onChooseFromPhotosClicked,
-            buttonStyle = ScriptLensButtonStyle.Secondary
+            buttonStyle = LexisButtonStyle.Secondary
         )
     }
 }

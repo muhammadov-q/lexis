@@ -23,37 +23,42 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import org.example.project.common.presentation.ui.composables.buttons.ScriptLensButton
-import org.example.project.common.presentation.ui.composables.buttons.ScriptLensButtonStyle
 import org.example.project.common.presentation.ui.composables.loading.OverlayLoadingState
-import org.example.project.common.presentation.ui.theme.ScriptLensColors
-import org.example.project.common.presentation.ui.theme.ScriptLensSpacing
-import org.example.project.common.presentation.ui.theme.ScriptLensTypography
+import org.example.project.common.presentation.ui.theme.LexisColors
+import org.example.project.common.presentation.ui.theme.LexisSpacing
+import org.example.project.common.presentation.ui.theme.LexisTypography
 import org.example.project.feature.camera.presentation.composables.CameraPreview
 import org.example.project.feature.camera.presentation.composables.CapturedPhotoContent
 import org.example.project.feature.camera.presentation.composables.EmptyCameraState
-import org.example.project.feature.camera.presentation.composables.modelPicker.ModelPicker
+import org.example.project.feature.camera.presentation.composables.ReadingProgressOverlay
 import org.example.project.feature.camera.presentation.composables.error.ErrorState
+import org.example.project.feature.camera.presentation.composables.modelPicker.ModelPicker
 import org.example.project.feature.camera.presentation.models.CameraScreenState
 import org.jetbrains.compose.resources.stringResource
-import scriptlens.shared.generated.resources.Res
-import scriptlens.shared.generated.resources.action_read_again
-import scriptlens.shared.generated.resources.camera_subtitle
-import scriptlens.shared.generated.resources.camera_title
+import lexis.shared.generated.resources.Res
+import lexis.shared.generated.resources.camera_subtitle
+import lexis.shared.generated.resources.camera_title
 
 @Composable
-fun CameraScreen(viewModel: CameraViewModel) {
+fun CameraScreen(
+    viewModel: CameraViewModel,
+    isAuthenticated: Boolean,
+    onOpenSaved: (Long) -> Unit,
+    onSignInRequested: () -> Unit,
+) {
     val state by viewModel.state.collectAsStateWithLifecycle()
 
     CameraScreenContent(
         state = state,
+        isAuthenticated = isAuthenticated,
+        onOpenSaved = onOpenSaved,
+        onSignInRequested = onSignInRequested,
         onTakePhotoClicked = { viewModel.onEvent(CameraEvent.CapturePhotoRequested) },
         onChooseFromPhotosClicked = { viewModel.onEvent(CameraEvent.SelectPhotoRequested) },
         onRetryClicked = { viewModel.onEvent(CameraEvent.RetryUploadRequested) },
         onPredictionSelected = { viewModel.onEvent(CameraEvent.SelectPrediction(it)) },
         onModelSelected = { viewModel.onEvent(CameraEvent.SelectModel(it)) },
-        onModelsReload = { viewModel.onEvent(CameraEvent.ReloadModels) },
-        onReadAgain = { viewModel.onEvent(CameraEvent.ReadAgain) }
+        onModelsReload = { viewModel.onEvent(CameraEvent.ReloadModels) }
     )
 
     CameraPreview(
@@ -73,7 +78,15 @@ fun CameraScreen(viewModel: CameraViewModel) {
         enter = fadeIn(tween(200)),
         exit = fadeOut(tween(200)),
     ) {
-        OverlayLoadingState()
+        val startedAtMs = state.readStartedAtMs
+        if (startedAtMs != null) {
+            ReadingProgressOverlay(
+                startedAtMs = startedAtMs,
+                onCancel = { viewModel.onEvent(CameraEvent.CancelReadRequested) },
+            )
+        } else {
+            OverlayLoadingState()
+        }
     }
 
 }
@@ -81,31 +94,39 @@ fun CameraScreen(viewModel: CameraViewModel) {
 @Composable
 private fun CameraScreenContent(
     state: CameraContract,
+    isAuthenticated: Boolean,
+    onOpenSaved: (Long) -> Unit,
+    onSignInRequested: () -> Unit,
     onTakePhotoClicked: () -> Unit,
     onChooseFromPhotosClicked: () -> Unit,
     onRetryClicked: () -> Unit,
-    onPredictionSelected: (Int) -> Unit,
+    onPredictionSelected: (Int?) -> Unit,
     onModelSelected: (String) -> Unit,
-    onModelsReload: () -> Unit,
-    onReadAgain: () -> Unit
+    onModelsReload: () -> Unit
 ) {
+    val showIntro = state.cameraScreenState !is CameraScreenState.PhotoCaptured
+
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .background(ScriptLensColors.Background)
-            .padding(ScriptLensSpacing.padding_24)
+            .background(LexisColors.Background)
+            .padding(LexisSpacing.padding_24)
     ) {
 
-        Text(
-            text = stringResource(Res.string.camera_title),
-            style = ScriptLensTypography.Title
-        )
+        AnimatedVisibility(visible = showIntro) {
+            Column {
+                Text(
+                    text = stringResource(Res.string.camera_title),
+                    style = LexisTypography.Title
+                )
 
-        Text(
-            text = stringResource(Res.string.camera_subtitle),
-            style = ScriptLensTypography.Body,
-            color = ScriptLensColors.Subtext
-        )
+                Text(
+                    text = stringResource(Res.string.camera_subtitle),
+                    style = LexisTypography.Body,
+                    color = LexisColors.Subtext
+                )
+            }
+        }
 
 
         AnimatedContent(
@@ -135,13 +156,19 @@ private fun CameraScreenContent(
 
                         is CameraScreenState.PhotoCaptured ->
                             CapturedPhotoContent(
-                                modifier = Modifier.padding(top = ScriptLensSpacing.padding_16),
+                                modifier = Modifier.padding(top = LexisSpacing.padding_16),
                                 photo = state.photo,
                                 prediction = state.prediction,
                                 selectedPredictionIndex = state.selectedPredictionIndex,
                                 onPredictionSelected = onPredictionSelected,
                                 onTakeNewPhotoClicked = onTakePhotoClicked,
-                                onChooseFromPhotosClicked = onChooseFromPhotosClicked
+                                onChooseFromPhotosClicked = onChooseFromPhotosClicked,
+                                readDurationMs = state.readDurationMs,
+                                isAuthenticated = isAuthenticated,
+                                isReading = state.isLoading,
+                                onReadPageClicked = onRetryClicked,
+                                onOpenSaved = onOpenSaved,
+                                onSignInRequested = onSignInRequested,
                             )
 
                         is CameraScreenState.Error ->
@@ -152,13 +179,6 @@ private fun CameraScreenContent(
                                     onChooseFromPhotosClicked = onChooseFromPhotosClicked,
                                     onRetryClicked = onRetryClicked,
                                 )
-                                if (state.photo != null) {
-                                    ScriptLensButton(
-                                        text = stringResource(Res.string.action_read_again),
-                                        onClick = onReadAgain,
-                                        buttonStyle = ScriptLensButtonStyle.Secondary,
-                                    )
-                                }
                             }
                     }
                 }
@@ -175,13 +195,15 @@ private fun CameraScreenPreview(
     MaterialTheme {
         CameraScreenContent(
             state = state,
+            isAuthenticated = false,
+            onOpenSaved = {},
+            onSignInRequested = {},
             onTakePhotoClicked = {},
             onChooseFromPhotosClicked = {},
             onRetryClicked = {},
             onPredictionSelected = {},
             onModelSelected = {},
-            onModelsReload = {},
-            onReadAgain = {},
+            onModelsReload = {}
         )
     }
 }
