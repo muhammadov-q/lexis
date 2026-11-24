@@ -3,6 +3,7 @@ package org.example.project.feature.vocabulary.presentation.note
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
@@ -22,6 +23,7 @@ class WordNoteViewModel(
 ) : ViewModel() {
     private val _state = MutableStateFlow(WordNoteContract())
     val state = _state.asStateFlow()
+    private var refresh: Job? = null
 
     init {
         viewModelScope.launch {
@@ -30,7 +32,7 @@ class WordNoteViewModel(
         viewModelScope.launch {
             authSessionStore.mode.collect { mode ->
                 if (mode is SessionMode.Guest) {
-                    repository.clear()
+                    refresh?.cancel()
                     _state.value = WordNoteContract()
                 }
             }
@@ -46,8 +48,8 @@ class WordNoteViewModel(
     }
 
     private fun load() {
-        if (_state.value.words != null) return
-        viewModelScope.launch {
+        if (refresh?.isActive == true) return
+        refresh = viewModelScope.launch {
             try {
                 repository.refresh()
                 _state.setState { it.copy(isLoadFailed = false) }

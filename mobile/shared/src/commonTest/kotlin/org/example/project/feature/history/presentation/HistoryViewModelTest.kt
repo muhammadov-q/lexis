@@ -218,6 +218,46 @@ class HistoryViewModelTest {
     }
 
     @Test
+    fun loadSelectsTheInitialWordWhenItIsOnThePage() = runHistoryTest {
+        val detail = RecognitionDetail(3, "2026-01-03", "detail.jpg", "v1", samplePrediction(), byteArrayOf(7))
+        val viewModel = createDetailViewModel(FakeHistoryRepository(detail = detail))
+
+        viewModel.load(3, initialWordIndex = 1)
+        advanceUntilIdle()
+
+        assertEquals(1, viewModel.state.value.selectedPredictionIndex)
+    }
+
+    @Test
+    fun loadIgnoresAnInitialWordOutsideThePage() = runHistoryTest {
+        val detail = RecognitionDetail(3, "2026-01-03", "detail.jpg", "v1", samplePrediction(), byteArrayOf(7))
+        val viewModel = createDetailViewModel(FakeHistoryRepository(detail = detail))
+
+        viewModel.load(3, initialWordIndex = 99)
+        advanceUntilIdle()
+
+        assertEquals(detail, viewModel.state.value.selectedDetail)
+        assertNull(viewModel.state.value.selectedPredictionIndex)
+    }
+
+    @Test
+    fun loadingTheSamePageAgainKeepsItAndTheSelectedWord() = runHistoryTest {
+        val detail = RecognitionDetail(3, "2026-01-03", "detail.jpg", "v1", samplePrediction(), byteArrayOf(7))
+        val repository = FakeHistoryRepository(detail = detail)
+        val viewModel = createDetailViewModel(repository)
+        viewModel.load(3)
+        advanceUntilIdle()
+        viewModel.selectPrediction(1)
+
+        viewModel.load(3)
+        advanceUntilIdle()
+
+        assertEquals(1, repository.detailRequests)
+        assertEquals(detail, viewModel.state.value.selectedDetail)
+        assertEquals(1, viewModel.state.value.selectedPredictionIndex)
+    }
+
+    @Test
     fun selectPredictionUpdatesSelectedIndex() = runHistoryTest {
         val detail = RecognitionDetail(
             id = 3,

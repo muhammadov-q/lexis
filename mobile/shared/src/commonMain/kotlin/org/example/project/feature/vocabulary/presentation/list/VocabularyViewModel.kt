@@ -32,7 +32,6 @@ class VocabularyViewModel(
             authSessionStore.mode.collect { mode ->
                 if (mode is SessionMode.Guest) {
                     request?.cancel()
-                    repository.clear()
                     _state.value = VocabularyContract()
                 }
             }

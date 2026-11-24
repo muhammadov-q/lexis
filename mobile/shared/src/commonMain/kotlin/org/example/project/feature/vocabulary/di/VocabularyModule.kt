@@ -12,7 +12,7 @@ import org.koin.dsl.module
 
 val vocabularyModule = module {
     single { VocabularyApi(client = get(), baseUrl = localBackendBaseUrl()) }
-    single<VocabularyRepository> { VocabularyRepositoryImpl(api = get()) }
+    single<VocabularyRepository> { VocabularyRepositoryImpl(api = get(), sessionStore = get()) }
     viewModelOf(::VocabularyViewModel)
     viewModelOf(::VocabularyWordViewModel)
     viewModelOf(::WordNoteViewModel)

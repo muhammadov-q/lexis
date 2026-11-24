@@ -104,7 +104,18 @@ class VocabularyViewModelsTest {
         advanceUntilIdle()
 
         assertNull(viewModel.state.value.words)
-        assertNull(repository.words.value)
+    }
+
+    @Test
+    fun theNoteFieldRefreshesWordsItAlreadyHas() = runVocabularyTest {
+        val repository = FakeVocabularyRepository(listOf(word(id = 6, text = "θεός")))
+        repository.setLoaded(listOf(word(id = 1, text = "λόγος")))
+        val viewModel = WordNoteViewModel(repository, signedIn())
+
+        viewModel.onEvent(WordNoteEvent.LoadRequested)
+        advanceUntilIdle()
+
+        assertEquals(listOf("θεός"), viewModel.state.value.words?.map { it.word })
     }
 
     @Test
@@ -199,9 +210,5 @@ private class FakeVocabularyRepository(
         removed += id
         serverWords = serverWords.filter { it.id != id }
         _words.value = serverWords
-    }
-
-    override fun clear() {
-        _words.value = null
     }
 }

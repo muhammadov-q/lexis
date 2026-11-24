@@ -12,14 +12,17 @@ import io.ktor.http.HttpMethod
 import io.ktor.http.HttpStatusCode
 import io.ktor.http.content.TextContent
 import io.ktor.http.headersOf
+import kotlinx.coroutines.test.TestScope
+import kotlinx.coroutines.test.runCurrent
 import kotlinx.coroutines.test.runTest
 import org.example.project.feature.auth.domain.model.AuthApiException
+import org.example.project.feature.auth.domain.model.User
+import org.example.project.feature.auth.domain.session.AuthSessionStore
 import org.example.project.feature.vocabulary.data.network.VocabularyApi
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFailsWith
 import kotlin.test.assertNull
-import kotlin.test.assertTrue
 
 class VocabularyRepositoryImplTest {
     @Test
@@ -103,19 +106,43 @@ class VocabularyRepositoryImplTest {
     }
 
     @Test
-    fun clearForgetsTheWords() = runTest {
-        val repository = repository { respondJson("[$LOGOS]") }
+    fun signingOutForgetsTheWords() = runTest {
+        val session = signedIn()
+        val repository = repository(session) { respondJson("[$LOGOS]") }
         repository.refresh()
 
-        repository.clear()
+        session.setGuest()
+        runCurrent()
 
         assertNull(repository.words.value)
-        assertTrue(repository.refresh().isNotEmpty())
     }
 
-    private fun repository(
+    @Test
+    fun aListThatArrivesAfterSigningOutIsDropped() = runTest {
+        val session = signedIn()
+        val repository = repository(session) {
+            session.setGuest()
+            respondJson("[$LOGOS]")
+        }
+
+        repository.refresh()
+        runCurrent()
+
+        assertNull(repository.words.value)
+    }
+
+    private fun signedIn() = AuthSessionStore().apply {
+        setAuthenticated(User(id = 1, email = "reader@example.com", firstName = null, lastName = null))
+    }
+
+    private fun TestScope.repository(
+        session: AuthSessionStore = signedIn(),
         handler: suspend MockRequestHandleScope.(HttpRequestData) -> HttpResponseData,
-    ) = VocabularyRepositoryImpl(VocabularyApi(HttpClient(MockEngine(handler)), "http://localhost:8000"))
+    ) = VocabularyRepositoryImpl(
+        api = VocabularyApi(HttpClient(MockEngine(handler)), "http://localhost:8000"),
+        sessionStore = session,
+        scope = backgroundScope,
+    )
 
     private fun MockRequestHandleScope.respondJson(
         body: String,

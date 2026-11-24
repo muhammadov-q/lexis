@@ -11,5 +11,4 @@ interface VocabularyRepository {
     suspend fun add(recognitionId: Long, wordIndex: Int, note: String): VocabularyWord
     suspend fun updateNote(id: Long, note: String): VocabularyWord
     suspend fun remove(id: Long)
-    fun clear()
 }

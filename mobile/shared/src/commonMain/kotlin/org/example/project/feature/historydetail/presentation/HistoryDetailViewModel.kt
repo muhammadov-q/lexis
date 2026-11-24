@@ -35,6 +35,7 @@ class HistoryDetailViewModel(
     }
 
     fun load(id: Long, initialWordIndex: Int? = null) {
+        if (_state.value.selectedDetail?.id == id) return
         request?.cancel()
         val currentRequestId = ++requestId
         _state.setState {
