@@ -42,3 +42,34 @@ uv run python -m ml.benchmark.judge --results results.json --data /path/to/eparc
 `ml.benchmark.judge` takes the saved results of a model that translates lines (`claude-code`) and lets Claude Opus, through Claude Code, judge every line translation against the true Greek text of that line: correct, partly (the main sense is right but something is missing, added or mistaken) or wrong. A read line is paired with the true line it overlaps most. Lines without a translation or without a true line are left out.
 
 This is a light check, not a benchmark. The judge is the same model that wrote the translations, so it can share their mistakes, and nobody who reads Greek has checked its verdicts. The translation is judged against the true text, so a line the reader misread counts against the translation too.
+
+
+
+## Models Benchmark
+### What hurt the line recognition
+<img width="1690" height="578" alt="image" src="https://github.com/user-attachments/assets/9dc31ce0-80a9-49b0-aff5-d24c342ea548" />
+
+We apply transformation to the original images one by one to measure what causes problems to the kraken line segmenter. It appear that the most impacting transformation is the tilt of the image. When the angle is more than ~7°, the model stop recognizing anything. The blur and motion blur are the to next that impact the most the model, but in real case people ll try to not move or redo the picture if it is two blurry even for them to read. 
+
+So the real impacting things, is the tilt, 7° is not a lot. 
+<img width="330" height="120" alt="image" src="https://github.com/user-attachments/assets/c0add141-be59-4b5b-8aad-ef65bd4452a5" />
+_7 degree angle: https://grinebiter.com/angles/7-degree-angle.html_
+
+### Short model difference explanation
+All three use the same first step, Kraken's line finder (segmenter). They differ in who
+reads the text and where the word boxes come from.
+
+- **kraken**: Kraken finds the lines, then our trained reader (`kraken_eparchos`,
+  trained on Eparchos manuscripts) reads each line as a straight rectangle. Words are cut
+  at the spaces of its reading and each box is shrunk to the ink.
+- **kraken-base**: exactly the same pipeline, but with the reader *before* training
+  (`ppocrv6_small`). The difference with kraken is the gain from our training.
+- **claude-code**: Kraken does everything first, then Claude (Opus 5.5) rereads the whole
+  page with Kraken's line boxes and returns the text (plus translations). A word Claude
+  reads like Kraken keeps Kraken's box; a different word gets an estimated box cut from
+  the line by letter count.
+
+### What performance for models
+<img width="1710" height="378" alt="image" src="https://github.com/user-attachments/assets/84d9b1bc-b52f-417a-b20b-94d30a5a6c33" />
+
+Each model perform equally, except the kraken-base model underperform compare to others. Image with no modification and with light modification are close to the same challenge for the models, where medium transformation  more challenging. On heavy modification, all models stop performing at all. It is in fact because the line segmenter stop finding line for this type of transformation.
