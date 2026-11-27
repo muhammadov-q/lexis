@@ -19,6 +19,24 @@ folder under `shared/src/commonMain/kotlin/org/example/project/feature/`, with `
 `domain`, `presentation` and `di` packages where it needs them. Composables shared by several features, the
 theme and the buttons are in `common/presentation/ui/`.
 
+## Tech Stack
+
+| Part         | Library                                                                         |
+| ------------ | ------------------------------------------------------------------------------- |
+| Language     | Kotlin Multiplatform: one codebase for Android and iOS                          |
+| UI           | Compose Multiplatform with Material 3, and Compose resources for text and icons |
+| Navigation   | Navigation Compose                                                              |
+| State        | AndroidX Lifecycle `ViewModel` with Kotlin coroutines and `StateFlow` (MVI)     |
+| Dependencies | Koin                                                                            |
+| Network      | Ktor client: CIO engine on Android, Darwin on iOS                               |
+| JSON         | kotlinx.serialization                                                           |
+| Dates        | kotlinx-datetime                                                                |
+| Photos       | ImagePickerKMP for the camera and the photo library                             |
+| Tests        | kotlin.test, kotlinx-coroutines-test and Ktor `MockEngine`                      |
+| Build        | Gradle with the Android Gradle Plugin on JDK 21, and Xcode for iOS              |
+
+The versions are in [`gradle/libs.versions.toml`](gradle/libs.versions.toml).
+
 ## Running the App
 
 ### Prerequisites
@@ -28,42 +46,88 @@ theme and the buttons are in `common/presentation/ui/`.
   Android Studio works.
 - **iOS:** macOS with Xcode and an iOS simulator.
 
-### Backend address
+### 1. Start the backend
 
-The app uses `http://127.0.0.1:8000` by default, which works in the iOS simulator and in the
-Android emulator with `adb reverse` (below). To use another address, for example on a phone,
-add it to `mobile/local.properties`, which git ignores:
+Start it as the [Backend README](../backend/README.md#run-the-api) describes, and add
+`--host 0.0.0.0` so that a phone on your Wi-Fi can reach it too. For example, with the demo
+model, which needs no extra install:
 
-```properties
-# Both platforms
-lexis.backendUrl=http://192.168.1.20:8000
-# Or one platform only
-lexis.backendUrl.ios=http://192.168.1.20:8000
-lexis.backendUrl.android=http://192.168.1.20:8000
+```bash
+cd backend
+ML_PREDICTOR="eparchos" uv run uvicorn app.main:app --reload --host 0.0.0.0
 ```
 
-Rebuild the app after changing it. For a phone, the phone and the computer must be on the
-same Wi-Fi, and the backend must be started with `--host 0.0.0.0`. Some networks, such as
-university Wi-Fi, block devices from reaching each other; use a hotspot or home Wi-Fi then.
+To read your own pages, use `ML_PREDICTOR="kraken"` after installing the `ml` extra, as the
+Backend README explains.
 
-### Android
+### 2. Tell the app where the backend is
 
-1. Open the `mobile/` folder in Android Studio and start an emulator from **Device Manager**.
-2. Forward the emulator's port 8000 to the backend on your computer (again after every
-   emulator restart):
+Find your case in the table:
+
+| Where the app runs | Backend address         | What you do                                                   |
+| ------------------ | ----------------------- | ------------------------------------------------------------- |
+| iOS simulator      | `http://127.0.0.1:8000` | Nothing, it is the default.                                   |
+| Android emulator   | `http://127.0.0.1:8000` | Run `adb reverse` (step 3), nothing else.                     |
+| iPhone             | Your computer's IP      | Add `lexis.backendUrl.ios` to `local.properties` (below).     |
+| Android phone      | Your computer's IP      | Add `lexis.backendUrl.android` to `local.properties` (below). |
+
+For a phone:
+
+1. Find your computer's IP on the Wi-Fi. On a Mac:
 
    ```bash
-   ~/Library/Android/sdk/platform-tools/adb reverse tcp:8000 tcp:8000
+   ipconfig getifaddr en0
    ```
 
-3. Run the `androidApp` configuration.
+2. Put it in `mobile/local.properties`. Android Studio creates this file with an `sdk.dir`
+   line; if you only use Xcode, create it yourself. Git ignores it, so your IP stays on your
+   computer.
 
-### iOS
+   ```properties
+   # Both platforms
+   lexis.backendUrl=http://192.168.1.20:8000
+   # Or one platform only
+   lexis.backendUrl.ios=http://192.168.1.20:8000
+   lexis.backendUrl.android=http://192.168.1.20:8000
+   ```
+
+3. Rebuild the app. The address is read when the app is built, not when it starts.
+
+4. Check that the phone reaches the backend: open `http://<your IP>:8000/models` in the
+   phone's browser. It should show a list of models.
+
+If the phone can't reach it: the phone and the computer must be on the same Wi-Fi, and the
+backend must run with `--host 0.0.0.0`. Some networks, such as university Wi-Fi, block
+devices from reaching each other; use a hotspot or home Wi-Fi then. Your IP changes when you
+change network, so update `local.properties` and rebuild.
+
+### 3. Run on Android
+
+1. Open the `mobile/` folder in Android Studio.
+2. Pick where to run it:
+   - **Emulator:** start one from **Device Manager**, then forward its port 8000 to your
+     computer (again after every emulator restart):
+
+     ```bash
+     ~/Library/Android/sdk/platform-tools/adb reverse tcp:8000 tcp:8000
+     ```
+
+   - **Phone:** turn on **Developer options** and **USB debugging** on the phone, connect it
+     with a cable and accept the prompt on the phone.
+3. Select the device at the top and run the `androidApp` configuration.
+
+### 4. Run on iOS
 
 1. Open `iosApp/iosApp.xcodeproj` in Xcode.
-2. Pick a simulator and run the `iosApp` scheme.
-
-The camera does not work in the simulator; use **Choose from photos** there.
+2. Pick where to run it:
+   - **Simulator:** choose one at the top. The camera does not work there; use
+     **Choose from photos**.
+   - **iPhone:** connect it with a cable. In Xcode, select the `iosApp` target, open
+     **Signing & Capabilities** and choose your Apple ID as **Team**; if the bundle identifier
+     is taken, change it to something of your own. On the phone, turn on **Developer Mode**
+     (Settings → Privacy & Security), and after the first install trust your Apple ID under
+     Settings → General → VPN & Device Management.
+3. Run the `iosApp` scheme.
 
 ### Tests
 
