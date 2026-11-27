@@ -21,7 +21,8 @@ import org.example.project.common.presentation.helpers.isPlaceholderModel
 import org.jetbrains.compose.resources.stringResource
 import org.example.project.common.presentation.ui.theme.LexisTypography
 
-private val ModelStyle = SpanStyle(fontFamily = FontFamily.Monospace, color = LexisColors.Text)
+private val ModelStyle: SpanStyle
+    @Composable get() = SpanStyle(fontFamily = FontFamily.Monospace, color = LexisColors.Text)
 
 @Composable
 internal fun ReadByLine(modelVersion: String, durationMs: Long?) {

@@ -22,7 +22,8 @@ import org.example.project.common.presentation.ui.theme.LexisColors
 import org.jetbrains.compose.resources.stringResource
 import org.example.project.common.presentation.ui.theme.LexisTypography
 
-private val LinkStyle = SpanStyle(
+private val LinkStyle: SpanStyle
+    @Composable get() = SpanStyle(
     color = LexisColors.Text,
     fontWeight = FontWeight.Medium,
     textDecoration = TextDecoration.Underline,

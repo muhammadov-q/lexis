@@ -44,7 +44,7 @@ fun LexisPill(
         Text(
             text = text.asString(),
             color = if (isEnabled)
-                LexisColors.Subtext
+                LexisColors.OnAccent
             else
                 LexisColors.Subtext.copy(alpha = 0.5f)
         )

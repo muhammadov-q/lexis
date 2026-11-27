@@ -46,6 +46,7 @@
     <string name="history_action_read_page">Read a page</string>
     <string name="history_retry">Retry</string>
     <string name="navigation_back">Back</string>
+    <string name="theme_switch">Switch theme</string>
     <string name="history_error_title">Could not load your history</string>
     <string name="history_empty_message">Read a page and its result is saved here.</string>
     <string name="history_error_unauthorized">Sign in to load your recognition history.</string>
