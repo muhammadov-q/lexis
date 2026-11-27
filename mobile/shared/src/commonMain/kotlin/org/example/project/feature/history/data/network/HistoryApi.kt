@@ -7,31 +7,32 @@ import io.ktor.client.statement.bodyAsText
 import io.ktor.client.statement.HttpResponse
 import io.ktor.http.HttpStatusCode
 import kotlinx.coroutines.CancellationException
-import kotlinx.serialization.json.Json
-import org.example.project.feature.auth.domain.model.AuthApiException
+import org.example.project.core.network.ApiConfig
+import org.example.project.core.network.ApiException
+import org.example.project.core.network.apiException
+import org.example.project.core.network.apiJson
 import org.example.project.feature.history.data.network.models.RecognitionDto
 
 class HistoryApi(
     private val client: HttpClient,
-    private val baseUrl: String,
+    private val config: ApiConfig,
 ) {
-    private val json = Json { ignoreUnknownKeys = true }
 
     suspend fun getRecognitions(): List<RecognitionDto> {
-        val endpoint = "${baseUrl.trimEnd('/')}/recognitions"
+        val endpoint = config.url("recognitions")
         return responseBodyOrThrow(clientGet(endpoint))
     }
 
     suspend fun getRecognition(id: Long): RecognitionDto {
-        val endpoint = "${baseUrl.trimEnd('/')}/recognitions/$id"
+        val endpoint = config.url("recognitions/$id")
         return responseBodyOrThrow(clientGet(endpoint))
     }
 
     suspend fun getRecognitionImage(id: Long): ByteArray {
-        val endpoint = "${baseUrl.trimEnd('/')}/recognitions/$id/image"
+        val endpoint = config.url("recognitions/$id/image")
         val response = clientGet(endpoint)
         if (response.status.value != HttpStatusCode.OK.value) {
-            throw AuthApiException(status = response.status.value)
+            throw apiException(response.status.value, response.bodyAsText())
         }
         return response.body()
     }
@@ -42,7 +43,7 @@ class HistoryApi(
         } catch (cancellation: CancellationException) {
             throw cancellation
         } catch (_: Exception) {
-            throw AuthApiException(status = 0)
+            throw ApiException(ApiException.NO_RESPONSE)
         }
     }
 
@@ -50,9 +51,9 @@ class HistoryApi(
         val status = response.status.value
         val body = response.bodyAsText()
         if (status != HttpStatusCode.OK.value) {
-            throw AuthApiException(status = status)
+            throw apiException(status, body)
         }
-        return json.decodeFromString(body)
+        return apiJson.decodeFromString(body)
     }
 }
 

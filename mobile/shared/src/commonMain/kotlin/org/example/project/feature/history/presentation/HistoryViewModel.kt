@@ -6,13 +6,12 @@ import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import org.example.project.common.presentation.ui.helpers.UiText
 import org.example.project.core.mvi.setState
-import org.example.project.feature.auth.domain.model.AuthApiException
+import org.example.project.core.network.ApiException
 import org.example.project.feature.auth.domain.session.AuthSessionStore
-import org.example.project.feature.auth.domain.session.SessionMode
+import org.example.project.feature.auth.presentation.resetOnSignOut
 import org.example.project.feature.history.domain.usecase.GetRecognitionHistoryUseCase
 import lexis.shared.generated.resources.Res
 import lexis.shared.generated.resources.history_error_general
@@ -25,14 +24,14 @@ class HistoryViewModel(
 ) : ViewModel() {
     private val _state = MutableStateFlow(HistoryContract())
     val state = _state.asStateFlow()
-    private var observersStarted: Boolean = false
     private var historyRequest: Job? = null
     private var requestId = 0L
 
-    fun startObservers() {
-        if (observersStarted) return
-        observersStarted = true
-        observeAuthMode()
+    init {
+        resetOnSignOut(authSessionStore) {
+            cancelHistoryRequest()
+            _state.value = HistoryContract()
+        }
     }
 
     fun onEvent(event: HistoryEvent) {
@@ -68,7 +67,7 @@ class HistoryViewModel(
                     it.copy(
                         isLoading = false,
                         error = historyError(exception),
-                        requiresSignIn = exception is AuthApiException && exception.status == 401,
+                        requiresSignIn = exception is ApiException && exception.isUnauthorized,
                     )
                 }
             }
@@ -80,32 +79,13 @@ class HistoryViewModel(
         historyRequest?.cancel()
         historyRequest = null
     }
-
-    private fun observeAuthMode() {
-        viewModelScope.launch {
-            authSessionStore.mode.collectLatest { mode ->
-                if (mode is SessionMode.Guest) {
-                    cancelHistoryRequest()
-                    _state.setState {
-                        it.copy(
-                            items = emptyList(),
-                            requiresSignIn = false,
-                            isLoading = false,
-                            error = null,
-                        )
-                    }
-                }
-            }
-        }
-    }
-
 }
 
 internal fun historyError(exception: Exception): UiText {
-    if (exception is AuthApiException) {
+    if (exception is ApiException) {
         return when (exception.status) {
-            401 -> UiText.Resource(Res.string.history_error_unauthorized)
-            404 -> UiText.Resource(Res.string.history_error_not_found)
+            ApiException.UNAUTHORIZED -> UiText.Resource(Res.string.history_error_unauthorized)
+            ApiException.NOT_FOUND -> UiText.Resource(Res.string.history_error_not_found)
             else -> UiText.Resource(Res.string.history_error_general)
         }
     }

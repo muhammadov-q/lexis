@@ -69,7 +69,7 @@ fun AuthScreen(
     val state by viewModel.state.collectAsStateWithLifecycle()
 
     LaunchedEffect(viewModel) {
-        viewModel.initializeMode(initialMode)
+        viewModel.onEvent(AuthEvent.InitialModeSet(initialMode))
     }
 
     AuthScreenContent(

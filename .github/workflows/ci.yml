@@ -1,6 +1,5 @@
 # Runs each area's check.sh, the same gate the pre-push hook runs. Like the
-# hook, an area without a check.sh yet is skipped, so backend and mobile join
-# by adding one (plus their toolchain setup here).
+# hook, an area without a check.sh is skipped.
 
 name: CI
 

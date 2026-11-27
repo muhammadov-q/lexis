@@ -1,5 +1,6 @@
 package org.example.project.feature.camera.data.repository
 
+import org.example.project.core.network.ApiConfig
 import io.ktor.client.HttpClient
 import io.ktor.client.engine.mock.MockEngine
 import io.ktor.client.engine.mock.respond
@@ -23,8 +24,8 @@ import kotlin.test.assertNull
 import kotlin.test.assertTrue
 
 class PhotoRepositoryImplTest {
+    private val apiConfig = ApiConfig(baseUrl = "http://localhost:8000/")
     private val config = PhotoUploadConfig(
-        baseUrl = "http://localhost:8000/",
         guestUploadPath = "/predict",
         authenticatedUploadPath = "/recognitions",
         multipartFieldName = "image",
@@ -138,7 +139,7 @@ class PhotoRepositoryImplTest {
             )
         }
         val repository = PhotoRepositoryImpl(
-            api = PhotoUploadApi(HttpClient(engine), config),
+            api = PhotoUploadApi(HttpClient(engine), apiConfig, config),
             config = config,
             authSessionStore = authSessionStore,
         )
@@ -158,7 +159,7 @@ class PhotoRepositoryImplTest {
             )
         }
         val repository = PhotoRepositoryImpl(
-            api = PhotoUploadApi(HttpClient(engine), config),
+            api = PhotoUploadApi(HttpClient(engine), apiConfig, config),
             config = config,
             authSessionStore = AuthSessionStore(),
         )
@@ -184,7 +185,7 @@ class PhotoRepositoryImplTest {
         }
 
         val repository = PhotoRepositoryImpl(
-            api = PhotoUploadApi(HttpClient(engine), config),
+            api = PhotoUploadApi(HttpClient(engine), apiConfig, config),
             config = config,
             authSessionStore = authSessionStore,
         )
@@ -224,6 +225,7 @@ class PhotoRepositoryImplTest {
                 HttpClient(engine) {
                     handleUnauthorizedResponses(authSessionStore)
                 },
+                apiConfig,
                 config,
             ),
             config = config,
@@ -245,6 +247,6 @@ class PhotoRepositoryImplTest {
                 headers = headersOf(HttpHeaders.ContentType, "application/json"),
             )
         }
-        return PhotoUploadApi(HttpClient(engine), config)
+        return PhotoUploadApi(HttpClient(engine), apiConfig, config)
     }
 }

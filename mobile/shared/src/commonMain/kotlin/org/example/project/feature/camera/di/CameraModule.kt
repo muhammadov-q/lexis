@@ -1,6 +1,5 @@
 package org.example.project.feature.camera.di
 
-import org.example.project.core.network.platform.localBackendBaseUrl
 import org.example.project.feature.camera.data.network.PhotoUploadApi
 import org.example.project.feature.camera.data.network.PhotoUploadConfig
 import org.example.project.feature.camera.data.repository.PhotoRepositoryImpl
@@ -14,13 +13,12 @@ import org.koin.dsl.module
 val cameraModule = module {
     single {
         PhotoUploadConfig(
-            baseUrl = localBackendBaseUrl(),
             guestUploadPath = "/predict",
             authenticatedUploadPath = "/recognitions",
             multipartFieldName = "image",
         )
     }
-    single { PhotoUploadApi(get(), get()) }
+    single { PhotoUploadApi(client = get(), apiConfig = get(), config = get()) }
     single<PhotoRepository> {
         PhotoRepositoryImpl(
             api = get(),

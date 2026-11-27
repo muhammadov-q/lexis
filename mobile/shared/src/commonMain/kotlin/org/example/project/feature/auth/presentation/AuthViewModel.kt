@@ -24,14 +24,9 @@ class AuthViewModel(
     val state = _state.asStateFlow()
     private var initialModeSet = false
 
-    fun initializeMode(mode: AuthMode) {
-        if (initialModeSet) return
-        initialModeSet = true
-        _state.setState { it.copy(mode = mode, error = null) }
-    }
-
     fun onEvent(event: AuthEvent) {
         when (event) {
+            is AuthEvent.InitialModeSet -> setInitialMode(event.mode)
             is AuthEvent.EmailChanged -> _state.setState { it.copy(email = event.value, error = null) }
             is AuthEvent.PasswordChanged -> _state.setState { it.copy(password = event.value, error = null) }
             is AuthEvent.FirstNameChanged -> _state.setState { it.copy(firstName = event.value, error = null) }
@@ -43,6 +38,12 @@ class AuthViewModel(
             is AuthEvent.SubmitRequested -> submit()
             is AuthEvent.DismissErrorRequested -> _state.setState { it.copy(error = null) }
         }
+    }
+
+    private fun setInitialMode(mode: AuthMode) {
+        if (initialModeSet) return
+        initialModeSet = true
+        _state.setState { it.copy(mode = mode, error = null) }
     }
 
     private fun toggleMode() {

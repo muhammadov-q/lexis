@@ -11,9 +11,9 @@ import lexis.shared.generated.resources.Res
 import lexis.shared.generated.resources.vocabulary_error_add
 import lexis.shared.generated.resources.vocabulary_error_save_note
 import org.example.project.core.mvi.setState
-import org.example.project.feature.auth.domain.model.AuthApiException
+import org.example.project.core.network.ApiException
 import org.example.project.feature.auth.domain.session.AuthSessionStore
-import org.example.project.feature.auth.domain.session.SessionMode
+import org.example.project.feature.auth.presentation.resetOnSignOut
 import org.example.project.feature.vocabulary.domain.repository.VocabularyRepository
 import org.example.project.feature.vocabulary.presentation.vocabularyError
 
@@ -29,13 +29,9 @@ class WordNoteViewModel(
         viewModelScope.launch {
             repository.words.collect { words -> _state.setState { it.copy(words = words) } }
         }
-        viewModelScope.launch {
-            authSessionStore.mode.collect { mode ->
-                if (mode is SessionMode.Guest) {
-                    refresh?.cancel()
-                    _state.value = WordNoteContract()
-                }
-            }
+        resetOnSignOut(authSessionStore) {
+            refresh?.cancel()
+            _state.value = WordNoteContract()
         }
     }
 
@@ -87,8 +83,8 @@ class WordNoteViewModel(
     private suspend fun addOrUpdate(event: WordNoteEvent.SaveRequested, note: String) {
         try {
             repository.add(event.recognitionId, event.wordIndex, note)
-        } catch (exception: AuthApiException) {
-            if (exception.status != 409) throw exception
+        } catch (exception: ApiException) {
+            if (exception.status != ApiException.CONFLICT) throw exception
             val saved = repository.refresh().find { it.word == event.headword } ?: throw exception
             repository.updateNote(saved.id, note)
         }

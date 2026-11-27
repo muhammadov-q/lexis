@@ -38,7 +38,7 @@ import org.example.project.feature.history.presentation.composables.Unauthorized
 import org.jetbrains.compose.resources.stringResource
 import lexis.shared.generated.resources.Res
 import lexis.shared.generated.resources.history_action_read_page
-import lexis.shared.generated.resources.history_authenticated_placeholder
+import lexis.shared.generated.resources.history_empty_message
 import lexis.shared.generated.resources.history_count_result
 import lexis.shared.generated.resources.history_count_results
 import lexis.shared.generated.resources.history_empty_title
@@ -65,7 +65,6 @@ fun HistoryScreen(
     val state by viewModel.state.collectAsStateWithLifecycle()
 
     LaunchedEffect(Unit) {
-        viewModel.startObservers()
         viewModel.onEvent(HistoryEvent.LoadRequested)
     }
 
@@ -150,7 +149,7 @@ private fun HistoryEmptyCard(onReadPageRequested: () -> Unit) {
                 style = MaterialTheme.typography.titleMedium,
             )
             Text(
-                text = stringResource(Res.string.history_authenticated_placeholder),
+                text = stringResource(Res.string.history_empty_message),
                 style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
             )

@@ -11,7 +11,7 @@ import kotlinx.coroutines.test.runCurrent
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
 import org.example.project.common.presentation.ui.helpers.UiText
-import org.example.project.feature.auth.domain.model.AuthApiException
+import org.example.project.core.network.ApiException
 import org.example.project.feature.auth.domain.model.User
 import org.example.project.feature.auth.domain.session.AuthSessionStore
 import org.example.project.feature.camera.domain.model.Prediction
@@ -24,6 +24,7 @@ import org.example.project.feature.history.domain.repository.HistoryRepository
 import org.example.project.feature.history.domain.usecase.GetRecognitionDetailUseCase
 import org.example.project.feature.history.domain.usecase.GetRecognitionHistoryUseCase
 import org.example.project.feature.historydetail.presentation.HistoryDetailContract
+import org.example.project.feature.historydetail.presentation.HistoryDetailEvent
 import org.example.project.feature.historydetail.presentation.HistoryDetailViewModel
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -76,7 +77,7 @@ class HistoryViewModelTest {
     @Test
     fun loadRequestedMapsUnauthorizedErrorForGuests() = runHistoryTest {
         val viewModel = createViewModel(
-            FakeHistoryRepository(historyError = AuthApiException(401)),
+            FakeHistoryRepository(historyError = ApiException(401)),
         )
 
         viewModel.onEvent(HistoryEvent.LoadRequested)
@@ -119,7 +120,7 @@ class HistoryViewModelTest {
         val repository = FakeHistoryRepository(detail = detail)
         val viewModel = createDetailViewModel(repository)
 
-        viewModel.load(8)
+        viewModel.onEvent(HistoryDetailEvent.LoadRequested(8))
         advanceUntilIdle()
 
         assertEquals(detail, viewModel.state.value.selectedDetail)
@@ -148,11 +149,11 @@ class HistoryViewModelTest {
         })
         val viewModel = createDetailViewModel(repository)
 
-        viewModel.load(1)
+        viewModel.onEvent(HistoryDetailEvent.LoadRequested(1))
         runCurrent()
         assertTrue(viewModel.state.value.isLoading)
 
-        viewModel.load(2)
+        viewModel.onEvent(HistoryDetailEvent.LoadRequested(2))
         advanceUntilIdle()
         firstRequest.complete(Unit)
         advanceUntilIdle()
@@ -164,9 +165,9 @@ class HistoryViewModelTest {
 
     @Test
     fun openDetailNotFoundMapsToNotFoundMessage() = runHistoryTest {
-        val viewModel = createDetailViewModel(FakeHistoryRepository(detailError = AuthApiException(404)))
+        val viewModel = createDetailViewModel(FakeHistoryRepository(detailError = ApiException(404)))
 
-        viewModel.load(99)
+        viewModel.onEvent(HistoryDetailEvent.LoadRequested(99))
         advanceUntilIdle()
 
         assertEquals(
@@ -179,10 +180,10 @@ class HistoryViewModelTest {
     fun unauthorizedDetailRequestDoesNotChangeSession() = runHistoryTest {
         val session = AuthSessionStore()
         session.setAuthenticated(User(1, "user@example.com", null, null))
-        val repository = FakeHistoryRepository(detailError = AuthApiException(401))
+        val repository = FakeHistoryRepository(detailError = ApiException(401))
         val viewModel = HistoryDetailViewModel(GetRecognitionDetailUseCase(repository), session)
 
-        viewModel.load(99)
+        viewModel.onEvent(HistoryDetailEvent.LoadRequested(99))
         advanceUntilIdle()
 
         assertTrue(session.isAuthenticated())
@@ -203,15 +204,15 @@ class HistoryViewModelTest {
 
     @Test
     fun retryUsesOpenDetailWhenDetailWasOpened() = runHistoryTest {
-        val repository = FakeHistoryRepository(detailError = AuthApiException(404))
+        val repository = FakeHistoryRepository(detailError = ApiException(404))
         val viewModel = createDetailViewModel(repository)
 
-        viewModel.load(77)
+        viewModel.onEvent(HistoryDetailEvent.LoadRequested(77))
         advanceUntilIdle()
         assertEquals(1, repository.detailRequests)
 
         repository.detailError = null
-        viewModel.load(77)
+        viewModel.onEvent(HistoryDetailEvent.LoadRequested(77))
         advanceUntilIdle()
 
         assertEquals(2, repository.detailRequests)
@@ -222,7 +223,7 @@ class HistoryViewModelTest {
         val detail = RecognitionDetail(3, "2026-01-03", "detail.jpg", "v1", samplePrediction(), byteArrayOf(7))
         val viewModel = createDetailViewModel(FakeHistoryRepository(detail = detail))
 
-        viewModel.load(3, initialWordIndex = 1)
+        viewModel.onEvent(HistoryDetailEvent.LoadRequested(3, initialWordIndex = 1))
         advanceUntilIdle()
 
         assertEquals(1, viewModel.state.value.selectedPredictionIndex)
@@ -233,7 +234,7 @@ class HistoryViewModelTest {
         val detail = RecognitionDetail(3, "2026-01-03", "detail.jpg", "v1", samplePrediction(), byteArrayOf(7))
         val viewModel = createDetailViewModel(FakeHistoryRepository(detail = detail))
 
-        viewModel.load(3, initialWordIndex = 99)
+        viewModel.onEvent(HistoryDetailEvent.LoadRequested(3, initialWordIndex = 99))
         advanceUntilIdle()
 
         assertEquals(detail, viewModel.state.value.selectedDetail)
@@ -245,11 +246,11 @@ class HistoryViewModelTest {
         val detail = RecognitionDetail(3, "2026-01-03", "detail.jpg", "v1", samplePrediction(), byteArrayOf(7))
         val repository = FakeHistoryRepository(detail = detail)
         val viewModel = createDetailViewModel(repository)
-        viewModel.load(3)
+        viewModel.onEvent(HistoryDetailEvent.LoadRequested(3))
         advanceUntilIdle()
-        viewModel.selectPrediction(1)
+        viewModel.onEvent(HistoryDetailEvent.WordSelected(1))
 
-        viewModel.load(3)
+        viewModel.onEvent(HistoryDetailEvent.LoadRequested(3))
         advanceUntilIdle()
 
         assertEquals(1, repository.detailRequests)
@@ -269,9 +270,9 @@ class HistoryViewModelTest {
         )
         val viewModel = createDetailViewModel(FakeHistoryRepository(detail = detail))
 
-        viewModel.load(3)
+        viewModel.onEvent(HistoryDetailEvent.LoadRequested(3))
         advanceUntilIdle()
-        viewModel.selectPrediction(1)
+        viewModel.onEvent(HistoryDetailEvent.WordSelected(1))
 
         assertEquals(1, viewModel.state.value.selectedPredictionIndex)
     }
@@ -281,10 +282,10 @@ class HistoryViewModelTest {
         val detail = RecognitionDetail(3, "2026-01-03", "detail.jpg", "v1", samplePrediction(), byteArrayOf(7))
         val viewModel = createDetailViewModel(FakeHistoryRepository(detail = detail))
 
-        viewModel.load(3)
+        viewModel.onEvent(HistoryDetailEvent.LoadRequested(3))
         advanceUntilIdle()
-        viewModel.selectPrediction(1)
-        viewModel.selectPrediction(null)
+        viewModel.onEvent(HistoryDetailEvent.WordSelected(1))
+        viewModel.onEvent(HistoryDetailEvent.WordSelected(null))
 
         assertNull(viewModel.state.value.selectedPredictionIndex)
     }
@@ -294,10 +295,10 @@ class HistoryViewModelTest {
         val detail = RecognitionDetail(3, "2026-01-03", "detail.jpg", "v1", samplePrediction(), byteArrayOf(7))
         val viewModel = createDetailViewModel(FakeHistoryRepository(detail = detail))
 
-        viewModel.load(3)
+        viewModel.onEvent(HistoryDetailEvent.LoadRequested(3))
         advanceUntilIdle()
-        viewModel.selectPrediction(1)
-        viewModel.selectPrediction(99)
+        viewModel.onEvent(HistoryDetailEvent.WordSelected(1))
+        viewModel.onEvent(HistoryDetailEvent.WordSelected(99))
 
         assertEquals(1, viewModel.state.value.selectedPredictionIndex)
     }
@@ -313,7 +314,7 @@ class HistoryViewModelTest {
         session.setAuthenticated(User(1, "user@example.com", null, null))
         val viewModel = HistoryDetailViewModel(GetRecognitionDetailUseCase(repository), session)
 
-        viewModel.load(3)
+        viewModel.onEvent(HistoryDetailEvent.LoadRequested(3))
         runCurrent()
         assertTrue(viewModel.state.value.isLoading)
 
@@ -343,7 +344,6 @@ class HistoryViewModelTest {
             GetRecognitionHistoryUseCase(repository),
             session,
         )
-        viewModel.startObservers()
         runCurrent()
 
         viewModel.onEvent(HistoryEvent.LoadRequested)

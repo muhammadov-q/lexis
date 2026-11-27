@@ -9,7 +9,7 @@ import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
 import org.example.project.common.presentation.ui.helpers.UiText
-import org.example.project.feature.auth.domain.model.AuthApiException
+import org.example.project.core.network.ApiException
 import org.example.project.feature.auth.domain.model.User
 import org.example.project.feature.auth.domain.repository.AuthRepository
 import org.example.project.feature.auth.domain.usecase.SignInUseCase
@@ -38,9 +38,9 @@ class AuthViewModelTest {
     fun initializeModeOnlyAppliesOnce() = runAuthTest {
         val viewModel = createViewModel(FakeAuthRepository())
 
-        viewModel.initializeMode(AuthMode.SignUp)
+        viewModel.onEvent(AuthEvent.InitialModeSet(AuthMode.SignUp))
         viewModel.onEvent(AuthEvent.ToggleModeRequested)
-        viewModel.initializeMode(AuthMode.SignUp)
+        viewModel.onEvent(AuthEvent.InitialModeSet(AuthMode.SignUp))
 
         assertEquals(AuthMode.SignIn, viewModel.state.value.mode)
     }
@@ -77,7 +77,7 @@ class AuthViewModelTest {
         val repository = FakeAuthRepository()
         val viewModel = createViewModel(repository)
 
-        viewModel.initializeMode(AuthMode.SignUp)
+        viewModel.onEvent(AuthEvent.InitialModeSet(AuthMode.SignUp))
         viewModel.onEvent(AuthEvent.EmailChanged("new@example.com"))
         viewModel.onEvent(AuthEvent.PasswordChanged("short"))
         viewModel.onEvent(AuthEvent.SubmitRequested)

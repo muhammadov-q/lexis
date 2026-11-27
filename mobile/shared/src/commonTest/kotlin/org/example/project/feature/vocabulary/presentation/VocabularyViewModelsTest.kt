@@ -14,7 +14,7 @@ import kotlinx.coroutines.test.setMain
 import lexis.shared.generated.resources.Res
 import lexis.shared.generated.resources.vocabulary_error_unauthorized
 import org.example.project.common.presentation.ui.helpers.UiText
-import org.example.project.feature.auth.domain.model.AuthApiException
+import org.example.project.core.network.ApiException
 import org.example.project.feature.auth.domain.model.User
 import org.example.project.feature.auth.domain.session.AuthSessionStore
 import org.example.project.feature.vocabulary.domain.model.VocabularyWord
@@ -68,7 +68,7 @@ class VocabularyViewModelsTest {
     fun aWordSavedElsewhereMeanwhileGetsTheNote() = runVocabularyTest {
         val repository = FakeVocabularyRepository(
             serverWords = listOf(word(id = 5, text = "λόγος")),
-            addError = AuthApiException(409),
+            addError = ApiException(409),
         )
         val viewModel = WordNoteViewModel(repository, signedIn())
         repository.setLoaded(emptyList())
@@ -82,7 +82,7 @@ class VocabularyViewModelsTest {
 
     @Test
     fun theListAsksToSignInOn401() = runVocabularyTest {
-        val repository = FakeVocabularyRepository(refreshError = AuthApiException(401))
+        val repository = FakeVocabularyRepository(refreshError = ApiException(401))
         val viewModel = VocabularyViewModel(repository, signedIn())
 
         viewModel.onEvent(VocabularyEvent.LoadRequested)

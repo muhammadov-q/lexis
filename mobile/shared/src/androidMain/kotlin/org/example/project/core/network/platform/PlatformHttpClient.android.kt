@@ -5,6 +5,7 @@ import io.ktor.client.engine.cio.CIO
 import io.ktor.client.plugins.HttpTimeout
 import io.ktor.client.plugins.cookies.CookiesStorage
 import io.ktor.client.plugins.cookies.HttpCookies
+import org.example.project.core.network.BackendConfig
 import org.example.project.feature.auth.domain.session.AuthSessionStore
 
 actual fun createHttpClient(
@@ -23,4 +24,4 @@ actual fun createHttpClient(
         handleUnauthorizedResponses(authSessionStore)
     }
 
-actual fun localBackendBaseUrl(): String = "http://127.0.0.1:8000"
+actual fun localBackendBaseUrl(): String = BackendConfig.ANDROID_URL

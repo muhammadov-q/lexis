@@ -6,6 +6,7 @@ How Lexis is built today. Start with the overview.
 | -------------------------------- | ---------------------------------------------------------- |
 | [[architecture/overview]]        | The stack and how the parts connect.                       |
 | [[architecture/frontend]]        | The web app: request path, code layout, loaders.           |
+| `mobile/README.md`               | The mobile app: running it, code layout, conventions.      |
 | [[architecture/api-contract]]    | Backend endpoints and how the frontend types stay in sync. |
 | [[architecture/database]]        | Tables, where the database code lives, migrations.         |
 | [[architecture/authentication]]  | Sign up, sign in, sessions and the cookie.                 |

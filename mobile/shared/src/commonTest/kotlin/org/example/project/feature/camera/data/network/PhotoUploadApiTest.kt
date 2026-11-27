@@ -1,5 +1,6 @@
 package org.example.project.feature.camera.data.network
 
+import org.example.project.core.network.ApiConfig
 import io.ktor.client.HttpClient
 import io.ktor.client.engine.mock.MockEngine
 import io.ktor.client.engine.mock.MockRequestHandleScope
@@ -14,7 +15,7 @@ import io.ktor.http.headersOf
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.test.runTest
 import kotlinx.serialization.SerializationException
-import org.example.project.feature.camera.domain.model.ApiException
+import org.example.project.core.network.ApiException
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFailsWith
@@ -22,8 +23,8 @@ import kotlin.test.assertTrue
 import kotlin.test.assertFalse
 
 class PhotoUploadApiTest {
+    private val apiConfig = ApiConfig(baseUrl = "http://localhost:8000/")
     private val config = PhotoUploadConfig(
-        baseUrl = "http://localhost:8000/",
         guestUploadPath = "/predict",
         authenticatedUploadPath = "/recognitions",
         multipartFieldName = "image",
@@ -31,7 +32,7 @@ class PhotoUploadApiTest {
     private val jsonHeaders = headersOf(HttpHeaders.ContentType, "application/json")
 
     private fun api(handler: suspend MockRequestHandleScope.(HttpRequestData) -> HttpResponseData) =
-        PhotoUploadApi(HttpClient(MockEngine(handler)), config)
+        PhotoUploadApi(HttpClient(MockEngine(handler)), apiConfig, config)
 
     @Test
     fun successfulUploadParsesThePrediction() = runTest {
