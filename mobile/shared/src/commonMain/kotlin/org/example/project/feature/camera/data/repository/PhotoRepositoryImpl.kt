@@ -31,7 +31,7 @@ class PhotoRepositoryImpl(
         val response = try {
             api.upload(photo, uploadPath, model)
         } catch (exception: ApiException) {
-            if (isAuthenticatedRequest && exception.status == 401) {
+            if (isAuthenticatedRequest && exception.isUnauthorized) {
                 api.upload(photo, config.guestUploadPath, model)
             } else {
                 throw exception

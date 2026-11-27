@@ -84,7 +84,7 @@ class WordNoteViewModel(
         try {
             repository.add(event.recognitionId, event.wordIndex, note)
         } catch (exception: ApiException) {
-            if (exception.status != 409) throw exception
+            if (exception.status != ApiException.CONFLICT) throw exception
             val saved = repository.refresh().find { it.word == event.headword } ?: throw exception
             repository.updateNote(saved.id, note)
         }

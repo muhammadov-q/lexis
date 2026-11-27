@@ -11,10 +11,10 @@ import lexis.shared.generated.resources.auth_error_validation
 
 fun mapAuthError(exception: Throwable): UiText = when (exception) {
     is ApiException -> when (exception.status) {
-        0 -> UiText.Resource(Res.string.auth_error_network)
-        400 -> exception.detail?.let(UiText::Plain) ?: UiText.Resource(Res.string.auth_error_validation)
-        401 -> exception.detail?.let(UiText::Plain) ?: UiText.Resource(Res.string.auth_error_unauthorized)
-        409 -> exception.detail?.let(UiText::Plain) ?: UiText.Resource(Res.string.auth_error_conflict)
+        ApiException.NO_RESPONSE -> UiText.Resource(Res.string.auth_error_network)
+        ApiException.BAD_REQUEST -> exception.detail?.let(UiText::Plain) ?: UiText.Resource(Res.string.auth_error_validation)
+        ApiException.UNAUTHORIZED -> exception.detail?.let(UiText::Plain) ?: UiText.Resource(Res.string.auth_error_unauthorized)
+        ApiException.CONFLICT -> exception.detail?.let(UiText::Plain) ?: UiText.Resource(Res.string.auth_error_conflict)
         else -> exception.detail?.let(UiText::Plain) ?: UiText.Resource(Res.string.auth_error_unknown)
     }
 

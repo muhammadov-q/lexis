@@ -70,7 +70,7 @@ class HistoryDetailViewModel(
                     it.copy(
                         isLoading = false,
                         error = historyError(exception),
-                        requiresSignIn = exception is ApiException && exception.status == 401,
+                        requiresSignIn = exception is ApiException && exception.isUnauthorized,
                     )
                 }
             }

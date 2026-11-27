@@ -67,7 +67,7 @@ class HistoryViewModel(
                     it.copy(
                         isLoading = false,
                         error = historyError(exception),
-                        requiresSignIn = exception is ApiException && exception.status == 401,
+                        requiresSignIn = exception is ApiException && exception.isUnauthorized,
                     )
                 }
             }
@@ -84,8 +84,8 @@ class HistoryViewModel(
 internal fun historyError(exception: Exception): UiText {
     if (exception is ApiException) {
         return when (exception.status) {
-            401 -> UiText.Resource(Res.string.history_error_unauthorized)
-            404 -> UiText.Resource(Res.string.history_error_not_found)
+            ApiException.UNAUTHORIZED -> UiText.Resource(Res.string.history_error_unauthorized)
+            ApiException.NOT_FOUND -> UiText.Resource(Res.string.history_error_not_found)
             else -> UiText.Resource(Res.string.history_error_general)
         }
     }

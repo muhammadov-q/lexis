@@ -52,7 +52,7 @@ class AuthRepositoryImpl(
             sessionStore.setAuthenticated(user)
             user
         } catch (exception: ApiException) {
-            if (exception.status == 401) {
+            if (exception.isUnauthorized) {
                 null
             } else {
                 throw exception
