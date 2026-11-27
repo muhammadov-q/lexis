@@ -1,5 +1,6 @@
 package org.example.project.feature.auth.presentation
 
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -37,6 +38,7 @@ import org.example.project.common.presentation.ui.helpers.asString
 import org.example.project.common.presentation.ui.theme.LexisColors
 import org.example.project.common.presentation.ui.theme.LexisSpacing
 import org.example.project.common.presentation.ui.theme.LexisTheme
+import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.viewmodel.koinViewModel
 import lexis.shared.generated.resources.Res
@@ -46,6 +48,7 @@ import lexis.shared.generated.resources.auth_action_creating_account
 import lexis.shared.generated.resources.auth_action_sign_in
 import lexis.shared.generated.resources.auth_action_signing_in
 import lexis.shared.generated.resources.auth_branding
+import lexis.shared.generated.resources.ic_lexis_logo
 import lexis.shared.generated.resources.auth_create_subtitle
 import lexis.shared.generated.resources.auth_create_title
 import lexis.shared.generated.resources.auth_email_label
@@ -101,6 +104,11 @@ private fun AuthScreenContent(
         ),
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
+        Image(
+            painter = painterResource(Res.drawable.ic_lexis_logo),
+            contentDescription = null,
+            modifier = Modifier.size(LexisSpacing.padding_56),
+        )
         Text(
             text = stringResource(Res.string.auth_branding),
             style = MaterialTheme.typography.titleMedium,
