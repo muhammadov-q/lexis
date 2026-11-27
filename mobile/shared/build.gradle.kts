@@ -1,3 +1,4 @@
+import java.util.Properties
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 
 plugins {
@@ -6,6 +7,38 @@ plugins {
     alias(libs.plugins.composeMultiplatform)
     alias(libs.plugins.composeCompiler)
     alias(libs.plugins.serialization)
+}
+
+val localProperties = Properties().apply {
+    rootProject.file("local.properties").takeIf { it.exists() }?.inputStream()?.use { load(it) }
+}
+
+fun backendUrl(platform: String): String =
+    localProperties.getProperty("lexis.backendUrl.$platform")
+        ?: localProperties.getProperty("lexis.backendUrl")
+        ?: "http://127.0.0.1:8000"
+
+val generateBackendConfig by tasks.registering {
+    val androidUrl = backendUrl("android")
+    val iosUrl = backendUrl("ios")
+    val outputDir = layout.buildDirectory.dir("generated/backendConfig/kotlin")
+    inputs.property("androidUrl", androidUrl)
+    inputs.property("iosUrl", iosUrl)
+    outputs.dir(outputDir)
+    doLast {
+        val file = outputDir.get().file("org/example/project/core/network/BackendConfig.kt").asFile
+        file.parentFile.mkdirs()
+        file.writeText(
+            """
+            |package org.example.project.core.network
+            |
+            |internal object BackendConfig {
+            |    const val ANDROID_URL = "$androidUrl"
+            |    const val IOS_URL = "$iosUrl"
+            |}
+            |""".trimMargin()
+        )
+    }
 }
 
 kotlin {
@@ -41,6 +74,9 @@ kotlin {
     }
     
     sourceSets {
+        commonMain {
+            kotlin.srcDir(generateBackendConfig)
+        }
         commonMain.dependencies {
             implementation(libs.compose.runtime)
             implementation(libs.compose.foundation)

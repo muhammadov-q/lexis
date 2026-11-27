@@ -64,14 +64,14 @@ fun HistoryDetailScreen(
 
     val state by viewModel.state.collectAsStateWithLifecycle()
     LaunchedEffect(viewModel, id, initialWordIndex) {
-        viewModel.load(id, initialWordIndex)
+        viewModel.onEvent(HistoryDetailEvent.LoadRequested(id, initialWordIndex))
     }
 
     Box(modifier = Modifier.fillMaxSize().background(LexisColors.Background)) {
         HistoryDetailContent(
             state = state,
-            onRetry = { viewModel.load(id, initialWordIndex) },
-            onPredictionSelected = viewModel::selectPrediction,
+            onRetry = { viewModel.onEvent(HistoryDetailEvent.LoadRequested(id, initialWordIndex)) },
+            onPredictionSelected = { viewModel.onEvent(HistoryDetailEvent.WordSelected(it)) },
             onSignInRequested = onSignInRequested,
             onOpenVocabularyWord = onOpenVocabularyWord,
             scrollToSelectedWord = initialWordIndex != null,

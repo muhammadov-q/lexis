@@ -1,5 +1,6 @@
 package org.example.project.feature.auth.data.repository
 
+import org.example.project.core.network.ApiConfig
 import io.ktor.client.HttpClient
 import io.ktor.client.engine.mock.MockEngine
 import io.ktor.client.engine.mock.respond
@@ -9,8 +10,7 @@ import io.ktor.http.headersOf
 import kotlinx.coroutines.test.runTest
 import org.example.project.core.persistence.SessionCookieStore
 import org.example.project.feature.auth.data.network.AuthApi
-import org.example.project.feature.auth.data.network.AuthConfig
-import org.example.project.feature.auth.domain.model.AuthApiException
+import org.example.project.core.network.ApiException
 import org.example.project.feature.auth.domain.model.User
 import org.example.project.feature.auth.domain.session.AuthSessionStore
 import org.example.project.feature.auth.domain.session.SessionMode
@@ -21,7 +21,7 @@ import kotlin.test.assertNull
 import kotlin.test.assertTrue
 
 class AuthRepositoryImplTest {
-    private val config = AuthConfig(baseUrl = "http://localhost:8000")
+    private val config = ApiConfig(baseUrl = "http://localhost:8000")
 
     @Test
     fun signInReturnsUser() = runTest {
@@ -56,7 +56,7 @@ class AuthRepositoryImplTest {
         }
         val repository = repositoryWithEngine(engine)
 
-        val exception = assertFailsWith<AuthApiException> {
+        val exception = assertFailsWith<ApiException> {
             repository.signUp("user@example.com", "password123", "John", "Doe")
         }
 
@@ -113,7 +113,7 @@ class AuthRepositoryImplTest {
         }
         val repository = repositoryWithEngine(engine, cookieStore, sessionStore)
 
-        assertFailsWith<AuthApiException> { repository.signOut() }
+        assertFailsWith<ApiException> { repository.signOut() }
 
         assertEquals(1, cookieStore.clearCount)
         assertTrue(sessionStore.mode.value is SessionMode.Guest)

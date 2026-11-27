@@ -1,13 +1,12 @@
-package org.example.project
+package org.example.project.feature.camera.presentation
 
-import org.example.project.feature.camera.presentation.CameraContract
 import org.example.project.feature.camera.presentation.models.CameraScreenState
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFalse
 import kotlin.test.assertNull
 
-class SharedCommonTest {
+class CameraContractTest {
     @Test
     fun cameraContractStartsWithoutPhotoOrPrediction() {
         val contract = CameraContract()

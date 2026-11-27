@@ -53,10 +53,6 @@ fun NavHostController.navigateAuth(mode: AuthMode) {
     navigate(route)
 }
 
-fun NavHostController.navigateDashboard() {
-    navigateCameraRoot()
-}
-
 fun NavHostController.navigateCameraRoot() {
     navigate(Screen.CameraView.route) {
         popUpTo(Screen.CameraView.route) { inclusive = false }

@@ -1,5 +1,6 @@
 package org.example.project.feature.vocabulary.data.repository
 
+import org.example.project.core.network.ApiConfig
 import io.ktor.client.HttpClient
 import io.ktor.client.engine.mock.MockEngine
 import io.ktor.client.engine.mock.MockRequestHandleScope
@@ -15,7 +16,7 @@ import io.ktor.http.headersOf
 import kotlinx.coroutines.test.TestScope
 import kotlinx.coroutines.test.runCurrent
 import kotlinx.coroutines.test.runTest
-import org.example.project.feature.auth.domain.model.AuthApiException
+import org.example.project.core.network.ApiException
 import org.example.project.feature.auth.domain.model.User
 import org.example.project.feature.auth.domain.session.AuthSessionStore
 import org.example.project.feature.vocabulary.data.network.VocabularyApi
@@ -99,7 +100,7 @@ class VocabularyRepositoryImplTest {
             respondJson("""{"detail":"This word is already in your vocabulary."}""", HttpStatusCode.Conflict)
         }
 
-        val error = assertFailsWith<AuthApiException> { repository.add(7, 14, "") }
+        val error = assertFailsWith<ApiException> { repository.add(7, 14, "") }
 
         assertEquals(409, error.status)
         assertEquals("This word is already in your vocabulary.", error.detail)
@@ -139,7 +140,7 @@ class VocabularyRepositoryImplTest {
         session: AuthSessionStore = signedIn(),
         handler: suspend MockRequestHandleScope.(HttpRequestData) -> HttpResponseData,
     ) = VocabularyRepositoryImpl(
-        api = VocabularyApi(HttpClient(MockEngine(handler)), "http://localhost:8000"),
+        api = VocabularyApi(HttpClient(MockEngine(handler)), ApiConfig("http://localhost:8000")),
         sessionStore = session,
         scope = backgroundScope,
     )

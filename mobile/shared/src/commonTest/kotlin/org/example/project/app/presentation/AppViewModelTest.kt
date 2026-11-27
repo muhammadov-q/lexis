@@ -12,7 +12,7 @@ import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
 import org.example.project.common.presentation.ui.helpers.UiText
-import org.example.project.feature.auth.domain.model.AuthApiException
+import org.example.project.core.network.ApiException
 import org.example.project.feature.auth.domain.model.User
 import org.example.project.feature.auth.domain.repository.AuthRepository
 import org.example.project.feature.auth.domain.session.AuthSessionStore
@@ -92,7 +92,7 @@ class AppViewModelTest {
         advanceUntilIdle()
 
         viewModel.onEvent(AppEvent.SignInRequested(mode))
-        authViewModel.initializeMode(mode)
+        authViewModel.onEvent(AuthEvent.InitialModeSet(mode))
         authViewModel.onEvent(AuthEvent.EmailChanged("user@example.com"))
         authViewModel.onEvent(AuthEvent.PasswordChanged("password123"))
         authViewModel.onEvent(AuthEvent.SubmitRequested)
@@ -108,7 +108,7 @@ class AppViewModelTest {
     fun failedAuthenticationStaysGuestWithoutDashboardNavigation() = runAppTest {
         for (mode in AuthMode.entries) {
             val sessionStore = AuthSessionStore()
-            val repository = FakeAuthRepository(null, sessionStore, authError = AuthApiException(0))
+            val repository = FakeAuthRepository(null, sessionStore, authError = ApiException(0))
             val viewModel = createViewModel(repository, sessionStore)
             val authViewModel = createAuthViewModel(repository)
             val effects = mutableListOf<AppEffect>()
@@ -118,7 +118,7 @@ class AppViewModelTest {
             advanceUntilIdle()
 
             viewModel.onEvent(AppEvent.SignInRequested(mode))
-            authViewModel.initializeMode(mode)
+            authViewModel.onEvent(AuthEvent.InitialModeSet(mode))
             authViewModel.onEvent(AuthEvent.EmailChanged("user@example.com"))
             authViewModel.onEvent(AuthEvent.PasswordChanged("password123"))
             authViewModel.onEvent(AuthEvent.SubmitRequested)
@@ -188,7 +188,7 @@ class AppViewModelTest {
         val repository = FakeAuthRepository(
             currentUser = User(4, "signed@in.com", null, null),
             sessionStore = sessionStore,
-            signOutError = AuthApiException(0),
+            signOutError = ApiException(0),
         )
         val viewModel = createViewModel(repository, sessionStore)
         advanceUntilIdle()

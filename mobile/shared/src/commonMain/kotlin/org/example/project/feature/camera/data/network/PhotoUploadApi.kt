@@ -11,35 +11,36 @@ import io.ktor.http.Headers
 import io.ktor.http.HttpHeaders
 import io.ktor.http.HttpStatusCode
 import kotlinx.coroutines.CancellationException
-import org.example.project.feature.camera.domain.model.ApiException
+import org.example.project.core.network.ApiConfig
+import org.example.project.core.network.ApiException
+import org.example.project.core.network.apiException
+import org.example.project.core.network.apiJson
 import io.ktor.client.request.forms.MultiPartFormDataContent
 import io.ktor.client.request.forms.formData
-import kotlinx.serialization.json.Json
 import org.example.project.feature.camera.data.network.models.PredictionDto
 import org.example.project.feature.camera.data.network.models.OcrModelsDto
 
 class PhotoUploadApi(
     private val client: HttpClient,
+    private val apiConfig: ApiConfig,
     private val config: PhotoUploadConfig,
 ) {
-    private val json = Json { ignoreUnknownKeys = true }
 
     suspend fun getModels(): OcrModelsDto {
         val response = try {
-            client.get("${config.baseUrl.trimEnd('/')}/models")
+            client.get(apiConfig.url("models"))
         } catch (cancellation: CancellationException) {
             throw cancellation
         } catch (exception: Exception) {
-            println("$TAG: request failed endpoint=models error=${exception::class.simpleName}")
-            throw ApiException(0)
+            throw ApiException(ApiException.NO_RESPONSE)
         }
-        if (response.status != HttpStatusCode.OK) throw ApiException(response.status.value)
-        return json.decodeFromString(response.bodyAsText())
+        val body = response.bodyAsText()
+        if (response.status != HttpStatusCode.OK) throw apiException(response.status.value, body)
+        return apiJson.decodeFromString(body)
     }
 
     suspend fun upload(photo: ByteArray, uploadPath: String, model: String? = null): PredictionDto {
-        val endpoint = "${config.baseUrl.trimEnd('/')}/${uploadPath.trimStart('/')}"
-        val endpointId = uploadPath.trimStart('/').ifBlank { "predict" }
+        val endpoint = apiConfig.url(uploadPath)
 
         val status: Int
         val body: String
@@ -56,16 +57,12 @@ class PhotoUploadApi(
         } catch (cancellation: CancellationException) {
             throw cancellation
         } catch (exception: Exception) {
-            val errorSummary = exception::class.simpleName ?: "Exception"
-            println("$TAG: request failed endpoint=$endpointId status=0 error=$errorSummary")
-            throw ApiException(0)
+            throw ApiException(ApiException.NO_RESPONSE)
         }
-
-        println("$TAG: response endpoint=$endpointId status=$status")
         if (status != HttpStatusCode.OK.value && status != HttpStatusCode.Created.value) {
-            throw ApiException(status)
+            throw apiException(status, body)
         }
-        return json.decodeFromString(body)
+        return apiJson.decodeFromString(body)
     }
 
     private fun photoBody(photo: ByteArray, model: String?) = MultiPartFormDataContent(
@@ -83,7 +80,6 @@ class PhotoUploadApi(
     )
 
     private companion object {
-        const val TAG = "PhotoUploadApi"
         const val UPLOAD_TIMEOUT_MILLIS = 360_000L // 6 minutes
     }
 }

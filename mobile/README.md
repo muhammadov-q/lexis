@@ -14,26 +14,37 @@ The code is organized into presentation, domain, and data layers:
 - **Dependency injection:** Koin wires the app's components and dependencies.
 - **Platform-specific code:** Android and iOS provide their own HTTP clients and image-handling implementations.
 
+Each feature (`auth`, `camera`, `history`, `historydetail`, `source`, `vocabulary`) lives in its own
+folder under `shared/src/commonMain/kotlin/org/example/project/feature/`, with `data`,
+`domain`, `presentation` and `di` packages where it needs them. Composables shared by several features, the
+theme and the buttons are in `common/presentation/ui/`.
+
 ## Running the App
 
 ### Prerequisites
 
 - **Backend:** running on port 8000, as described in the [Backend README](../backend/README.md#run-the-api).
-- **Android:** Android Studio with an emulator.
+- **Android:** Android Studio with an emulator. Gradle runs on JDK 21; the JDK bundled with
+  Android Studio works.
 - **iOS:** macOS with Xcode and an iOS simulator.
 
 ### Backend address
 
-The app reaches the backend through `localBackendBaseUrl()`. Set it for where you run the app:
+The app uses `http://127.0.0.1:8000` by default, which works in the iOS simulator and in the
+Android emulator with `adb reverse` (below). To use another address, for example on a phone,
+add it to `mobile/local.properties`, which git ignores:
 
-| Where | File | Address |
-|---|---|---|
-| Android emulator | `shared/src/androidMain/kotlin/org/example/project/core/network/platform/PlatformHttpClient.android.kt` | `http://127.0.0.1:8000` (default, needs `adb reverse` below) |
-| iOS simulator | `shared/src/iosMain/kotlin/org/example/project/core/network/platform/PlatformHttpClient.ios.kt` | `http://127.0.0.1:8000` (default) |
-| Phone | the file for its platform | `http://<computer-LAN-IP>:8000` |
+```properties
+# Both platforms
+lexis.backendUrl=http://192.168.1.20:8000
+# Or one platform only
+lexis.backendUrl.ios=http://192.168.1.20:8000
+lexis.backendUrl.android=http://192.168.1.20:8000
+```
 
-For a phone, the phone and the computer must be on the same Wi-Fi, and the backend must be
-started with `--host 0.0.0.0`.
+Rebuild the app after changing it. For a phone, the phone and the computer must be on the
+same Wi-Fi, and the backend must be started with `--host 0.0.0.0`. Some networks, such as
+university Wi-Fi, block devices from reaching each other; use a hotspot or home Wi-Fi then.
 
 ### Android
 
@@ -64,6 +75,30 @@ Android debug build):
 ```
 
 `./gradlew :shared:testAndroidHostTest` runs only the shared tests on the JVM, which is quicker.
+To build an APK without Android Studio, run `./gradlew :androidApp:assembleDebug`; it is
+written to `androidApp/build/outputs/apk/debug/`.
+
+## Development
+
+- **Screens:** each screen has a `ViewModel` that exposes a `StateFlow` of its `XContract`
+  state and takes all input as `XEvent`s through `onEvent`, with no other public functions. One-off actions, such as leaving a screen,
+  go through an `XEffect` channel. The state, events and effects are in the screen's
+  `XContract.kt`.
+- **Composables:** put a new composable in its own file, with a `@Preview`. A screen's stateful
+  composable gets its view model from Koin and passes plain state to a stateless content
+  composable.
+- **Text:** all user-facing text is in `shared/src/commonMain/composeResources/values/strings.xml`.
+  Use the same words as the web app.
+- **Dependencies:** register new APIs, repositories and view models in the feature's `di`
+  module, and add new modules to `di/AppModule.kt`.
+- **Network:** APIs take the shared `ApiConfig` and build URLs with `config.url(...)`. They
+  decode with `apiJson` and throw `ApiException(status, detail)`, with status 0 when the
+  backend could not be reached. All three are in `core/network`.
+- **Sign-out:** a view model that shows a user's data calls `resetOnSignOut(sessionStore) { ... }`
+  in `init` to clear its state. A repository that caches a user's data clears it itself when
+  the session becomes Guest, like `VocabularyRepositoryImpl`.
+- **Tests:** shared tests are in `shared/src/commonTest/`, in the same package as the code
+  they test. Run `./check.sh` before opening a pull request; CI runs the same script.
 
 ## Using the App
 

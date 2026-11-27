@@ -1,6 +1,6 @@
 package org.example.project.feature.camera.presentation.mappers
 
-import org.example.project.feature.camera.domain.model.ApiException
+import org.example.project.core.network.ApiException
 import org.example.project.feature.camera.presentation.models.CameraScreenErrorState
 
 fun mapUploadErrorToUiModel(error: Throwable): CameraScreenErrorState {

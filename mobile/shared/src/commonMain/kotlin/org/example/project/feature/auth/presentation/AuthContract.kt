@@ -19,6 +19,7 @@ data class AuthContract(
 )
 
 sealed interface AuthEvent {
+    data class InitialModeSet(val mode: AuthMode) : AuthEvent
     data class EmailChanged(val value: String) : AuthEvent
     data class PasswordChanged(val value: String) : AuthEvent
     data class FirstNameChanged(val value: String) : AuthEvent

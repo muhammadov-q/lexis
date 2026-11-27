@@ -10,3 +10,8 @@ data class HistoryDetailContract(
     val requiresSignIn: Boolean = false,
     val error: UiText? = null,
 )
+
+sealed interface HistoryDetailEvent {
+    data class LoadRequested(val id: Long, val initialWordIndex: Int? = null) : HistoryDetailEvent
+    data class WordSelected(val index: Int?) : HistoryDetailEvent
+}

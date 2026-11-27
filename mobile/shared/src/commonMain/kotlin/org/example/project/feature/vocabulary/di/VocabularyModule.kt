@@ -1,6 +1,5 @@
 package org.example.project.feature.vocabulary.di
 
-import org.example.project.core.network.platform.localBackendBaseUrl
 import org.example.project.feature.vocabulary.data.network.VocabularyApi
 import org.example.project.feature.vocabulary.data.repository.VocabularyRepositoryImpl
 import org.example.project.feature.vocabulary.domain.repository.VocabularyRepository
@@ -11,7 +10,7 @@ import org.koin.core.module.dsl.viewModelOf
 import org.koin.dsl.module
 
 val vocabularyModule = module {
-    single { VocabularyApi(client = get(), baseUrl = localBackendBaseUrl()) }
+    single { VocabularyApi(client = get(), config = get()) }
     single<VocabularyRepository> { VocabularyRepositoryImpl(api = get(), sessionStore = get()) }
     viewModelOf(::VocabularyViewModel)
     viewModelOf(::VocabularyWordViewModel)

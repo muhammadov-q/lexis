@@ -20,5 +20,5 @@ kraken reads about one letter in twelve wrong on Eparchos and gives no translati
 - No API key or bill. Each page uses the plan's usage limits.
 - One person's login can only serve that person. A shared server would need an API key and a predictor that calls the Claude API directly.
 - Pages leave the computer.
-- A page takes one to two minutes, so the mobile app's 15 second timeout cuts it off.
+- A page takes one to two minutes. The mobile app waits up to six minutes for a page, so it can use this model.
 - CI never calls Claude Code. Its tests replace it with a fake.

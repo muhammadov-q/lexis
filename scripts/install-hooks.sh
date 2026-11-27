@@ -23,7 +23,7 @@ done
 echo "Hooks enabled (core.hooksPath -> .githooks)."
 echo
 echo "  pre-commit  ESLint --fix + Prettier on staged frontend files (lint-staged)"
-echo "  pre-push    the check.sh of every area you touched (frontend today)"
+echo "  pre-push    the check.sh of every area you touched (frontend, backend, mobile, docs)"
 echo
 echo "Bypass once with:     git commit --no-verify / git push --no-verify"
 echo "Disable entirely with: git config --unset core.hooksPath"

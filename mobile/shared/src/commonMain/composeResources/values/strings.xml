@@ -19,8 +19,8 @@
     <string name="auth_last_name_label">Last name (optional)</string>
     <string name="auth_action_sign_in">Sign in</string>
     <string name="auth_action_create_account">Create account</string>
-    <string name="auth_action_signing_in">Signing in...</string>
-    <string name="auth_action_creating_account">Creating account...</string>
+    <string name="auth_action_signing_in">Signing in…</string>
+    <string name="auth_action_creating_account">Creating account…</string>
     <string name="auth_action_sign_out">Sign out</string>
     <string name="auth_action_continue_as_guest">Continue as guest</string>
     <string name="auth_no_account_create">Don&apos;t have an account? Create one.</string>
@@ -47,7 +47,7 @@
     <string name="history_retry">Retry</string>
     <string name="navigation_back">Back</string>
     <string name="history_error_title">Could not load your history</string>
-    <string name="history_authenticated_placeholder">Your recognition history is available from your account.</string>
+    <string name="history_empty_message">Read a page and its result is saved here.</string>
     <string name="history_error_unauthorized">Sign in to load your recognition history.</string>
     <string name="history_error_not_found">Saved recognition was not found.</string>
     <string name="history_error_general">Could not load recognition history. Please try again.</string>
@@ -60,7 +60,7 @@
     <!-- Camera screen -->
     <string name="camera_title">Read historical manuscripts</string>
     <string name="camera_subtitle">Photograph a page and Lexis recognizes words and helps you read the transcription with translations.</string>
-    <string name="camera_empty_hint">Lay the page flat in good light JPG, PNG or TIFF</string>
+    <string name="camera_empty_hint">Lay the page flat in good light.\nJPG, PNG or TIFF</string>
     <string name="model_recognition_title">Recognition model</string>
     <string name="model_select">Select model</string>
     <string name="model_select_description">Select recognition model</string>

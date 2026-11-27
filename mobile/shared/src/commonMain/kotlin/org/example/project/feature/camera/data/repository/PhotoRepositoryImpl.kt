@@ -4,7 +4,7 @@ import org.example.project.feature.auth.domain.session.AuthSessionStore
 import org.example.project.feature.camera.data.network.PhotoUploadApi
 import org.example.project.feature.camera.data.network.PhotoUploadConfig
 import org.example.project.feature.camera.data.network.models.mapTo
-import org.example.project.feature.camera.domain.model.ApiException
+import org.example.project.core.network.ApiException
 import org.example.project.feature.camera.domain.model.Prediction
 import org.example.project.feature.camera.domain.model.OcrModel
 import org.example.project.feature.camera.domain.model.OcrModels

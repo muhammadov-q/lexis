@@ -8,9 +8,9 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import org.example.project.core.mvi.setState
-import org.example.project.feature.auth.domain.model.AuthApiException
+import org.example.project.core.network.ApiException
 import org.example.project.feature.auth.domain.session.AuthSessionStore
-import org.example.project.feature.auth.domain.session.SessionMode
+import org.example.project.feature.auth.presentation.resetOnSignOut
 import org.example.project.feature.history.domain.usecase.GetRecognitionDetailUseCase
 import org.example.project.feature.history.presentation.historyError
 
@@ -24,17 +24,20 @@ class HistoryDetailViewModel(
     private var requestId = 0L
 
     init {
-        viewModelScope.launch {
-            authSessionStore.mode.collect { mode ->
-                if (mode is SessionMode.Guest) {
-                    cancelRequest()
-                    _state.value = HistoryDetailContract()
-                }
-            }
+        resetOnSignOut(authSessionStore) {
+            cancelRequest()
+            _state.value = HistoryDetailContract()
         }
     }
 
-    fun load(id: Long, initialWordIndex: Int? = null) {
+    fun onEvent(event: HistoryDetailEvent) {
+        when (event) {
+            is HistoryDetailEvent.LoadRequested -> load(event.id, event.initialWordIndex)
+            is HistoryDetailEvent.WordSelected -> selectWord(event.index)
+        }
+    }
+
+    private fun load(id: Long, initialWordIndex: Int?) {
         if (_state.value.selectedDetail?.id == id) return
         request?.cancel()
         val currentRequestId = ++requestId
@@ -67,12 +70,11 @@ class HistoryDetailViewModel(
                     it.copy(
                         isLoading = false,
                         error = historyError(exception),
-                        requiresSignIn = exception is AuthApiException && exception.status == 401,
+                        requiresSignIn = exception is ApiException && exception.status == 401,
                     )
                 }
             }
         }
-
     }
 
     private fun cancelRequest() {
@@ -81,7 +83,7 @@ class HistoryDetailViewModel(
         request = null
     }
 
-    fun selectPrediction(index: Int?) {
+    private fun selectWord(index: Int?) {
         _state.setState { current ->
             val maxIndex = current.selectedDetail?.prediction?.predictions?.lastIndex ?: -1
             if (index == null || index in 0..maxIndex) current.copy(selectedPredictionIndex = index) else current

@@ -13,7 +13,6 @@ import kotlinx.coroutines.launch
 import org.example.project.common.presentation.ui.helpers.UiText
 import org.example.project.core.mvi.setEffect
 import org.example.project.core.mvi.setState
-import org.example.project.feature.camera.domain.model.ApiException
 import org.example.project.feature.camera.domain.usecase.GetModelsUseCase
 import org.example.project.feature.camera.domain.usecase.UploadPhotoUseCase
 import org.example.project.feature.camera.presentation.mappers.mapPredictionToUiModel
@@ -96,7 +95,6 @@ class CameraViewModel(
             } catch (cancellation: CancellationException) {
                 throw cancellation
             } catch (exception: Exception) {
-                println("$TAG: model discovery failed: ${exception.message}")
                 _state.setState {
                     it.copy(
                         models = emptyList(),
@@ -116,7 +114,6 @@ class CameraViewModel(
     }
 
     private fun onPhotoCaptureFailed(message: String) {
-        println("$TAG: photo capture failed: $message")
         _state.setState {
             it.copy(
                 isLoading = false,
@@ -137,10 +134,8 @@ class CameraViewModel(
                 )
             }
         } else {
-            println("$TAG: retrying upload")
             upload(photo)
         }
-
     }
 
     private fun onPhotoPicked(photoBytes: ByteArray?) {
@@ -198,7 +193,6 @@ class CameraViewModel(
                         cameraScreenState = CameraScreenState.PhotoCaptured,
                     )
                 }
-                println("$TAG: upload succeeded")
             } catch (cancellation: CancellationException) {
                 throw cancellation
             } catch (exception: Exception) {
@@ -211,8 +205,6 @@ class CameraViewModel(
                         )
                     )
                 }
-                val status = (exception as? ApiException)?.status
-                println("$TAG: upload failed (status=$status): ${exception.message}")
             }
         }
     }
@@ -221,9 +213,5 @@ class CameraViewModel(
         _state.setState {
             if (isLoading) it.copy(isLoading = true, readStartedAtMs = null) else it.copy(isLoading = false)
         }
-    }
-
-    private companion object {
-        const val TAG = "CameraViewModel"
     }
 }

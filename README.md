@@ -16,11 +16,12 @@ kraken finds the lines on the page, a PP-OCRv6-S model fine-tuned on Eparchos re
 
 - Upload or capture an image of a text.
 - Explore recognized words and their positions on the page.
-- View translations in the Ancient Greek demo.
+- Read each word's translation, dictionary form and definition, and line translations with the `claude-code` model.
 - Save and revisit previous results.
-- Send photos from your phone to the web app.
+- Keep a vocabulary of words from your pages, with your own notes.
+- Send photos from your phone to the web app, or use the Android and iOS app.
 
-> **Note:** The current Ancient Greek demo uses a fixed Eparchos sample result. It demonstrates the word-level experience but does not yet recognize and translate arbitrary Ancient Greek pages.
+> **Note:** The quick start runs the `eparchos` demo model, which returns the same Eparchos page whatever you upload. To read your own pages, run the `kraken` or `claude-code` model, as described in the [Backend README](backend/README.md#run-the-api).
 
 ## Quick start
 

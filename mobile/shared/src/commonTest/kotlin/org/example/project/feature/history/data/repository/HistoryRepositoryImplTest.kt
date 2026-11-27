@@ -1,5 +1,6 @@
 package org.example.project.feature.history.data.repository
 
+import org.example.project.core.network.ApiConfig
 import io.ktor.client.HttpClient
 import io.ktor.client.engine.mock.MockEngine
 import io.ktor.client.engine.mock.respond
@@ -8,7 +9,7 @@ import io.ktor.http.HttpHeaders
 import io.ktor.http.HttpStatusCode
 import io.ktor.http.headersOf
 import kotlinx.coroutines.test.runTest
-import org.example.project.feature.auth.domain.model.AuthApiException
+import org.example.project.core.network.ApiException
 import org.example.project.feature.history.data.network.HistoryApi
 import kotlin.test.Test
 import kotlin.test.assertContentEquals
@@ -95,7 +96,7 @@ class HistoryRepositoryImplTest {
         val api = historyApi(detailStatus = HttpStatusCode.NotFound)
         val repository = HistoryRepositoryImpl(api)
 
-        val error = assertFailsWith<AuthApiException> { repository.getRecognitionDetail(55) }
+        val error = assertFailsWith<ApiException> { repository.getRecognitionDetail(55) }
 
         assertEquals(404, error.status)
     }
@@ -130,6 +131,6 @@ class HistoryRepositoryImplTest {
                 else -> error("Unexpected path: ${request.url.encodedPath}")
             }
         }
-        return HistoryApi(HttpClient(engine), "http://localhost:8000")
+        return HistoryApi(HttpClient(engine), ApiConfig("http://localhost:8000"))
     }
 }

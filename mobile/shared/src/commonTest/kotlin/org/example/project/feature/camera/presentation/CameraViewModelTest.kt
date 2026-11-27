@@ -15,7 +15,7 @@ import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
 import org.example.project.common.presentation.ui.helpers.UiText
-import org.example.project.feature.camera.domain.model.ApiException
+import org.example.project.core.network.ApiException
 import org.example.project.feature.camera.domain.model.Prediction
 import org.example.project.feature.camera.domain.model.OcrModel
 import org.example.project.feature.camera.domain.model.OcrModels

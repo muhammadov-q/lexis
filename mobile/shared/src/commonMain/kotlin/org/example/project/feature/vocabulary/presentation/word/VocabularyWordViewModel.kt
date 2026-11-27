@@ -16,7 +16,7 @@ import lexis.shared.generated.resources.vocabulary_error_save_note
 import org.example.project.core.mvi.setEffect
 import org.example.project.core.mvi.setState
 import org.example.project.feature.auth.domain.session.AuthSessionStore
-import org.example.project.feature.auth.domain.session.SessionMode
+import org.example.project.feature.auth.presentation.resetOnSignOut
 import org.example.project.feature.vocabulary.domain.repository.VocabularyRepository
 import org.example.project.feature.vocabulary.presentation.isUnauthorized
 import org.example.project.feature.vocabulary.presentation.vocabularyError
@@ -34,13 +34,9 @@ class VocabularyWordViewModel(
     private var request: Job? = null
 
     init {
-        viewModelScope.launch {
-            authSessionStore.mode.collect { mode ->
-                if (mode is SessionMode.Guest) {
-                    request?.cancel()
-                    _state.value = VocabularyWordContract()
-                }
-            }
+        resetOnSignOut(authSessionStore) {
+            request?.cancel()
+            _state.value = VocabularyWordContract()
         }
     }
 

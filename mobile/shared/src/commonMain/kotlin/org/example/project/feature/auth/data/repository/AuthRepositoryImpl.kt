@@ -3,7 +3,7 @@ package org.example.project.feature.auth.data.repository
 import org.example.project.core.persistence.SessionCookieStore
 import org.example.project.feature.auth.data.mapper.mapTo
 import org.example.project.feature.auth.data.network.AuthApi
-import org.example.project.feature.auth.domain.model.AuthApiException
+import org.example.project.core.network.ApiException
 import org.example.project.feature.auth.domain.model.User
 import org.example.project.feature.auth.domain.repository.AuthRepository
 import org.example.project.feature.auth.domain.session.AuthSessionStore
@@ -51,7 +51,7 @@ class AuthRepositoryImpl(
             val user = mapTo(api.me())
             sessionStore.setAuthenticated(user)
             user
-        } catch (exception: AuthApiException) {
+        } catch (exception: ApiException) {
             if (exception.status == 401) {
                 null
             } else {
