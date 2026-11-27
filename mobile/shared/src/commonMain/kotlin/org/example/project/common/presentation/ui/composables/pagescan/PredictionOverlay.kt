@@ -33,6 +33,7 @@ fun PredictionOverlay(
 ) {
     var containerSize by remember { mutableStateOf(IntSize.Zero) }
     val predictions = prediction?.predictions.orEmpty()
+    val accent = LexisColors.Accent
 
     Canvas(
         modifier = modifier
@@ -66,10 +67,10 @@ fun PredictionOverlay(
 
             val isSelected = index == selectedPredictionIndex
             if (isSelected) {
-                drawRect(color = LexisColors.Accent.copy(alpha = 0.25f), topLeft = rect.topLeft, size = rect.size)
+                drawRect(color = accent.copy(alpha = 0.25f), topLeft = rect.topLeft, size = rect.size)
             }
             drawRect(
-                color = if (isSelected) LexisColors.Accent else LexisColors.Accent.copy(alpha = 0.55f),
+                color = if (isSelected) accent else accent.copy(alpha = 0.55f),
                 topLeft = rect.topLeft,
                 size = rect.size,
                 style = Stroke(width = if (isSelected) 2.dp.toPx() else 1.dp.toPx()),

@@ -39,6 +39,7 @@ internal fun WordLoupe(image: ImageBitmap, word: WordPredictionModel) {
         crop.h.roundToInt().coerceIn(1, image.height - srcOffset.y),
     )
     val description = stringResource(Res.string.word_loupe_description, word.text)
+    val accent = LexisColors.Accent
 
     Canvas(
         modifier = Modifier
@@ -58,7 +59,7 @@ internal fun WordLoupe(image: ImageBitmap, word: WordPredictionModel) {
         val scaleX = size.width / srcSize.width
         val scaleY = size.height / srcSize.height
         drawRoundRect(
-            color = LexisColors.Accent,
+            color = accent,
             topLeft = Offset(
                 x = ((word.box.x - srcOffset.x) * scaleX).toFloat(),
                 y = ((word.box.y - srcOffset.y) * scaleY).toFloat(),
